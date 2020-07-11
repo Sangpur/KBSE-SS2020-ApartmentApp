@@ -1,2 +1,3 @@
-# KBSE-SS2020-ApartmentApp
-KBSE Final Project - HS Osnabrück SS2020 - ApartmentApp
+# ApartmentApp
+
+KBSE Projektarbeit AppartmentApp - WG Planer

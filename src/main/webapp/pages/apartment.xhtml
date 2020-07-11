@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>WG-Planer Übersicht</title>
+    </h:head>
+    <h:body>
+        <h:outputStylesheet name="css/style.css"  />
+        <div id="wrapper" class="ui-g">
+            <header>
+                <div class="header__content">
+                    <h1 class="header__title">
+                        WG <span>#</span>4538
+                    </h1>
+                </div>
+            </header>
+            <main>
+                <h:form>
+                    <div class="overview_head">
+                        <span>Angemeldet als Max</span> | 
+                        <p:commandButton value="Mitglieder" action="members?faces-redirect=true" class="overview_link" />
+                    </div>
+                    <div class="overview">
+                        <div class="overview_element">
+                            <div class="overview_icon">
+                                <p:graphicImage name="img/icon-pinboard.png" class="overview_image" />
+                            </div>
+                            <p:commandButton value="Pinnwand" action="pinboard?faces-redirect=true" class="overview_button" />
+                        </div>
+                        <div class="overview_element">
+                            <div class="overview_icon">
+                                <p:graphicImage name="img/icon-calender.png" class="overview_image" />
+                            </div>
+                            <p:commandButton value="Kalender" action="calender?faces-redirect=true" class="overview_button" />
+                        </div>
+                        <div class="overview_element">
+                            <div class="overview_icon">
+                                <p:graphicImage name="img/icon-shopping.png" class="overview_image" />
+                            </div>
+                            <p:commandButton value="Einkaufsliste" action="shoppinglist?faces-redirect=true" class="overview_button" />
+                        </div>
+                        <div class="overview_element">
+                            <div class="overview_icon">
+                                <p:graphicImage name="img/icon-cashflow.png" class="overview_image" />
+                            </div>
+                            <p:commandButton value="Kostenliste" action="cashflow?faces-redirect=true" class="overview_button" />
+                        </div>
+                    </div>
+                </h:form>
+            </main>
+        </div>
+    </h:body>
+</html>
+
