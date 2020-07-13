@@ -8,6 +8,9 @@
         <title>Kostenliste</title>
     </h:head>
     <h:body>
+        <!-- PrimeFaces:
+           - https://primefaces.github.io/primefaces/8_0/#/ 
+           - https://www.primefaces.org/showcase/ -->
         <h:outputStylesheet name="css/style.css"  />
         <div id="wrapper" class="ui-g">
             <header>
@@ -22,11 +25,55 @@
                     </div>
                 </div>
             </header>
-            <main>
+            <main class="cashflow">
                 
-                Hello from Facelets
-                Test
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:autoUpdate />
+                </p:messages>
                 
+                <div class="addbutton__wrap">
+                    <h:form>
+                        <p:commandButton value="+" action="#{cashflowVM.test()}" class="addbutton" />
+                    </h:form>
+                </div>
+                
+                <p:dataGrid var="member" value="#{cashflowVM.members}" columns="4" layout="grid" rows="8" paginator="false">
+                    <div class="card card--#{member.details.color}">
+                        <p class="card__name">
+                            <h:outputText value="#{member.name}" />
+                        </p>
+                        <p class="card__balance">
+                            <h:outputText value="#{member.details.cashBalance}">
+                                <f:convertNumber pattern="#0.00"/>
+                            </h:outputText> €
+                        </p>
+                    </div>
+                </p:dataGrid>
+                
+                <p:dataTable var="payment" value="#{cashflowVM.payments}">
+                    <p:column headerText="Beschreibung">
+                        <h:outputText value="#{payment.description}" />
+                    </p:column>
+
+                    <p:column headerText="Datum">
+                        <h:outputText value="#{payment.getDateFormat()}" />
+                    </p:column>
+
+                    <p:column headerText="Bezahlt von">
+                        <h:outputText value="#{payment.giver.name}" />
+                    </p:column>
+                    
+                    <p:column headerText="Bezahlt für">
+                        <h:outputText value="#{payment.getInvolvedMembersFormat()}" />
+                    </p:column>
+
+                    <p:column headerText="Betrag">
+                        <h:outputText value="#{payment.sum}">
+                            <f:convertNumber pattern="#0.00"/>
+                        </h:outputText> €
+                    </p:column>
+                </p:dataTable>
+
             </main>
         </div>
     </h:body>

@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -34,7 +35,11 @@ public class CalenderViewModel implements Serializable {
     
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
+    /* Controller Class */
     private final Calender calender;
+    
+    /* Injected Conversation */
+    private final Conversation conversation;
     
     /* Bean Validation API */
     private static Validator validator;
@@ -43,8 +48,9 @@ public class CalenderViewModel implements Serializable {
     
     @Inject
     @Logable(LogLevel.INFO)
-    public CalenderViewModel(Calender calender) {
+    public CalenderViewModel(Calender calender, Conversation conversation) {
         this.calender = calender;
+        this.conversation = conversation;
     }
     
     @PostConstruct

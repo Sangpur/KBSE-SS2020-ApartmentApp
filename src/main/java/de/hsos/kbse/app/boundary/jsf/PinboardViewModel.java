@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -38,7 +39,11 @@ public class PinboardViewModel implements Serializable {
     
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
+    /* Controller Class */
     private final Pinboard pinboard;
+    
+    /* Injected Conversation */
+    private final Conversation conversation;
     
     /* Bean Validation API */
     private static Validator validator;
@@ -47,8 +52,9 @@ public class PinboardViewModel implements Serializable {
     
     @Inject
     @Logable(LogLevel.INFO)
-    public PinboardViewModel(Pinboard pinboard) {
+    public PinboardViewModel(Pinboard pinboard, Conversation conversation) {
         this.pinboard = pinboard;
+        this.conversation = conversation;
     }
     
     @PostConstruct

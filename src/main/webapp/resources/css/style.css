@@ -139,6 +139,79 @@ main {
     border-color: transparent !important;
 }
 
+/* ----------------- Buttons ----------------- */
+
+.addbutton__wrap {
+    
+}
+
+.addbutton {
+    width: 80px;
+    height: 80px;
+    font-size: 30px !important;
+    line-height: 0;
+    border-radius: 40px !important;
+}
+
+.addbutton span {
+    padding: .6em !important;
+}
+
+/* ----------------- Cards ----------------- */
+
+.card {
+    position: relative;
+    padding: 1.2em 1em 1.8em 1em;
+    border-radius: .5em;
+    text-align: center;
+    overflow: hidden;
+}
+
+.card p {
+    margin: 0;
+    padding: 0;
+}
+
+.card__name {
+    color: #4e4e4e;
+    font-size: 20px;
+}
+
+.card__balance {
+    font-size: 28px;
+    line-height: 20px;
+}
+
+.card--RED {
+    border: 1px solid #f10b0b;
+    background-color: rgba(241,11,11,.2);
+}
+
+.card--GREEN {
+    border: 1px solid #85d222;
+    background-color: rgba(133,210,34,.2);
+}
+
+.card--BLUE {
+    border: 1px solid #2a79fc;
+    background-color: rgba(42,121,252,.2);
+}
+
+.card--YELLOW {
+    border: 1px solid #eed506;
+    background-color: rgba(238,213,6,.2);
+}
+
+.card--PINK {
+    border: 1px solid #ff2dcb;
+    background-color: rgba(255,45,203,.2);
+}
+
+.card--ORANGE {
+    border: 1px solid #ee8e06;
+    background-color: rgba(238,142,6,.2);
+}
+
 /* --------------------------------------- PRIMEFACES -------------------------------------- */
 
 body .ui-button, body .ui-button:visited {
@@ -153,4 +226,9 @@ body .ui-button:hover, body .ui-button:focus {
 
 body .ui-button.ui-button-text-only .ui-button-text {
     padding: .7em 1em;
+}
+
+body .ui-datagrid .ui-datagrid-content {
+    padding: 1em 0;
+    border: none;
 }

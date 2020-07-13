@@ -39,6 +39,8 @@ public class MemberDetail implements Serializable {
     @Enumerated(EnumType.STRING)
     private MemberColor color;
     
+    private float cashBalance;
+    
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
@@ -59,6 +61,14 @@ public class MemberDetail implements Serializable {
 
     public void setColor(MemberColor color) {
         this.color = color;
+    }
+
+    public float getCashBalance() {
+        return cashBalance;
+    }
+
+    public void setCashBalance(float cashBalance) {
+        this.cashBalance = cashBalance;
     }
     
 }

@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.Conversation;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -30,7 +31,11 @@ public class ShoppingListViewModel implements Serializable {
     
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
+    /* Controller Class */
     private final ShoppingList shoppinglist;
+    
+    /* Injected Conversation */
+    private final Conversation conversation;
     
     /* Bean Validation API */
     private static Validator validator;
@@ -39,8 +44,9 @@ public class ShoppingListViewModel implements Serializable {
     
     @Inject
     @Logable(LogLevel.INFO)
-    public ShoppingListViewModel(ShoppingList shoppinglist) {
+    public ShoppingListViewModel(ShoppingList shoppinglist, Conversation conversation) {
         this.shoppinglist = shoppinglist;
+        this.conversation = conversation;
     }
     
     @PostConstruct

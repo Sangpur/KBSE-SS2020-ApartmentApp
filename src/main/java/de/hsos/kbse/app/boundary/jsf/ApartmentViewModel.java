@@ -5,13 +5,18 @@
 package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.ApartmentRepository;
+import de.hsos.kbse.app.control.MemberRepository;
+import de.hsos.kbse.app.entity.Apartment;
+import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.ValidationGroup;
+import de.hsos.kbse.app.util.AppException;
 import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
@@ -35,20 +40,28 @@ public class ApartmentViewModel implements Serializable {
     
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
+    /* Controller Classes */
     private final ApartmentRepository repository;
+    private final MemberRepository memberRepository;
     
+    /* Conversation */
     private final Conversation conversation;
     
     /* Bean Validation API */
     private static Validator validator;
     
+    private Apartment apartment;
+    private List<Member> members;
+    
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
     @Inject
     @Logable(LogLevel.INFO)
-    public ApartmentViewModel(ApartmentRepository repository, Conversation conversation) {
+    public ApartmentViewModel(ApartmentRepository repository, MemberRepository memberRepository, Conversation conversation) {
         this.repository = repository;
+        this.memberRepository = memberRepository;
         this.conversation = conversation;
+        this.initApartmentByID(1000L); // TODO: Bei Login-Prozess entsprechende ID setzen
     }
     
     @PostConstruct
@@ -72,6 +85,16 @@ public class ApartmentViewModel implements Serializable {
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
+    
+    private void initApartmentByID(Long id) {
+        try {
+            this.apartment = this.repository.findApartment(id);
+            this.members = this.memberRepository.getAllMembersFrom(id);
+        } catch(AppException ex) {
+            String msg = ex.getMessage();
+            FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage(msg));
+        }
+    }
     
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {
@@ -105,5 +128,9 @@ public class ApartmentViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-    
+
+    public List<Member> getMembers() {
+        return members;
+    }
+
 }

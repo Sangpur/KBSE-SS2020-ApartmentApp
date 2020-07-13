@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -43,6 +44,9 @@ public class Member implements Serializable {
     
     @OneToOne(cascade = CascadeType.PERSIST)
     private MemberDetail details;
+    
+    @Column(name="apartment_id")
+    private Long apartmentID;
 
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
@@ -103,6 +107,14 @@ public class Member implements Serializable {
 
     public void setDetails(MemberDetail details) {
         this.details = details;
+    }
+    
+    public Long getApartmentID() {
+        return apartmentID;
+    }
+
+    public void setApartmentID(Long apartmentID) {
+        this.apartmentID = apartmentID;
     }
 
 }

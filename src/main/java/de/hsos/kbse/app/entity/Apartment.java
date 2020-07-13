@@ -34,14 +34,14 @@ public class Apartment implements Serializable {
     
     private String name;
     
-    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Member> members;
+    //@OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
+    //private List<Member> members;
     
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
     public Apartment() {
-        this.members = new ArrayList();
+        //this.members = new ArrayList();
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
@@ -64,12 +64,12 @@ public class Apartment implements Serializable {
         this.name = name;
     }
 
-    public List<Member> getMembers() {
+    /*public List<Member> getMembers() {
         return members;
     }
 
     public void setMembers(List<Member> members) {
         this.members = members;
-    }
+    }*/
     
 }

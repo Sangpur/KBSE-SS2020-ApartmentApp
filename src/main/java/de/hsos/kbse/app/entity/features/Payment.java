@@ -6,8 +6,10 @@ package de.hsos.kbse.app.entity.features;
 
 import de.hsos.kbse.app.entity.member.Member;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,7 +29,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Vetoed
-public class Payment implements Serializable {
+public class Payment implements Serializable, Comparable<Payment> {
     
     /* ----------------------------------------- ATTRIBUTES ---------------------------------------- */
     
@@ -57,6 +59,13 @@ public class Payment implements Serializable {
     private Long apartmentID;
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    @Override
+    public int compareTo(Payment p) {
+      if (this.date == null || p.getDate() == null)
+        return 0;
+      return this.date.compareTo(p.getDate());
+    }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
@@ -97,6 +106,17 @@ public class Payment implements Serializable {
     public List<Member> getInvolvedMembers() {
         return involvedMembers;
     }
+    
+    public String getInvolvedMembersFormat() {
+        String str = "";
+        ListIterator<Member> it = this.involvedMembers.listIterator(); 
+        while (it.hasNext()) { 
+            str += it.next().getName();
+            if(it.hasNext())
+                str += ", ";
+        }
+        return str;
+    }
 
     public void setInvolvedMembers(List<Member> involvedMembers) {
         this.involvedMembers = involvedMembers;
@@ -104,6 +124,12 @@ public class Payment implements Serializable {
 
     public Date getDate() {
         return date;
+    }
+    
+    public String getDateFormat() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");  
+        String strDate = formatter.format(this.date);  
+        return strDate;
     }
 
     public void setDate(Date date) {
