@@ -142,29 +142,44 @@ main {
 /* ----------------- Buttons ----------------- */
 
 .addbutton__wrap {
-    
+    position: relative;
 }
 
-.addbutton {
-    width: 80px;
-    height: 80px;
+.addbutton, .overview_button:visited {
+    position: absolute;
+    top: -60px;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: #43d7a6 !important;
     font-size: 30px !important;
     line-height: 0;
-    border-radius: 40px !important;
+    border-color: #43d7a6 !important;
+    border-radius: 30px !important;
+}
+
+.addbutton:hover, .addbutton:focus {
+    background: #35be91 !important;
 }
 
 .addbutton span {
-    padding: .6em !important;
+    padding: .3em !important;
 }
 
 /* ----------------- Cards ----------------- */
 
+.cards {
+    margin-bottom: 1em;
+}
+
 .card {
     position: relative;
     padding: 1.2em 1em 1.8em 1em;
+    background: #f8f8f8;
     border-radius: .5em;
     text-align: center;
     overflow: hidden;
+    border: 1px solid #d7d7d7;
 }
 
 .card p {
@@ -173,46 +188,119 @@ main {
 }
 
 .card__name {
-    color: #4e4e4e;
-    font-size: 20px;
+    font-size: 14px;
+    text-transform: uppercase;
 }
 
 .card__balance {
     font-size: 28px;
-    line-height: 20px;
+    line-height: 30px;
+}
+
+.card__balance--positive {
+    color: #000000;
+}
+
+.card__balance--negative {
+    color: #ff0000;
 }
 
 .card--RED {
-    border: 1px solid #f10b0b;
-    background-color: rgba(241,11,11,.2);
+    color: #f10b0b;
 }
 
 .card--GREEN {
-    border: 1px solid #85d222;
-    background-color: rgba(133,210,34,.2);
+    color: #85d222;
 }
 
 .card--BLUE {
-    border: 1px solid #2a79fc;
-    background-color: rgba(42,121,252,.2);
+    color: #2a79fc;
 }
 
 .card--YELLOW {
-    border: 1px solid #eed506;
-    background-color: rgba(238,213,6,.2);
+    color: #eed506;
 }
 
 .card--PINK {
-    border: 1px solid #ff2dcb;
-    background-color: rgba(255,45,203,.2);
+    color: #ff2dcb;
 }
 
 .card--ORANGE {
-    border: 1px solid #ee8e06;
-    background-color: rgba(238,142,6,.2);
+    color: #ee8e06;
 }
 
+/* ----------------- Form ----------------- */
+
+.form {
+    margin-bottom: 1em;
+}
+
+.form__buttons {
+    
+}
+
+.form__button {
+    margin-right: .5em !important;
+}
+
+.input__wrap {
+    margin-bottom: .4em;
+    display: flex;
+}
+
+.input__label {
+    min-width: 8em;
+    padding: .5em;
+}
+
+.input .ui-inputfield {
+    
+}
+
+.input--big .ui-inputfield {
+    width: 20em;
+}
+
+.input--small .ui-inputfield {
+    width: 8em;
+}
+
+.input .ui-selectmanycheckbox.ui-widget td, .input .ui-selectoneradio.ui-widget td {
+    padding-top: .5em;
+}
+
+body .ui-chkbox .ui-chkbox-box.ui-state-active {
+    border-color: #43d7a6;
+    background-color: #43d7a6;
+}
+
+/* ----------------- Table ----------------- */
+
+table__cell {
+    
+}
+
+.table__cell--medium {
+    width: 8em;
+}
+
+.table__cell--small {
+    width: 5em;
+    
+}
+
+.table__cell--center {
+    text-align: center;
+}
+
+.table__cell--right {
+    text-align: right;
+}
+
+
 /* --------------------------------------- PRIMEFACES -------------------------------------- */
+
+/* ----------------- Buttons ----------------- */
 
 body .ui-button, body .ui-button:visited {
     background-color: #000;
@@ -232,3 +320,38 @@ body .ui-datagrid .ui-datagrid-content {
     padding: 1em 0;
     border: none;
 }
+
+/* ----------------- Table ----------------- */
+
+body .ui-datatable table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+body .ui-datatable thead th {
+    padding: .8em 1em .7em 1em;
+    background: #b2e8d6;
+}
+
+body .ui-datatable .ui-datatable-data>tr {
+    
+}
+
+body .ui-datatable .ui-datatable-data>tr td {
+    padding: .8em 1em .7em 1em;
+}
+
+body .ui-datatable .ui-datatable-data>tr.ui-datatable-even {
+    background: #ffffff;
+}
+
+/* Table border and border-radius */
+body .ui-datatable .ui-datatable-data>tr { border-bottom: 1px solid #000; }
+body .ui-datatable .ui-datatable-data>tr td { border-right: 1px solid #000; }
+body .ui-datatable .ui-datatable-data>tr td:first-child { border-left: 1px solid #000; }
+body .ui-datatable tr th { border-right: 1px solid #000; border-top: 1px solid #000; border-bottom: 1px solid #000; }
+body .ui-datatable tr th:first-child { border-left: 1px solid #000; }
+body .ui-datatable tr:first-child th:first-child { border-top-left-radius: .5em; }
+body .ui-datatable tr:first-child th:last-child { border-top-right-radius: .5em; }
+body .ui-datatable tr:last-child td:first-child { border-bottom-left-radius: .5em; }
+body .ui-datatable tr:last-child td:last-child { border-bottom-right-radius: .5em; }

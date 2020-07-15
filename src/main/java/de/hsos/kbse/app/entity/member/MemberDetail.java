@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  *
@@ -40,6 +41,9 @@ public class MemberDetail implements Serializable {
     private MemberColor color;
     
     private float cashBalance;
+    
+    @Transient
+    private boolean positiveBalance;
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
@@ -69,6 +73,15 @@ public class MemberDetail implements Serializable {
 
     public void setCashBalance(float cashBalance) {
         this.cashBalance = cashBalance;
+        if(cashBalance >= 0) {
+            this.positiveBalance = true;
+        } else {
+            this.positiveBalance = false;
+        }  
     }
-    
+
+    public boolean isPositiveBalance() {
+        return positiveBalance;
+    }
+
 }

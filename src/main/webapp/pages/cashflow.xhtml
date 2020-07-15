@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
     <h:head>
         <title>Kostenliste</title>
     </h:head>
@@ -33,46 +34,53 @@
                 
                 <div class="addbutton__wrap">
                     <h:form>
-                        <p:commandButton value="+" action="#{cashflowVM.test()}" class="addbutton" />
+                        <p:commandButton value="+" action="cashflow-add?faces-redirect=true" class="addbutton" />
                     </h:form>
                 </div>
                 
-                <p:dataGrid var="member" value="#{cashflowVM.members}" columns="4" layout="grid" rows="8" paginator="false">
-                    <div class="card card--#{member.details.color}">
-                        <p class="card__name">
-                            <h:outputText value="#{member.name}" />
-                        </p>
-                        <p class="card__balance">
-                            <h:outputText value="#{member.details.cashBalance}">
-                                <f:convertNumber pattern="#0.00"/>
-                            </h:outputText> €
-                        </p>
-                    </div>
-                </p:dataGrid>
+                <div class="cards">
+                    <p:dataGrid var="member" value="#{cashflowVM.members}" columns="4" layout="grid" rows="8" paginator="false">
+                        <div class="card card--#{member.details.color}">
+                            <p class="card__name">
+                                <h:outputText value="#{member.name}" />
+                            </p>
+                            <p class="card__balance #{cashflowVM.checkBalance(member.details.cashBalance) ? 'card__balance--positive' : 'card__balance--negative'}">
+                                <ui:fragment rendered="#{cashflowVM.checkBalance(member.details.cashBalance)}">+</ui:fragment>
+                                <h:outputText value="#{member.details.cashBalance}">
+                                    <f:convertNumber pattern="#0.00"/>
+                                </h:outputText> €
+                            </p>
+                        </div>
+                    </p:dataGrid>
+                </div>
                 
                 <p:dataTable var="payment" value="#{cashflowVM.payments}">
-                    <p:column headerText="Beschreibung">
+                    <p:column headerText="Beschreibung" class="table__cell">
                         <h:outputText value="#{payment.description}" />
                     </p:column>
 
-                    <p:column headerText="Datum">
+                    <p:column headerText="Datum" class="table__cell table__cell--medium table__cell--center">
                         <h:outputText value="#{payment.getDateFormat()}" />
                     </p:column>
 
-                    <p:column headerText="Bezahlt von">
+                    <p:column headerText="Bezahlt von" class="table__cell">
                         <h:outputText value="#{payment.giver.name}" />
                     </p:column>
                     
-                    <p:column headerText="Bezahlt für">
+                    <p:column headerText="Bezahlt für" class="table__cell">
                         <h:outputText value="#{payment.getInvolvedMembersFormat()}" />
                     </p:column>
 
-                    <p:column headerText="Betrag">
+                    <p:column headerText="Betrag" class="table__cell table__cell--small table__cell--right">
                         <h:outputText value="#{payment.sum}">
                             <f:convertNumber pattern="#0.00"/>
                         </h:outputText> €
                     </p:column>
                 </p:dataTable>
+                
+                <h:form>
+                    <p:commandButton value="Test" action="#{cashflowVM.test()}" />
+                </h:form>
 
             </main>
         </div>

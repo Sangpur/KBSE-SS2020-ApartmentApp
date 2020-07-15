@@ -56,6 +56,8 @@ public class CashFlowViewModel implements Serializable {
     private List<Payment> payments;
     private List<Member> members;
     private Member loggedInMember;
+    private boolean balance = false;        // true = positive, false = negative
+    private Payment newPayment;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -68,12 +70,35 @@ public class CashFlowViewModel implements Serializable {
         this.payments = new LinkedList(); // Hier kann das neuste Element an Position 0 eingefuegt werden
         this.initPaymentsList();
         this.initMemberList();
+        this.newPayment = new Payment();
     }
     
     @PostConstruct
     public static void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+    
+    public boolean checkBalance(float sum) {
+        return sum >= 0;
+    }
+    
+    public String savePayment() {
+        System.out.println("savePayment()");
+        System.out.println("Description: " + newPayment.getDescription());
+        for(int i=0; i < newPayment.getInvolvedMembers().size(); i++) {
+            System.out.println("InvolvedMember " + i + ": "+ newPayment.getInvolvedMembers().get(i).getName());
+        }
+        System.out.println("Sum: " + newPayment.getSum() + " €");
+        return "cashflow";
+    }
+    
+    public String discardPayment() {
+        System.out.println("discardPayment()");
+        this.newPayment.setDescription("");
+        this.newPayment.getInvolvedMembers().clear();
+        this.newPayment.setSum(0);
+        return "cashflow";
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
@@ -147,6 +172,24 @@ public class CashFlowViewModel implements Serializable {
     public void setLoggedInMember(Member loggedInMember) {
         this.loggedInMember = loggedInMember;
     }
+
+    public void setBalance(boolean balance) {
+        this.balance = balance;
+    }
+
+    public boolean isBalance() {
+        return balance;
+    }
+
+    public Payment getNewPayment() {
+        return newPayment;
+    }
+
+    public void setNewPayment(Payment newPayment) {
+        this.newPayment = newPayment;
+    }
+    
+    
     
     
     
