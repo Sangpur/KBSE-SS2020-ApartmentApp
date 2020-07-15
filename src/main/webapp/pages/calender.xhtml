@@ -22,7 +22,17 @@
                     </div>
                 </div>
             </header>
-            <main>
+            <main class="calender">
+                
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:autoUpdate />
+                </p:messages>
+                
+                <div class="addbutton__wrap">
+                    <h:form>
+                        <p:commandButton value="+" action="calender-add?faces-redirect=true" class="addbutton" />
+                    </h:form>
+                </div>
                 
                 Hello from Facelets. Chris war da, um committen zu testen.
                 

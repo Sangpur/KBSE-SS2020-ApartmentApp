@@ -5,7 +5,7 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://java.sun.com/jsf/core">
     <h:head>
-        <title>Mitglieder</title>
+        <title>Pinnwand</title>
     </h:head>
     <h:body>
         <h:outputStylesheet name="css/style.css"  />
@@ -13,27 +13,31 @@
             <header>
                 <div class="header__content">
                     <h1 class="header__title">
-                        Mitglieder<span>.</span>
+                        Notiz hinzufügen<span>:</span>
                     </h1>
-                    <div class="header__backlink">
-                        <h:form>
-                            <p:commandButton action="apartment?faces-redirect=true" icon="pi pi-angle-left" />
-                        </h:form>
-                    </div>
                 </div>
             </header>
-            <main class="members">
+            <main class="pinboard--add">
                 
                 <p:messages id="messages" showDetail="true" closable="true">
                     <p:autoUpdate />
                 </p:messages>
                 
-                <div class="addbutton__wrap">
-                    <h:form>
-                        <p:commandButton value="+" action="members-add?faces-redirect=true" class="addbutton" />
-                    </h:form>
-                </div>
-                
+                <h:form>
+                    <div class="form">
+                        <div class="input__wrap">
+                            <div class="input__label">Textfeld:</div>
+                            <div class="input">
+                                <p:inputText value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__buttons">
+                        <p:commandButton value="Speichern" class="form__button" />
+                        <p:commandButton value="Abbrechen" class="form__button" />
+                    </div>
+                </h:form>
+
             </main>
         </div>
     </h:body>
