@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.ShoppingList;
+import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.Condition;
@@ -15,9 +16,11 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
+import javax.enterprise.context.ConversationScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -27,6 +30,8 @@ import javax.validation.ValidatorFactory;
  *
  * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
  */
+@Named("shoppingVM")
+@ConversationScoped
 public class ShoppingListViewModel implements Serializable {
     
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
@@ -39,6 +44,8 @@ public class ShoppingListViewModel implements Serializable {
     
     /* Bean Validation API */
     private static Validator validator;
+    
+    private Member loggedInMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -89,5 +96,9 @@ public class ShoppingListViewModel implements Serializable {
     }
      
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+    
+    public void setLoggedInMember(Member loggedInMember) {
+        this.loggedInMember = loggedInMember;
+    }
     
 }

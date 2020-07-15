@@ -55,6 +55,7 @@ public class CashFlowViewModel implements Serializable {
     private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
     private List<Payment> payments;
     private List<Member> members;
+    private Member loggedInMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -142,12 +143,15 @@ public class CashFlowViewModel implements Serializable {
     public List<Member> getMembers() {
         return members;
     }
-    
-    
+
+    public void setLoggedInMember(Member loggedInMember) {
+        this.loggedInMember = loggedInMember;
+    }
     
     
     
     public void test() {
         System.out.println("Member Anzahl: " + this.members.size());
+        System.out.println("Login Name:" + this.loggedInMember.getName());
     }
 }

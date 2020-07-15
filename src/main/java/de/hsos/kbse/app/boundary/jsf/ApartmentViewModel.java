@@ -52,6 +52,7 @@ public class ApartmentViewModel implements Serializable {
     
     private Apartment apartment;
     private List<Member> members;
+    private Member loggedInMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -82,6 +83,11 @@ public class ApartmentViewModel implements Serializable {
         if(!conversation.isTransient()) {
             conversation.end();
         }
+    }
+    
+    public void login() {
+        this.loggedInMember = members.get(0);
+        //return "pages/apartment";
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
@@ -133,4 +139,9 @@ public class ApartmentViewModel implements Serializable {
         return members;
     }
 
+    public Member getLoggedInMember() {
+        System.out.println("getLoggedInMember: " + this.loggedInMember.getName());
+        return loggedInMember;
+    }
+    
 }

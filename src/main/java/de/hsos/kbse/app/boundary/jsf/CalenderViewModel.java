@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.Calender;
+import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.Condition;
@@ -43,6 +44,8 @@ public class CalenderViewModel implements Serializable {
     
     /* Bean Validation API */
     private static Validator validator;
+    
+    private Member loggedInMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -93,5 +96,9 @@ public class CalenderViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+    
+    public void setLoggedInMember(Member loggedInMember) {
+        this.loggedInMember = loggedInMember;
+    }
     
 }

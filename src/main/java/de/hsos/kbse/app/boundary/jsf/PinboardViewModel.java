@@ -6,6 +6,7 @@ package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.Pinboard;
 import de.hsos.kbse.app.entity.features.Note;
+import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.NoteCategory;
 import de.hsos.kbse.app.enums.ValidationGroup;
@@ -47,6 +48,8 @@ public class PinboardViewModel implements Serializable {
     
     /* Bean Validation API */
     private static Validator validator;
+    
+    private Member loggedInMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -97,5 +100,9 @@ public class PinboardViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+    
+    public void setLoggedInMember(Member loggedInMember) {
+        this.loggedInMember = loggedInMember;
+    }
     
 }
