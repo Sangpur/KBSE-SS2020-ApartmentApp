@@ -28,15 +28,15 @@
             </header>
             <main class="cashflow">
                 
+                <div class="addbutton__wrap">
+                    <h:form>
+                        <p:commandButton value="+" action="#{cashflowVM.addPayment()}" class="addbutton" />
+                    </h:form>
+                </div>
+                
                 <p:messages id="messages" showDetail="true" closable="true">
                     <p:autoUpdate />
                 </p:messages>
-                
-                <div class="addbutton__wrap">
-                    <h:form>
-                        <p:commandButton value="+" action="cashflow-add?faces-redirect=true" class="addbutton" />
-                    </h:form>
-                </div>
                 
                 <div class="cards">
                     <p:dataGrid var="member" value="#{cashflowVM.members}" columns="4" layout="grid" rows="8" paginator="false">
@@ -76,12 +76,17 @@
                             <f:convertNumber pattern="#0.00"/>
                         </h:outputText> €
                     </p:column>
+                    
+                    <p:column class="table__cell table__cell--center">
+                        <ui:fragment rendered="#{cashflowVM.checkAccessRights(payment)}">
+                            <h:form>
+                                <p:commandButton action="#{cashflowVM.editPayment(payment)}" icon="pi pi-pencil" class="form__button" />
+                                <p:commandButton action="#{cashflowVM.deletePayment()}" icon="pi pi-trash" class="form__button" />
+                            </h:form>
+                        </ui:fragment>
+                    </p:column>
                 </p:dataTable>
                 
-                <h:form>
-                    <p:commandButton value="Test" action="#{cashflowVM.test()}" />
-                </h:form>
-
             </main>
         </div>
     </h:body>

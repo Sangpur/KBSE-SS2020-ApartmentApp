@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.ShoppingList;
+import de.hsos.kbse.app.entity.features.ShoppingItem;
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.ValidationGroup;
@@ -46,6 +47,7 @@ public class ShoppingListViewModel implements Serializable {
     private static Validator validator;
     
     private Member loggedInMember;
+    private ShoppingItem currentItem;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -60,6 +62,12 @@ public class ShoppingListViewModel implements Serializable {
     public static void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+    
+    public String addItem() {
+        System.out.println("addItem()");
+        this.currentItem = new ShoppingItem();
+        return "shoppinglist-add";
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */

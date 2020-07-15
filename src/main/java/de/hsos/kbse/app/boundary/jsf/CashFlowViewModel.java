@@ -9,6 +9,7 @@ import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.features.Payment;
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
+import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.AppException;
 import de.hsos.kbse.app.util.Condition;
@@ -56,8 +57,10 @@ public class CashFlowViewModel implements Serializable {
     private List<Payment> payments;
     private List<Member> members;
     private Member loggedInMember;
-    private boolean balance = false;        // true = positive, false = negative
-    private Payment newPayment;
+    private boolean admin;              // true = ADMIN, false = USER
+    private Payment currentPayment;
+    private boolean addPayment;         // true = addPayment()
+    private boolean editPayment;        // true = editPayment()
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -70,7 +73,7 @@ public class CashFlowViewModel implements Serializable {
         this.payments = new LinkedList(); // Hier kann das neuste Element an Position 0 eingefuegt werden
         this.initPaymentsList();
         this.initMemberList();
-        this.newPayment = new Payment();
+        this.currentPayment = new Payment();
     }
     
     @PostConstruct
@@ -83,21 +86,46 @@ public class CashFlowViewModel implements Serializable {
         return sum >= 0;
     }
     
+    public boolean checkAccessRights(Payment payment) {
+        /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
+         * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
+        return this.admin || payment.getGiver().getId().equals(this.loggedInMember.getId());
+    }
+    
+    public String addPayment() {
+        System.out.println("addPayment()");
+        this.currentPayment = new Payment();
+        this.addPayment = true;
+        this.editPayment = false;
+        return "cashflow-add";
+    }
+    
+    public String editPayment(Payment payment) {
+        System.out.println("editPayment()");
+        this.currentPayment = payment;
+        this.editPayment = true;
+        this.addPayment = false;
+        return "cashflow-add";
+    }
+    
+    public void deletePayment() {
+        System.out.println("deletePayment()");
+    }
+    
     public String savePayment() {
+        // Bool-Variable isNewPayment, um dann DB-Eintrag zu createn und ansonsten zu updaten, da Edit-Funktion
+        // auch diese Funktion nutzt.
         System.out.println("savePayment()");
-        System.out.println("Description: " + newPayment.getDescription());
-        for(int i=0; i < newPayment.getInvolvedMembers().size(); i++) {
-            System.out.println("InvolvedMember " + i + ": "+ newPayment.getInvolvedMembers().get(i).getName());
+        System.out.println("Description: " + currentPayment.getDescription());
+        for(int i=0; i < currentPayment.getInvolvedMembers().size(); i++) {
+            System.out.println("InvolvedMember " + i + ": "+ currentPayment.getInvolvedMembers().get(i).getName());
         }
-        System.out.println("Sum: " + newPayment.getSum() + " €");
+        System.out.println("Sum: " + currentPayment.getSum() + " €");
         return "cashflow";
     }
     
     public String discardPayment() {
         System.out.println("discardPayment()");
-        this.newPayment.setDescription("");
-        this.newPayment.getInvolvedMembers().clear();
-        this.newPayment.setSum(0);
         return "cashflow";
     }
     
@@ -171,24 +199,34 @@ public class CashFlowViewModel implements Serializable {
 
     public void setLoggedInMember(Member loggedInMember) {
         this.loggedInMember = loggedInMember;
+        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
+            this.admin = true;
+        }
     }
 
-    public void setBalance(boolean balance) {
-        this.balance = balance;
+    public boolean isAdmin() {
+        return admin;
     }
 
-    public boolean isBalance() {
-        return balance;
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
-    public Payment getNewPayment() {
-        return newPayment;
+    public Payment getCurrentPayment() {
+        return currentPayment;
     }
 
-    public void setNewPayment(Payment newPayment) {
-        this.newPayment = newPayment;
+    public void setCurrentPayment(Payment currentPayment) {
+        this.currentPayment = currentPayment;
     }
-    
+
+    public boolean isAddPayment() {
+        return addPayment;
+    }
+
+    public boolean isEditPayment() {
+        return editPayment;
+    }
     
     
     

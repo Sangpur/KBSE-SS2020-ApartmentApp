@@ -24,17 +24,17 @@
             </header>
             <main class="pinboard">
                 
-                <p:messages id="messages" showDetail="true" closable="true">
-                    <p:autoUpdate />
-                </p:messages>
-                
                 <div class="addbutton__wrap">
                     <h:form>
-                        <p:commandButton value="+" action="pinboard-add?faces-redirect=true" class="addbutton" />
+                        <p:commandButton value="+" action="#{pinboardVM.addNote()}" class="addbutton" />
                     </h:form>
                 </div>
                 
-                Chris war hier und sogar zweimal!
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:autoUpdate />
+                </p:messages>
+
+                YOUR CONTENT.
                 
             </main>
         </div>

@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
     <h:head>
         <title>Kostenliste</title>
     </h:head>
@@ -28,21 +29,29 @@
                         <div class="input__wrap">
                             <div class="input__label">Beschreibung:</div>
                             <div class="input input--big">
-                                <p:inputText value="#{cashflowVM.newPayment.description}" />
+                                <p:inputText value="#{cashflowVM.currentPayment.description}" />
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Bezahlt für:</div>
                             <div class="input">
-                                <p:selectManyCheckbox id="grid" value="#{cashflowVM.newPayment.involvedMembers}" layout="grid" columns="4">
-                                    <f:selectItems value="#{cashflowVM.members}" var="member" itemLabel="#{member.name}" itemValue="#{member}" />
-                                </p:selectManyCheckbox>
+                                <ui:fragment >
+                                    <p:selectManyCheckbox value="#{cashflowVM.currentPayment.involvedMembers}" layout="grid" columns="4" rendered="#{cashflowVM.addPayment}">
+                                        <f:selectItems value="#{cashflowVM.members}" var="member" itemLabel="#{member.name}" itemValue="#{member}" />
+                                    </p:selectManyCheckbox>
+                                </ui:fragment>
+                                <ui:fragment >
+                                    <!-- bereits ausgewaehlte Elemente schon auswaehlen -->
+                                    <p:selectManyCheckbox value="#{cashflowVM.currentPayment.involvedMembers}" layout="grid" columns="4" rendered="#{cashflowVM.editPayment}">
+                                        <f:selectItems value="#{cashflowVM.members}" var="member" itemLabel="#{member.name}" itemValue="#{member}" />
+                                    </p:selectManyCheckbox>
+                                </ui:fragment>
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Betrag:</div>
                             <div class="input input--small">
-                                <p:inputNumber value="#{cashflowVM.newPayment.sum}" symbol=" €" symbolPosition="s" decimalSeparator="," thousandSeparator="." />
+                                <p:inputNumber value="#{cashflowVM.currentPayment.sum}" symbol=" €" symbolPosition="s" decimalSeparator="," thousandSeparator="." />
                             </div>
                         </div>
                     </div>

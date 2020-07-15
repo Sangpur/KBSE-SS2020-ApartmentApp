@@ -50,6 +50,7 @@ public class PinboardViewModel implements Serializable {
     private static Validator validator;
     
     private Member loggedInMember;
+    private Note currentNote;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -64,6 +65,12 @@ public class PinboardViewModel implements Serializable {
     public static void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+    
+    public String addNote() {
+        System.out.println("addNote()");
+        this.currentNote = new Note();
+        return "pinboard-add";
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */

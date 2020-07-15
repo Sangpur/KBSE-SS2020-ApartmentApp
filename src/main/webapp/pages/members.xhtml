@@ -24,15 +24,17 @@
             </header>
             <main class="members">
                 
+                <div class="addbutton__wrap">
+                    <h:form>
+                        <p:commandButton value="+" action="#{apartmentVM.addMember()}" class="addbutton" />
+                    </h:form>
+                </div>
+                
                 <p:messages id="messages" showDetail="true" closable="true">
                     <p:autoUpdate />
                 </p:messages>
                 
-                <div class="addbutton__wrap">
-                    <h:form>
-                        <p:commandButton value="+" action="members-add?faces-redirect=true" class="addbutton" />
-                    </h:form>
-                </div>
+                YOUR CONTENT.
                 
             </main>
         </div>

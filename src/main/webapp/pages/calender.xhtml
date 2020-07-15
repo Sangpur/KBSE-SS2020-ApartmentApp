@@ -23,18 +23,18 @@
                 </div>
             </header>
             <main class="calender">
+
+                <div class="addbutton__wrap">
+                    <h:form>
+                        <p:commandButton value="+" action="#{calenderVM.addEvent()}" class="addbutton" />
+                    </h:form>
+                </div>
                 
                 <p:messages id="messages" showDetail="true" closable="true">
                     <p:autoUpdate />
                 </p:messages>
                 
-                <div class="addbutton__wrap">
-                    <h:form>
-                        <p:commandButton value="+" action="calender-add?faces-redirect=true" class="addbutton" />
-                    </h:form>
-                </div>
-                
-                Hello from Facelets. Chris war da, um committen zu testen.
+                YOUR CONTENT.
                 
             </main>
         </div>

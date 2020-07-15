@@ -42,9 +42,6 @@ public class MemberDetail implements Serializable {
     
     private float cashBalance;
     
-    @Transient
-    private boolean positiveBalance;
-    
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
@@ -69,19 +66,6 @@ public class MemberDetail implements Serializable {
 
     public float getCashBalance() {
         return cashBalance;
-    }
-
-    public void setCashBalance(float cashBalance) {
-        this.cashBalance = cashBalance;
-        if(cashBalance >= 0) {
-            this.positiveBalance = true;
-        } else {
-            this.positiveBalance = false;
-        }  
-    }
-
-    public boolean isPositiveBalance() {
-        return positiveBalance;
     }
 
 }

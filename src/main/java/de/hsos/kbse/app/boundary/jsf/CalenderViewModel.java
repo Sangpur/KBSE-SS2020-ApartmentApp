@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.Calender;
+import de.hsos.kbse.app.entity.features.Event;
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.ValidationGroup;
@@ -46,6 +47,7 @@ public class CalenderViewModel implements Serializable {
     private static Validator validator;
     
     private Member loggedInMember;
+    private Event currentEvent;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -60,6 +62,12 @@ public class CalenderViewModel implements Serializable {
     public static void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+    
+    public String addEvent() {
+        System.out.println("addEvent()");
+        this.currentEvent = new Event();
+        return "calender-add";
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */

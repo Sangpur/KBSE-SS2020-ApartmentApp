@@ -53,6 +53,7 @@ public class ApartmentViewModel implements Serializable {
     private Apartment apartment;
     private List<Member> members;
     private Member loggedInMember;
+    private Member newMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -88,6 +89,12 @@ public class ApartmentViewModel implements Serializable {
     public void login() {
         this.loggedInMember = members.get(0);
         //return "pages/apartment";
+    }
+    
+    public String addMember() {
+        System.out.println("addMember()");
+        this.newMember = new Member();
+        return "members-add";
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */

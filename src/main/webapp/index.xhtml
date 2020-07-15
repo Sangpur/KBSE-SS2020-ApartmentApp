@@ -24,11 +24,7 @@
                 
                 Hello from Facelets
 
-                <!-- Ueber diese Buttons klappt es nicht, die Conversation vernuenftig zu initiieren.
-                     Wird aktuell im Header implementiert, damit es vorerst funktioniert. -->
                 <h:form>
-                    <p:commandButton value="Init Conversation" action="#{apartmentVM.initConversation()}" update="@form" />
-                    <p:commandButton value="End Conversation" action="#{apartmentVM.endConversation()}" update="@form" />
                     <p:commandButton value="Login" action="pages/apartment?faces-redirect=true">
                         <f:actionListener binding="#{apartmentVM.login()}"/>
                         <f:actionListener binding="#{calenderVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
