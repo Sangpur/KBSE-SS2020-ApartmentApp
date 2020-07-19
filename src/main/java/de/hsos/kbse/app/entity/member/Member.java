@@ -42,7 +42,7 @@ public class Member implements Serializable {
     
     private String password;
     
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     private MemberDetail details;
     
     @Column(name="apartment_id")

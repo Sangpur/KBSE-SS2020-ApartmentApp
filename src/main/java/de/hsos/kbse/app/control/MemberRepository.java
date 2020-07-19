@@ -5,18 +5,23 @@
 package de.hsos.kbse.app.control;
 
 import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.member.MemberDetail;
 import de.hsos.kbse.app.entity.member.MemberManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
 import java.util.List;
+import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 
 /**
  *
  * @author Annika Limbrock
  */
+@RequestScoped
+@Transactional
 public class MemberRepository implements MemberManager, Serializable {
     
     /* ----------------------------------------- ATTRIBUTES ---------------------------------------- */
@@ -50,7 +55,7 @@ public class MemberRepository implements MemberManager, Serializable {
     @Override
     public Member updateMember(Member member) throws AppException {
         try {
-            member = this.em.merge(member);           // Rueckgabe ist null, falls Zahlung nicht existiert
+            member = this.em.merge(member);           // Rueckgabe ist null, falls Mitglied nicht existiert
         } catch(Exception ex) {
             ex.printStackTrace();
             throw new AppException("Mitglied konnte nicht angepasst werden!");
@@ -62,7 +67,7 @@ public class MemberRepository implements MemberManager, Serializable {
     public Member findMember(Long id) throws AppException {
         Member member = null;
         try {
-            member = this.em.find(Member.class, id);  // Rueckgabe ist null, falls Zahlung nicht existiert
+            member = this.em.find(Member.class, id);  // Rueckgabe ist null, falls Mitglied nicht existiert
         } catch(Exception ex) {
             ex.printStackTrace();
             throw new AppException("Mitglied konnte nicht gefunden werden!");

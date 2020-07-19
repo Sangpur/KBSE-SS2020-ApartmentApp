@@ -5,7 +5,10 @@
 package de.hsos.kbse.app.entity.features;
 
 import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.util.Condition;
+import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -22,10 +25,14 @@ import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock
  */
 @Entity
 @Vetoed
@@ -38,27 +45,48 @@ public class Payment implements Serializable, Comparable<Payment> {
     @TableGenerator(name = "modPayment", initialValue = 4)
     private Long id;
     
-    @Column(name="amount")
-    private float sum;
+    @Column(name="amount", precision = 8, scale = 2)
+    @NotNull(groups = {General.class, Condition.class}, message="Der Betrag darf nicht leer sein!")
+    @DecimalMin(groups = {General.class, Condition.class}, value="0.01", message="Der Betrag muss größer als 0.00 € sein!")
+    private BigDecimal sum;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Die Beschreibung darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Die Beschreibung muss zwischen 3 und 50 Zeichen liegen!")
+    @Pattern(groups = {General.class, Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Die Beschreibung enthält ungültige Bezeichner!")
     private String description;
     
     @OneToOne(cascade = CascadeType.MERGE)
     private Member giver;
     
     @OneToMany(cascade = CascadeType.MERGE)
+    @Size(groups = {General.class, Condition.class}, min=1, message="Es muss mindestens ein Mitglied ausgewählt werden, für das bezahlt wurde!")
     private List<Member> involvedMembers;
     
     @Temporal(TemporalType.DATE)
     @Column(name="day")
     private Date date;
     
-    private boolean repayment;  // boolean fuer Zahlung (= false) oder Rueckzahlung (= true)
-    
     @Column(name="apartment_id")
     private Long apartmentID;
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    public Payment() {}
+    
+    public Payment(Member giver, Date date, Long apartmentID) {
+        this.giver = giver;
+        this.date = date;
+        this.apartmentID = apartmentID;
+    }
+    
+    public Payment(Payment obj) {
+        this.sum = obj.getSum();
+        this.description = obj.getDescription();
+        this.giver = obj.getGiver();
+        this.involvedMembers = obj.getInvolvedMembers();
+        this.date = obj.getDate();
+        this.apartmentID = obj.getApartmentID();
+    }
     
     @Override
     public int compareTo(Payment p) {
@@ -79,11 +107,11 @@ public class Payment implements Serializable, Comparable<Payment> {
         this.id = id;
     }
     
-    public float getSum() {
+    public BigDecimal getSum() {
         return sum;
     }
 
-    public void setSum(float sum) {
+    public void setSum(BigDecimal sum) {
         this.sum = sum;
     }
 
@@ -134,14 +162,6 @@ public class Payment implements Serializable, Comparable<Payment> {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public boolean isRepayment() {
-        return repayment;
-    }
-
-    public void setRepayment(boolean repayment) {
-        this.repayment = repayment;
     }
 
     public Long getApartmentID() {

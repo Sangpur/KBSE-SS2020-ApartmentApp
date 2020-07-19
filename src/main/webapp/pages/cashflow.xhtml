@@ -39,7 +39,7 @@
                 </p:messages>
                 
                 <div class="cards">
-                    <p:dataGrid var="member" value="#{cashflowVM.members}" columns="4" layout="grid" rows="8" paginator="false">
+                    <p:dataGrid id="payments__balance" var="member" value="#{cashflowVM.members}" columns="4" layout="grid" rows="8" paginator="false">
                         <div class="card card--#{member.details.color}">
                             <p class="card__name">
                                 <h:outputText value="#{member.name}" />
@@ -54,7 +54,7 @@
                     </p:dataGrid>
                 </div>
                 
-                <p:dataTable var="payment" value="#{cashflowVM.payments}">
+                <p:dataTable id="payments__list" var="payment" value="#{cashflowVM.payments}">
                     <p:column headerText="Beschreibung" class="table__cell">
                         <h:outputText value="#{payment.description}" />
                     </p:column>
@@ -81,7 +81,13 @@
                         <ui:fragment rendered="#{cashflowVM.checkAccessRights(payment)}">
                             <h:form>
                                 <p:commandButton action="#{cashflowVM.editPayment(payment)}" icon="pi pi-pencil" class="form__button" />
-                                <p:commandButton action="#{cashflowVM.deletePayment()}" icon="pi pi-trash" class="form__button" />
+                                <p:commandButton action="#{cashflowVM.deletePayment(payment)}" icon="pi pi-trash" class="form__button" update="payments__balance, payments__list">
+                                    <p:confirm header="Löschen der Zahlung" message="Soll die Zahlung wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                    <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                </p:confirmDialog> 
                             </h:form>
                         </ui:fragment>
                     </p:column>
