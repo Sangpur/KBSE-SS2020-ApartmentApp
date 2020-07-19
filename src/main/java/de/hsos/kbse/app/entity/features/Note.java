@@ -28,13 +28,13 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Vetoed
-public class Note implements Serializable {
+public class Note implements Serializable, Comparable<Note> {
     
     /* ----------------------------------------- ATTRIBUTES ---------------------------------------- */
     
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "modNote")
-    @TableGenerator(name = "modNote", initialValue = 2)
+    @TableGenerator(name = "modNote", initialValue = 7)
     private Long id;
     
     private String message;
@@ -53,6 +53,13 @@ public class Note implements Serializable {
     private Long apartmentID;
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    @Override
+    public int compareTo(Note n) {
+      if (this.timestamp == null || n.getTimestamp()== null)
+        return 0;
+      return this.timestamp.compareTo(n.getTimestamp());
+    }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     

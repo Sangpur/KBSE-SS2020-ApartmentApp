@@ -8,9 +8,11 @@ import de.hsos.kbse.app.entity.features.Note;
 import de.hsos.kbse.app.entity.features.NoteManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 /**
@@ -72,8 +74,24 @@ public class Pinboard implements NoteManager, Serializable {
         return note;
     }
     
+    @Override
+    public List<Note> getAllNotesFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "SELECT n FROM Note n WHERE n.apartmentID = :id";
+            TypedQuery<Note> querySelect = em.createQuery(str, Note.class);
+            querySelect.setParameter("id", apartmentID);
+            List<Note> results = querySelect.getResultList();
+            return results;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Notizen der WG "+ apartmentID +" konnten nicht gefunden werden!");
+        }
+    }
+    
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+
+
     
 }

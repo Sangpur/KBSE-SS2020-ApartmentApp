@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.entity.features;
 
 import de.hsos.kbse.app.util.AppException;
+import java.util.List;
 
 /**
  *
@@ -16,5 +17,6 @@ public interface NoteManager {
     public void deleteNote(Note note) throws AppException;
     public Note updateNote(Note note) throws AppException;
     public Note findNote(Long id) throws AppException;
+    public List<Note> getAllNotesFrom(Long apartmentID) throws AppException;
     
 }
