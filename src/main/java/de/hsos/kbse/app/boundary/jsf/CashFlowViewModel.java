@@ -16,7 +16,10 @@ import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,8 +62,10 @@ public class CashFlowViewModel implements Serializable {
     private Member loggedInMember;
     private boolean admin;              // true = ADMIN, false = USER
     private Payment currentPayment;
+    private Payment originalPayment;    // Sicherung des zu bearbeitenden Payment-Objekts
     private boolean addPayment;         // true = addPayment()
     private boolean editPayment;        // true = editPayment()
+    private boolean deletePayment;      // true = deletePayment();
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -73,7 +78,6 @@ public class CashFlowViewModel implements Serializable {
         this.payments = new LinkedList(); // Hier kann das neuste Element an Position 0 eingefuegt werden
         this.initPaymentsList();
         this.initMemberList();
-        this.currentPayment = new Payment();
     }
     
     @PostConstruct
@@ -92,40 +96,90 @@ public class CashFlowViewModel implements Serializable {
         return this.admin || payment.getGiver().getId().equals(this.loggedInMember.getId());
     }
     
+    @Logable(LogLevel.INFO)
     public String addPayment() {
-        System.out.println("addPayment()");
-        this.currentPayment = new Payment();
+        /* Neues Payment-Objekt initiieren */
+        this.currentPayment = new Payment(this.loggedInMember, new Date(), this.apartmentID);
         this.addPayment = true;
         this.editPayment = false;
+        this.deletePayment = false;
         return "cashflow-add";
     }
     
+    @Logable(LogLevel.INFO)
     public String editPayment(Payment payment) {
-        System.out.println("editPayment()");
+        /* Ausgewaehltes Payment-Objekt setzen und Sicherungskopie anlegen */
         this.currentPayment = payment;
+        this.originalPayment = new Payment(payment);
         this.editPayment = true;
         this.addPayment = false;
+        this.deletePayment = false;
         return "cashflow-add";
     }
     
-    public void deletePayment() {
-        System.out.println("deletePayment()");
+    @Logable(LogLevel.INFO)
+    public void deletePayment(Payment payment) {
+        this.deletePayment = true;
+        this.addPayment = false;
+        this.editPayment = false;
+        try {
+            /* Bestehendes Payment-Objekt aus der Datenbank entfernen */
+            this.cashflow.deletePayment(payment);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+        /* Bestehendes Payment-Objekt aus der Payments-Liste entfernen */
+        this.payments.remove(payment);
+        /* Neue Balance für die Mitglieder berechnen */
+        this.calculateBalance(payment);
     }
     
+    @Logable(LogLevel.INFO)
     public String savePayment() {
-        // Bool-Variable isNewPayment, um dann DB-Eintrag zu createn und ansonsten zu updaten, da Edit-Funktion
-        // auch diese Funktion nutzt.
-        System.out.println("savePayment()");
-        System.out.println("Description: " + currentPayment.getDescription());
-        for(int i=0; i < currentPayment.getInvolvedMembers().size(); i++) {
-            System.out.println("InvolvedMember " + i + ": "+ currentPayment.getInvolvedMembers().get(i).getName());
+        if(this.validateInput(ValidationGroup.GENERAL)) {   // Gueltige Eingabe
+            if(this.addPayment) {   // Zahlung hinzufuegen
+                try {
+                    /* Neues Payment-Objekt der Datenbank hinzufügen */
+                    this.cashflow.createPayment(this.currentPayment);
+                } catch(AppException ex) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
+                /* Neues Payment-Objekt der zu Anfang initialisierten Payments-Liste hinzufügen */
+                this.payments.add(0, this.currentPayment);
+                /* Neue Balance für die Mitglieder berechnen */
+                this.calculateBalance(this.currentPayment);
+            }
+            if(this.editPayment) {  // Bestehende Zahlung updaten
+                try {
+                    /* Bestehendes Payment-Objekt in der Datenbank updaten */
+                    this.cashflow.updatePayment(this.currentPayment);
+                } catch(AppException ex) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
+                /* Neue Balance für die Mitglieder berechnen */
+                this.calculateBalance(this.currentPayment);
+            }
+        } else {    // Ungueltige Eingabe
+            return "";
         }
-        System.out.println("Sum: " + currentPayment.getSum() + " €");
         return "cashflow";
     }
     
+    @Logable(LogLevel.INFO)
     public String discardPayment() {
-        System.out.println("discardPayment()");
+        if(this.editPayment) {
+            /* Falls ein vorhandenes Objekt bearbeitet werden sollte und diese Aktion abgebrochen wurde,
+             * muss dieses auf seinen Originalzustand zurückgesetzt werden.*/
+            this.currentPayment.setDescription(this.originalPayment.getDescription());
+            this.currentPayment.setInvolvedMembers(this.originalPayment.getInvolvedMembers());
+            this.currentPayment.setSum(this.originalPayment.getSum());
+        }
         return "cashflow";
     }
     
@@ -138,8 +192,9 @@ public class CashFlowViewModel implements Serializable {
             Collections.sort(this.payments);
             Collections.reverse(this.payments);
         } catch(AppException ex) {
-            String msg = ex.getMessage();
-            FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage(msg));
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
         }
     }
      
@@ -147,8 +202,116 @@ public class CashFlowViewModel implements Serializable {
         try {
             this.members = this.memberRepository.getAllMembersFrom(apartmentID);
         } catch(AppException ex) {
-            String msg = ex.getMessage();
-            FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage(msg));
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+    }
+    
+    private Member findMemberByID(Long id) {
+        /* Auffinden eines Mitglieds mit der uebergebenen ID in der Members-Liste */
+        for(int i = 0; i < this.members.size(); i++) {
+            Member tempMember = this.members.get(i);
+            if(tempMember.getId().equals(id)) {
+                return tempMember;
+            }
+        }
+        return null;
+    }
+    
+    private void calculateBalance(Payment payment) {
+        Member giver = payment.getGiver();
+        List<Member> involvedMembers = payment.getInvolvedMembers();
+        int amountMembers = involvedMembers.size();
+        BigDecimal balanceTotal = payment.getSum();
+        BigDecimal balancePerMember = balanceTotal.divide(BigDecimal.valueOf(amountMembers));
+        balancePerMember = balancePerMember.multiply(new BigDecimal(-1));
+
+        System.out.println("Anzahl Member: " + amountMembers);
+        System.out.println("1 Balance pro Member: " + balancePerMember);
+        
+        if(this.editPayment) {
+            /* Funktioniert noch nicht, da jedes Mitglied einzeln betrachtet werden muss. 
+             * Fehler sobald man in einem Beitrag von einem involvierten Member zu zweien wechselt, 
+             * da beim zweiten der Betrag vom ersten verrechnet wird. */
+            //int originalAmountMembers = this.originalPayment.getInvolvedMembers().size();
+            System.out.println("Edit Payment");
+            /*BigDecimal originalBalanceTotal = this.originalPayment.getSum();
+            System.out.println("3 OriginalBalance: " + originalBalanceTotal);
+            BigDecimal originalBalancePerMember = originalBalanceTotal.divide(BigDecimal.valueOf(originalAmountMembers));
+            System.out.println("4 originalBalancePerMember: " + originalBalancePerMember);
+            
+            
+            balanceTotal = balanceTotal.subtract(originalBalanceTotal);
+            balancePerMember = balancePerMember.add(originalBalancePerMember);
+            System.out.println("5 BalancePerMember: " + balancePerMember);*/
+            
+        } 
+        
+        if(this.deletePayment) {
+            /* Die Betrage, die unter addPayment hinzugefuegt werden, werden einfach negiert
+             * und daher in diesem Fall abgezogen. */
+            balanceTotal = balanceTotal.multiply(new BigDecimal(-1));
+            balancePerMember = balancePerMember.multiply(new BigDecimal(-1));
+            System.out.println("Ich werde ausgeführt!");
+        }
+        
+        
+        
+        //if(this.addPayment) {
+            /* Dem Geldgeber wird der gesamte Betrag positiv angerechnet. Falls dieser sich aber 
+             * ebenfalls in der Liste der involvierten Mitgiedern befindet, wird in der folgenden 
+             * Schleife der Betrag, den er dementsprechend nur fuer sich bezahlt hat, 
+             * von seiner Cashbalance angezogen. */
+            giver.getDetails().calcCashBalance(balanceTotal);
+            /* Update der Members-Liste zur Anzeige auf der JSF-Seite */
+            Member objFromMembers = this.findMemberByID(giver.getId());
+            objFromMembers.getDetails().setCashBalance(giver.getDetails().getCashBalance());
+            
+            boolean isGiverInvolved = false;
+            for(int i = 0; i < amountMembers; i++) {
+                Member currentMember = involvedMembers.get(i);
+                System.out.println("Hier wird was gerechnet: " + balancePerMember);
+                System.out.println(currentMember.getName() + ": " + currentMember.getDetails().getCashBalance());
+                currentMember.getDetails().calcCashBalance(balancePerMember);
+                System.out.println("Ergebnis: " + currentMember.getDetails().getCashBalance());
+                if(currentMember.getId().equals(giver.getId())) {
+                    isGiverInvolved = true;
+                }
+                /* Update der Members-Liste zur Anzeige auf der JSF-Seite */
+                objFromMembers = this.findMemberByID(currentMember.getId());
+                objFromMembers.getDetails().setCashBalance(currentMember.getDetails().getCashBalance());
+            }
+
+            if(!isGiverInvolved) {
+                /* Falls der Geldgeber nicht zu den involvierten Mitgliedern gehoert, wird dieses Mitglied
+                 * einer Kopie der Liste hinzugefuegt, damit alle in der Liste enthaltenen Mitglieder 
+                 * in der Datenbank geupdatet werden koennen. */
+                List<Member> copy = new ArrayList<>();
+                copy.addAll(involvedMembers);
+                copy.add(giver);
+                this.updateCashbalanceInDatabase(copy);
+            } else {
+                /* Falls der Geldgeber zu den involvierten Mitgliedern gehoert, kann einfach die Liste
+                 * "involvedMembers" in der Datenbank geupdatet werden. */
+                this.updateCashbalanceInDatabase(involvedMembers);
+            }
+            
+        //}
+        
+        
+    }
+    
+    private void updateCashbalanceInDatabase(List<Member> members) {
+        for(int i = 0; i < members.size(); i++) {
+            Member tempMember = members.get(i);
+            try {
+                this.memberRepository.updateMember(tempMember);
+            } catch(AppException ex) {
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                facesContext.addMessage("Error",msg);
+            }
         }
     }
     
@@ -158,14 +321,9 @@ public class CashFlowViewModel implements Serializable {
          * sind. Dieses Set ist leer, falls die Eingabe gueltig ist. Durch die Gruppierung der Constraints, hier General.class, besteht die
          * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird.
          * s. https://www.baeldung.com/javax-validation-groups */
-        Set<ConstraintViolation<CashFlowViewModel>> constraintViolations = null;
+        Set<ConstraintViolation<Payment>> constraintViolations = null;
         if(group == ValidationGroup.GENERAL) {
-            // Moeglichkeit 1 -> diese Klasse selbst validieren
-            constraintViolations = validator.validate( this, General.class );
-            // Moeglichkeit 1 -> Sub-Klasse validieren
-            //constraintViolations = validator.validate( this.subklasse, General.class );
-        } else if(group == ValidationGroup.CONDITION) {
-            constraintViolations = validator.validate( this, Condition.class );
+            constraintViolations = validator.validate( this.currentPayment, General.class );
         }
 
         if(constraintViolations != null && constraintViolations.isEmpty()) {
@@ -174,7 +332,7 @@ public class CashFlowViewModel implements Serializable {
         } else {
             /* Ungueltige Eingabe */
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Iterator<ConstraintViolation<CashFlowViewModel>> iter = constraintViolations.iterator();
+            Iterator<ConstraintViolation<Payment>> iter = constraintViolations.iterator();
             while (iter.hasNext()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", iter.next().getMessage());
                 facesContext.addMessage("Constraint Violation",msg);
@@ -227,12 +385,5 @@ public class CashFlowViewModel implements Serializable {
     public boolean isEditPayment() {
         return editPayment;
     }
-    
-    
-    
-    
-    public void test() {
-        System.out.println("Member Anzahl: " + this.members.size());
-        System.out.println("Login Name:" + this.loggedInMember.getName());
-    }
+
 }

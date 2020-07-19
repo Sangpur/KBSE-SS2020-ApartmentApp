@@ -6,8 +6,10 @@ package de.hsos.kbse.app.entity.member;
 
 import de.hsos.kbse.app.enums.MemberColor;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -40,9 +42,14 @@ public class MemberDetail implements Serializable {
     @Enumerated(EnumType.STRING)
     private MemberColor color;
     
-    private float cashBalance;
+    @Column(precision = 8, scale = 2)
+    private BigDecimal cashBalance;
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    public void calcCashBalance(BigDecimal value) {
+        this.cashBalance = this.cashBalance.add(value);
+    }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
@@ -64,8 +71,12 @@ public class MemberDetail implements Serializable {
         this.color = color;
     }
 
-    public float getCashBalance() {
+    public BigDecimal getCashBalance() {
         return cashBalance;
+    }
+
+    public void setCashBalance(BigDecimal cashBalance) {
+        this.cashBalance = cashBalance;
     }
 
 }
