@@ -1,5 +1,5 @@
 /*
- * CONTROLLER CLASS Calender
+ * CONTROLLER CLASS Calendar
  *
  */
 package de.hsos.kbse.app.control;
@@ -8,9 +8,11 @@ import de.hsos.kbse.app.entity.features.Event;
 import de.hsos.kbse.app.entity.features.EventManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 /**
@@ -19,7 +21,7 @@ import javax.transaction.Transactional;
  */
 @RequestScoped
 @Transactional
-public class Calender implements EventManager, Serializable {
+public class Calendar implements EventManager, Serializable {
     
     /* ----------------------------------------- ATTRIBUTES ---------------------------------------- */
     
@@ -70,6 +72,20 @@ public class Calender implements EventManager, Serializable {
             throw new AppException("Kalendereintrag konnte nicht gefunden werden!");
         }
         return event;
+    }
+    
+    @Override
+    public List<Event> getAllEventsFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "SELECT e FROM Event e WHERE e.apartmentID = :id";
+            TypedQuery<Event> querySelect = em.createQuery(str, Event.class);
+            querySelect.setParameter("id", apartmentID);
+            List<Event> results = querySelect.getResultList();
+            return results;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Events der WG "+ apartmentID +" konnten nicht gefunden werden!");
+        }
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
