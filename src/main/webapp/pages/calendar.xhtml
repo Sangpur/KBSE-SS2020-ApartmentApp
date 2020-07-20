@@ -26,7 +26,7 @@
 
                 <div class="addbutton__wrap">
                     <h:form>
-                        <p:commandButton value="+" action="#{calenderVM.addEvent()}" class="addbutton" />
+                        <p:commandButton value="+" action="#{calendarVM.addEvent()}" class="addbutton" />
                     </h:form>
                 </div>
                 
@@ -35,6 +35,15 @@
                 </p:messages>
                 
                 YOUR CONTENT.
+                
+                <div>
+                    <h:form>
+                        <p:commandButton action="#{calendarVM.backward()}" icon="pi pi-angle-left" />
+                        <h:outputText value="Monat Jahreszahl"/>
+                        <p:commandButton action="#{calendarVM.forward()}" icon="pi pi-angle-right" />
+                    </h:form>
+                </div>
+
                 
             </main>
         </div>

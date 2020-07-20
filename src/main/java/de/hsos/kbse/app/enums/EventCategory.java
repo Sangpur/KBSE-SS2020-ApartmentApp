@@ -10,11 +10,24 @@ package de.hsos.kbse.app.enums;
  */
 public enum EventCategory {
     
-    BIRTHDAY, EVENT, VACATION, APPOINTMENT, OTHER;
+    BIRTHDAY("Geburtstag"), 
+    EVENT("Veranstaltung"), 
+    VACATION("Urlaub"), 
+    APPOINTMENT("Termin"), 
+    OTHER("Sonstiges");
+    
+    private final String status;
+    
+    private EventCategory(String status){
+        this.status = status;
+    }
     
     @Override
     public String toString() {
         return super.toString();
     }
     
+    public String getStatus(){
+        return this.status;
+    }
 }
