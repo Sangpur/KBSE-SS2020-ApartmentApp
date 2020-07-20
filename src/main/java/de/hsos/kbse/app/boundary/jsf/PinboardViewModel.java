@@ -12,7 +12,6 @@ import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.NoteCategory;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.AppException;
-import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
@@ -23,8 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -56,14 +53,16 @@ public class PinboardViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
+    private Long apartmentID = 1000L;   // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
     private Member loggedInMember;
     private Note currentNote;
+    private Note originalNote;      // Sicherung des zu bearbeitenden Notiz-Objekts
     private List<Note> notes;
-    private boolean admin;           // true = ADMIN, false = USER
-    private boolean addNote;         // true = addNote()
-    private boolean editNote;        // true = editNote()
-    private NoteCategory[] categories;
+    private boolean admin;          // true = ADMIN, false = USER
+    private boolean addNote;        // true = addNote()
+    private boolean editNote;       // true = editNote()
+    private final NoteCategory[] categories;
+    
 
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
@@ -85,63 +84,90 @@ public class PinboardViewModel implements Serializable {
         validator = factory.getValidator();
     }
     
+    @Logable(LogLevel.INFO)
     public String addNote() {
-        System.out.println("addNote()");
-        this.currentNote = new Note();
+        /* Neues Note-Objekt initiieren */
+        this.currentNote = new Note(this.loggedInMember, new Date(), this.apartmentID);
         this.addNote = true;
         this.editNote = false;
         return "pinboard-add";
     }
     
+    @Logable(LogLevel.INFO)
     public String editNote(Note note){
-        System.out.println("editNote()");
+        /* Ausgewaehltes Notiz-Objekt setzen und Sicherungskopie anlegen */
         this.currentNote = note;
+        this.originalNote = new Note(currentNote);
         this.editNote = true;
         this.addNote = false;
         return "pinboard-add";
     }
     
+    @Logable(LogLevel.INFO)
     public void deleteNote(Note note){
-        System.out.println("deleteNote()");
+        this.addNote = false;
+        this.editNote = false;
         try {
+            /* Bestehendes Payment-Objekt aus der Datenbank entfernen */
             this.pinboard.deleteNote(note);
-            removeFromNoteList(note);
+            
         } catch (AppException ex) {
-            Logger.getLogger(PinboardViewModel.class.getName()).log(Level.SEVERE, null, ex);
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
         }
+        /* Bestehendes Notiz-Objekt aus der Notizen-Liste entfernen */
+        removeFromNoteList(note);
     }
     
+    @Logable(LogLevel.INFO)
     public String saveNote(){
-        System.out.println("saveNote()");
         
-        this.currentNote.setApartmentID(apartmentID);
-        
-        if(this.addNote && !this.editNote){
-            this.currentNote.setTimestamp(new Date());
-            this.currentNote.setAuthor(loggedInMember);
+        if(this.validateInput(ValidationGroup.GENERAL)) { // Gültige Eingabe
             
-            try {
-                this.pinboard.createNote(currentNote);
-            } catch (AppException ex) {
-                Logger.getLogger(PinboardViewModel.class.getName()).log(Level.SEVERE, null, ex);
+            if(this.addNote){ // Neue Notiz
+                try {
+                    /* Neues Notiz-Objekt der Datenbank hinzufügen */
+                    this.pinboard.createNote(currentNote);
+                } catch (AppException ex) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
+                /* Neues Notiz-Objekt der zu Anfang initialisierten Notizen-Liste hinzufügen */
+                addNoteToList(this.currentNote);
             }
-            addNoteToList(this.currentNote);
-        }else if(!this.addNote && this.editNote){
-            this.currentNote.setTimestamp(new Date());
-            try {
-                this.pinboard.updateNote(currentNote);
-            } catch (AppException ex) {
-                Logger.getLogger(PinboardViewModel.class.getName()).log(Level.SEVERE, null, ex);
+            else if(this.editNote){ // Bestehende Notiz bearbeiten
+                
+                this.currentNote.setTimestamp(new Date());
+                try {
+                    /* Bestehendes Noitz-Objekt in der Datenbank updaten */
+                    this.pinboard.updateNote(currentNote);
+                } catch (AppException ex) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
+                
+                /* Bestehendes Notiz-Objekt in der zu Anfang initialisierten Notizen-Liste aktualisieren */
+                updateNoteList(this.currentNote);
             }
-            updateNoteList(this.currentNote);
+        }else{ // Ungültige Eingabe
+            return "";
         }
         
         return "pinboard";
     }
     
+    @Logable(LogLevel.INFO)
     public String discardNote(){
-        System.out.println("discardNote()");
-        this.currentNote = new Note();
+        /* Falls ein vorhandenes Objekt bearbeitet werden sollte und diese Aktion abgebrochen wurde,
+         * muss dieses auf seinen Originalzustand zurückgesetzt werden.*/
+        if(this.editNote){
+            this.currentNote.setMessage(this.originalNote.getMessage());           
+            this.currentNote.setCategory(this.originalNote.getCategory());
+            this.currentNote.setTimestamp(this.originalNote.getTimestamp());
+        }
         return "pinboard";
     }
     
@@ -153,40 +179,11 @@ public class PinboardViewModel implements Serializable {
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
-    
-    private void removeFromNoteList(Note n){
-        System.out.println("removeFromNoteList()");
-        for(int i = 0; i < this.notes.size(); i++){
-            if(this.notes.get(i).equals(n)){
-                this.notes.remove(i);
-            }
-        }
-        /* Collections.sort(this.notes);
-        Collections.reverse(this.notes); */
-    }
-    
-    private void updateNoteList(Note n){
-        System.out.println("updateNoteList()");
-        this.notes.forEach((note) -> {
-            if(note.getId().equals(n.getId())){
-                note = n;
-            }
-        });
-        Collections.sort(this.notes);
-        Collections.reverse(this.notes);
-    }
-    
-    private void addNoteToList(Note n){
-        System.out.println("addNoteToList()");
-        this.notes.add(n);
-        Collections.sort(notes);
-        Collections.reverse(notes);
-    }
-    
     private void initNoteList() {
-        System.out.println("initNoteList()");
         try {
             List<Note> tmp = this.pinboard.getAllNotesFrom(apartmentID);
+            
+            /* Einträge der letzten 7 Tage der Notizen-Liste werden hinzugefügt */
             Date lastWeek = java.sql.Date.valueOf(LocalDate.now().minusDays(7));
             
             tmp.forEach((note) -> {
@@ -195,14 +192,49 @@ public class PinboardViewModel implements Serializable {
                 }   
             });
             
+            /* Absteigende Sortierung der Notizen anhand des Datums. Notizen mit Status "URGENT" werden an oberster Stelle einsortiert.*/
             Collections.sort(this.notes);
             Collections.reverse(this.notes);
 
         } catch(AppException ex) {
-            String msg = ex.getMessage();
-            FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage(msg));
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
         }
     }
+    
+    private void removeFromNoteList(Note n){
+        /* Das Notiz-Objekt wird aus der Notizen-Liste entfernt */
+        for(int i = 0; i < this.notes.size(); i++){
+            if(this.notes.get(i).equals(n)){
+                this.notes.remove(i);
+            }
+        }
+    }
+    
+    private void updateNoteList(Note n){
+        /* Das Notiz-Objekt innerhalb der Notizen-Liste wird aktualisiert */
+        this.notes.forEach((note) -> {
+            if(note.getId().equals(n.getId())){
+                note = n;
+            }
+        });
+        
+        /* Die Notizen-List wird erneut sortiert */
+        Collections.sort(this.notes);
+        Collections.reverse(this.notes);
+    }
+    
+    private void addNoteToList(Note n){
+        /* Ein Noitz-Objekt wird der Notizen-Liste hinzugefügt */
+        this.notes.add(n);
+        
+        /* Die Notizen-List wird erneut sortiert und das Notiz-Objekt somit an die richtige Stelle bewegt */
+        Collections.sort(notes);
+        Collections.reverse(notes);
+    }
+    
+
     
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {
@@ -210,14 +242,9 @@ public class PinboardViewModel implements Serializable {
          * sind. Dieses Set ist leer, falls die Eingabe gueltig ist. Durch die Gruppierung der Constraints, hier General.class, besteht die
          * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird.
          * s. https://www.baeldung.com/javax-validation-groups */
-        Set<ConstraintViolation<PinboardViewModel>> constraintViolations = null;
+        Set<ConstraintViolation<Note>> constraintViolations = null;
         if(group == ValidationGroup.GENERAL) {
-            // Moeglichkeit 1 -> diese Klasse selbst validieren
-            constraintViolations = validator.validate( this, General.class );
-            // Moeglichkeit 1 -> Sub-Klasse validieren
-            //constraintViolations = validator.validate( this.subklasse, General.class );
-        } else if(group == ValidationGroup.CONDITION) {
-            constraintViolations = validator.validate( this, Condition.class );
+            constraintViolations = validator.validate( this.currentNote, General.class );
         }
 
         if(constraintViolations != null && constraintViolations.isEmpty()) {
@@ -226,7 +253,7 @@ public class PinboardViewModel implements Serializable {
         } else {
             /* Ungueltige Eingabe */
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Iterator<ConstraintViolation<PinboardViewModel>> iter = constraintViolations.iterator();
+            Iterator<ConstraintViolation<Note>> iter = constraintViolations.iterator();
             while (iter.hasNext()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", iter.next().getMessage());
                 facesContext.addMessage("Constraint Violation",msg);
@@ -244,72 +271,24 @@ public class PinboardViewModel implements Serializable {
         }
     }
 
-    public static Validator getValidator() {
-        return validator;
-    }
-
-    public static void setValidator(Validator validator) {
-        PinboardViewModel.validator = validator;
-    }
-
-    public Long getApartmentID() {
-        return apartmentID;
-    }
-
-    public void setApartmentID(Long apartmentID) {
-        this.apartmentID = apartmentID;
-    }
-
     public Note getCurrentNote() {
         return currentNote;
-    }
-
-    public void setCurrentNote(Note currentNote) {
-        this.currentNote = currentNote;
-    }
-
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
     }
 
     public boolean isAddNote() {
         return addNote;
     }
 
-    public void setAddNote(boolean addNote) {
-        this.addNote = addNote;
-    }
-
     public boolean isEditNote() {
         return editNote;
-    }
-
-    public void setEditNote(boolean editNote) {
-        this.editNote = editNote;
     }
 
     public List<Note> getNotes() {
         return notes;
     }
 
-    public void setNotes(List<Note> notes) {
-        this.notes = notes;
-    }
-
     public NoteCategory[] getCategories() {
         return categories;
     }
 
-    public void setCategories(NoteCategory[] categories) {
-        this.categories = categories;
-    }
-   
-    
-    
-    
-    
 }

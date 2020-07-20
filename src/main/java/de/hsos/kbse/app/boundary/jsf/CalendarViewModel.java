@@ -39,14 +39,14 @@ import javax.validation.ValidatorFactory;
  *
  * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
  */
-@Named("calenderVM")
+@Named("calendarVM")
 @ConversationScoped
 public class CalendarViewModel implements Serializable {
     
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
     /* Controller Class */
-    private final Calendar calender;
+    private final Calendar calendar;
     
     /* Injected Conversation */
     private final Conversation conversation;
@@ -67,8 +67,8 @@ public class CalendarViewModel implements Serializable {
     
     @Inject
     @Logable(LogLevel.INFO)
-    public CalendarViewModel(Calendar calender, Conversation conversation) {
-        this.calender = calender;
+    public CalendarViewModel(Calendar calendar, Conversation conversation) {
+        this.calendar = calendar;
         this.conversation = conversation;
         this.events = new LinkedList<>();
         this.initEventList();
@@ -86,7 +86,7 @@ public class CalendarViewModel implements Serializable {
     public String addEvent() {
         System.out.println("addEvent()");
         this.currentEvent = new Event();
-        return "calender-add";
+        return "calendar-add";
     }
     
     public String editEvent(Event event){
@@ -100,10 +100,12 @@ public class CalendarViewModel implements Serializable {
     public void deleteEvent(Event event){
         System.out.println("deleteEvent()");
         try {
-            this.calender.deleteEvent(event);
+            this.calendar.deleteEvent(event);
             removeFromEventList(event);
         } catch (AppException ex) {
-            Logger.getLogger(CalendarViewModel.class.getName()).log(Level.SEVERE, null, ex);
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
         }
     }
     
@@ -117,35 +119,39 @@ public class CalendarViewModel implements Serializable {
             // this.currentEvent.setAuthor(loggedInMember);
             
             try {
-                this.calender.createEvent(currentEvent);
+                this.calendar.createEvent(currentEvent);
             } catch (AppException ex) {
-                Logger.getLogger(CalendarViewModel.class.getName()).log(Level.SEVERE, null, ex);
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                facesContext.addMessage("Error",msg);
             }
             addEventToList(this.currentEvent);
         }else if(!this.addEvent && this.editEvent){
             // this.currentEvent.setTimestamp(new Date());
             try {
-                this.calender.updateEvent(currentEvent);
+                this.calendar.updateEvent(currentEvent);
             } catch (AppException ex) {
-                Logger.getLogger(CalendarViewModel.class.getName()).log(Level.SEVERE, null, ex);
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                facesContext.addMessage("Error",msg);
             }
             updateEventList(this.currentEvent);
         }
         
-        return "calender";
+        return "calendar";
     }
     
     public String discardEvent(){
         System.out.println("discardEvent()");
         this.currentEvent = new Event();
-        return "calender";
+        return "calendar";
     }
     
     /* Überarbeiten */
     public boolean checkAccessRights(Event event) {
         /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        return this.admin; //|| event.get .getId().equals(this.loggedInMember.getId());
+        return this.admin || event.getAuthor().getId().equals(this.loggedInMember.getId());
     }
     
     
@@ -158,8 +164,6 @@ public class CalendarViewModel implements Serializable {
                 this.events.remove(i);
             }
         }
-        /* Collections.sort(this.notes);
-        Collections.reverse(this.notes); */
     }
     
     private void updateEventList(Event e){
@@ -183,14 +187,15 @@ public class CalendarViewModel implements Serializable {
     private void initEventList(){
         System.out.println("initEventList()");
         try {
-            this.events = this.calender.getAllEventsFrom(apartmentID);
+            this.events = this.calendar.getAllEventsFrom(apartmentID);
 
             Collections.sort(this.events);
             Collections.reverse(this.events);
 
         } catch(AppException ex) {
-            String msg = ex.getMessage();
-            FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage(msg));
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
         }
     }
     
@@ -201,14 +206,9 @@ public class CalendarViewModel implements Serializable {
          * sind. Dieses Set ist leer, falls die Eingabe gueltig ist. Durch die Gruppierung der Constraints, hier General.class, besteht die
          * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird.
          * s. https://www.baeldung.com/javax-validation-groups */
-        Set<ConstraintViolation<CalendarViewModel>> constraintViolations = null;
+        Set<ConstraintViolation<Event>> constraintViolations = null;
         if(group == ValidationGroup.GENERAL) {
-            // Moeglichkeit 1 -> diese Klasse selbst validieren
-            constraintViolations = validator.validate( this, General.class );
-            // Moeglichkeit 1 -> Sub-Klasse validieren
-            //constraintViolations = validator.validate( this.subklasse, General.class );
-        } else if(group == ValidationGroup.CONDITION) {
-            constraintViolations = validator.validate( this, Condition.class );
+            constraintViolations = validator.validate( this.currentEvent, General.class );
         }
 
         if(constraintViolations != null && constraintViolations.isEmpty()) {
@@ -217,7 +217,7 @@ public class CalendarViewModel implements Serializable {
         } else {
             /* Ungueltige Eingabe */
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Iterator<ConstraintViolation<CalendarViewModel>> iter = constraintViolations.iterator();
+            Iterator<ConstraintViolation<Event>> iter = constraintViolations.iterator();
             while (iter.hasNext()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", iter.next().getMessage());
                 facesContext.addMessage("Constraint Violation",msg);
