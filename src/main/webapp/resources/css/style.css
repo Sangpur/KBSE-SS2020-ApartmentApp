@@ -353,6 +353,18 @@ main {
     width: 8em;
 }
 
+/* Select */
+
+.input__select .ui-selectonemenu {
+    width: 12em;
+}
+
+body .ui-selectonemenu-panel .ui-selectonemenu-items .ui-selectonemenu-item.ui-state-highlight {
+    background-color: #43d7a6;
+}
+
+/* Checkbox */
+
 .input .ui-selectmanycheckbox.ui-widget td, .input .ui-selectoneradio.ui-widget td {
     padding-top: .5em;
 }
