@@ -47,8 +47,12 @@ public class MemberDetail implements Serializable {
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
-    public void calcCashBalance(BigDecimal value) {
+    public void addCashBalance(BigDecimal value) {
         this.cashBalance = this.cashBalance.add(value);
+    }
+    
+    public void subtractCashBalance(BigDecimal value) {
+        this.cashBalance = this.cashBalance.subtract(value);
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
