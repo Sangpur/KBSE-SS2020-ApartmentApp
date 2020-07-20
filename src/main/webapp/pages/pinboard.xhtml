@@ -36,11 +36,11 @@
                 </p:messages>
 
                 <div class="cards pinboard-cards">
-                    <p:dataGrid var="note" value="#{pinboardVM.notes}" columns="3" layout="grid" paginator="false">
+                    <p:dataGrid id="notes__list" var="note" value="#{pinboardVM.notes}" columns="3" layout="grid" paginator="false">
                         <div class="card card--#{note.author.details.color}">
                             <div class="card__header">
                                 <p class="card__header--left card__categorie">
-                                    <h:outputText value="#{note.category}" />
+                                    <h:outputText value="#{note.category.status}" />
                                 </p>
                                 <p class="card__header--right card__date">
                                     <h:outputText value="#{note.timestamp}"> 
@@ -59,18 +59,18 @@
                                     <h:outputText value="#{note.author.name}" />
                                 </p>
                                 <ui:fragment rendered="#{pinboardVM.checkAccessRights(note)}">
-                                  <div class="card__footer--right card__edit">
-                                      <h:form>
-                                          <p:commandButton action="#{pinboardVM.editNote(note)}" icon="pi pi-pencil" class="form__button" />
-                                          <p:commandButton action="#{pinboardVM.deleteNote(note)}" icon="pi pi-trash" class="form__button" update="notes__list">
-                                              <p:confirm header="Löschen der Notiz" message="Soll die Notiz wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
-                                          </p:commandButton>
-                                          <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-                                              <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                                              <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                                          </p:confirmDialog> 
-                                      </h:form>
-                                    </div>
+                                <div class="card__footer--right card__edit">
+                                    <h:form>
+                                        <p:commandButton action="#{pinboardVM.editNote(note)}" icon="pi pi-pencil" class="form__button" />
+                                        <p:commandButton action="#{pinboardVM.deleteNote(note)}" icon="pi pi-trash" class="form__button" update="notes__list">
+                                            <p:confirm header="Löschen der Notiz" message="Soll die Notiz wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                        </p:commandButton>
+                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                            <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                            <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                        </p:confirmDialog> 
+                                    </h:form>
+                                </div>
                                 </ui:fragment>
                             </div>
                         </div>
