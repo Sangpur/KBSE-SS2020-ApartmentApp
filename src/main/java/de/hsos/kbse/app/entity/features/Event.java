@@ -6,6 +6,8 @@ package de.hsos.kbse.app.entity.features;
 
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.EventCategory;
+import de.hsos.kbse.app.util.Condition;
+import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
@@ -21,6 +23,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -37,6 +42,9 @@ public class Event implements Serializable, Comparable<Event> {
     @TableGenerator(name = "modEvent", initialValue = 3)
     private Long id;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Der Titel darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Der Titel muss zwischen 3 und 50 Zeichen liegen!")
+    @Pattern(groups = {General.class, Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Der Titel enthält ungültige Bezeichner!")
     private String title;
     
     @OneToOne(cascade = CascadeType.MERGE)

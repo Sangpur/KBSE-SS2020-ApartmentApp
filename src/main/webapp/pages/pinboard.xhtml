@@ -38,26 +38,32 @@
                 YOUR CONTENT.
                 
                 <div class="cards">
-                    <p:dataGrid var="note" value="#{pinboardVM.notes}" columns="4" layout="grid" rows="8" paginator="false">
+                    <p:dataGrid id="notes__list" var="note" value="#{pinboardVM.notes}" columns="4" layout="grid" rows="8" paginator="false">
                         <div class="card card--#{note.author.details.color}">
                             <p class="card__name">
                                 <h:outputText value="#{note.author.name}" />
                             </p>
                             <p class="card__category">
-                                <h:outputText value="#{note.category}" />
+                                <h:outputText value="#{note.category.status}" />
                             </p>
                             <p class="card__content">
                                 <h:outputText value="#{note.message}" />
                             </p>
                             <p class="card__content">
                                 <h:outputText value="#{note.timestamp}"> 
-                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                    <f:convertDateTime pattern="dd.MM.yyyy" />
                                 </h:outputText>
                             </p>
                             <ui:fragment rendered="#{pinboardVM.checkAccessRights(note)}">
                                 <h:form>
                                     <p:commandButton action="#{pinboardVM.editNote(note)}" icon="pi pi-pencil" class="form__button" />
-                                    <p:commandButton action="#{pinboardVM.deleteNote(note)}" ajax="false" icon="pi pi-trash" class="form__button" />
+                                    <p:commandButton action="#{pinboardVM.deleteNote(note)}" icon="pi pi-trash" class="form__button" update="notes__list">
+                                        <p:confirm header="Löschen der Notiz" message="Soll die Notiz wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                    </p:commandButton>
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                        <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                        <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                    </p:confirmDialog> 
                                 </h:form>
                              </ui:fragment>
                         </div>
