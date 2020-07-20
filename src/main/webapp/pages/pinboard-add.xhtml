@@ -27,8 +27,14 @@
                 <h:form>
                     <div class="form">
                         <div class="input__wrap">
-                            <div class="input__label">Kategorie auswählen:</div>
-                            <div class="input">
+                            <div class="input__label">Notiz:</div>
+                            <div class="input input--big">
+                                <p:inputText value="#{pinboardVM.currentNote.message}" />
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Kategorie:</div>
+                            <div class="input input__select">
                                 <ui:fragment >
                                     <p:selectOneMenu value="#{pinboardVM.currentNote.category}"  rendered="#{pinboardVM.addNote}">
                                         <f:selectItems value="#{pinboardVM.categories}" var="category" itemLabel="#{category.status}" itemValue="#{category}" />
@@ -40,12 +46,6 @@
                                         <f:selectItems value="#{pinboardVM.categories}" var="category" itemLabel="#{category.status}" itemValue="#{category}"/>
                                     </p:selectOneMenu>
                                 </ui:fragment>
-                            </div>
-                        </div>
-                        <div class="input__wrap">
-                            <div class="input__label">Textfeld:</div>
-                            <div class="input">
-                                <p:inputText value="#{pinboardVM.currentNote.message}" />
                             </div>
                         </div>
                     </div>

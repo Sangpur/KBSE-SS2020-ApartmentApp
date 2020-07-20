@@ -34,32 +34,39 @@
                 <p:messages id="messages" showDetail="true" closable="true">
                     <p:autoUpdate />
                 </p:messages>
-
-                YOUR CONTENT.
                 
-                <div class="cards">
-                    <p:dataGrid var="note" value="#{pinboardVM.notes}" columns="4" layout="grid" rows="8" paginator="false">
+                <div class="cards pinboard-cards">
+                    <p:dataGrid var="note" value="#{pinboardVM.notes}" columns="3" layout="grid" paginator="false">
                         <div class="card card--#{note.author.details.color}">
-                            <p class="card__name">
-                                <h:outputText value="#{note.author.name}" />
-                            </p>
-                            <p class="card__category">
-                                <h:outputText value="#{note.category}" />
-                            </p>
-                            <p class="card__content">
-                                <h:outputText value="#{note.message}" />
-                            </p>
-                            <p class="card__content">
-                                <h:outputText value="#{note.timestamp}"> 
-                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
-                                </h:outputText>
-                            </p>
-                            <ui:fragment rendered="#{pinboardVM.checkAccessRights(note)}">
-                                <h:form>
-                                    <p:commandButton action="#{pinboardVM.editNote(note)}" icon="pi pi-pencil" class="form__button" />
-                                    <p:commandButton action="#{pinboardVM.deleteNote(note)}" ajax="false" icon="pi pi-trash" class="form__button" />
-                                </h:form>
-                             </ui:fragment>
+                            <div class="card__header">
+                                <p class="card__header--left card__categorie">
+                                    <h:outputText value="#{note.category}" />
+                                </p>
+                                <p class="card__header--right card__date">
+                                    <h:outputText value="#{note.timestamp}"> 
+                                        <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                    </h:outputText>
+                                </p>
+                            </div>
+                            
+                            <div class="card__content">
+                                <p>
+                                    <h:outputText value="#{note.message}" />
+                                </p>
+                            </div>
+                            <div class="card__footer">
+                                <p class="card__footer--left card__name">
+                                    <h:outputText value="#{note.author.name}" />
+                                </p>
+                                <ui:fragment rendered="#{pinboardVM.checkAccessRights(note)}">
+                                    <h:form>
+                                        <div class="card__footer--right card__edit">
+                                            <p:commandButton action="#{pinboardVM.editNote(note)}" icon="pi pi-pencil" class="form__button" />
+                                            <p:commandButton action="#{pinboardVM.deleteNote(note)}" ajax="false" icon="pi pi-trash" class="form__button" />
+                                        </div>
+                                    </h:form>
+                                </ui:fragment>
+                            </div>
                         </div>
                     </p:dataGrid>
                 </div>
