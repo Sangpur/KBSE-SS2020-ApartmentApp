@@ -182,6 +182,64 @@ main {
     border: 1px solid #d7d7d7;
 }
 
+.pinboard-cards .card {
+    padding-bottom: 1.2em;
+    min-height: 14em;
+    border: none;
+}
+
+.card__header {
+    position: relative;
+    height: 2.5em;
+}
+
+.card__header--left {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.card__header--right {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.card__categorie {
+    color: #000000;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.card__date {
+    color: #000000;
+}
+
+.card__content {
+    display: flex;
+    height: 6.5em;
+    color: #000000;
+    align-items: center;
+    justify-content: center;
+}
+
+.card__footer {
+    position: relative;
+    height: 2.5em;
+}
+
+.card__footer--left {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.card__footer--right {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
 .card p {
     margin: 0;
     padding: 0;
@@ -205,28 +263,58 @@ main {
     color: #ff0000;
 }
 
+.card__edit {
+    position: absolute;
+    bottom: -6px;
+    right: -10px;
+}
+
 .card--RED {
     color: #f10b0b;
+}
+
+.pinboard-cards .card--RED {
+    background: rgba(241, 11, 11, 0.2);
 }
 
 .card--GREEN {
     color: #85d222;
 }
 
+.pinboard-cards .card--GREEN {
+    background: rgba(133, 210, 34, 0.2);
+}
+
 .card--BLUE {
     color: #2a79fc;
+}
+
+.pinboard-cards .card--BLUE {
+    background: rgba(41, 121, 252, 0.2);
 }
 
 .card--YELLOW {
     color: #eed506;
 }
 
+.pinboard-cards .card--YELLOW {
+    background: rgba(238, 213, 6, 0.2);
+}
+
 .card--PINK {
     color: #ff2dcb;
 }
 
+.pinboard-cards .card--PINK {
+    background: rgba(255, 45, 203, 0.2);
+}
+
 .card--ORANGE {
     color: #ee8e06;
+}
+
+.pinboard-cards .card--ORANGE {
+    background: rgba(238, 142, 6, 0.2);
 }
 
 /* ----------------- Form ----------------- */
