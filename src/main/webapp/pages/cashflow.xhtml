@@ -45,7 +45,7 @@
                                 <h:outputText value="#{member.name}" />
                             </p>
                             <p class="card__balance #{cashflowVM.checkBalance(member.details.cashBalance) ? 'card__balance--positive' : 'card__balance--negative'}">
-                                <ui:fragment rendered="#{cashflowVM.checkBalance(member.details.cashBalance)}">+</ui:fragment>
+                                <ui:fragment rendered="#{cashflowVM.checkBalancePositive(member.details.cashBalance)}">+</ui:fragment>
                                 <h:outputText value="#{member.details.cashBalance}">
                                     <f:convertNumber pattern="#0.00"/>
                                 </h:outputText> €

@@ -12,7 +12,6 @@ import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.AppException;
-import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
@@ -88,6 +87,10 @@ public class CashFlowViewModel implements Serializable {
     
     public boolean checkBalance(float sum) {
         return sum >= 0;
+    }
+    
+    public boolean checkBalancePositive(float sum) {
+        return sum > 0;
     }
     
     public boolean checkAccessRights(Payment payment) {
@@ -219,87 +222,79 @@ public class CashFlowViewModel implements Serializable {
         return null;
     }
     
+    
     private void calculateBalance(Payment payment) {
-        Member giver = payment.getGiver();
-        List<Member> involvedMembers = payment.getInvolvedMembers();
-        int amountMembers = involvedMembers.size();
+        /* Die Member-Objekte in dem Payment-Objekt sollen nicht innerhalb des Payment-Objekts 
+         * geupdatet werden, sondern in der Members-Liste und der Datenbank, da diese sonst 
+         * moeglicherweise nicht auf dem aktuellen Stand bzgl. der CashBalance sind. */
+        Member giver = this.findMemberByID(payment.getGiver().getId());
+        int amountMembers = payment.getInvolvedMembers().size();
+        List<Member> involvedMembers = new ArrayList();
+        for(int i = 0; i < amountMembers; i++) {
+            Long tempID = payment.getInvolvedMembers().get(i).getId();
+            Member tempMember = this.findMemberByID(tempID);
+            involvedMembers.add(tempMember);
+        }
         BigDecimal balanceTotal = payment.getSum();
         BigDecimal balancePerMember = balanceTotal.divide(BigDecimal.valueOf(amountMembers));
-        balancePerMember = balancePerMember.multiply(new BigDecimal(-1));
-
-        System.out.println("Anzahl Member: " + amountMembers);
-        System.out.println("1 Balance pro Member: " + balancePerMember);
+        boolean isGiverInvolved = false;
         
-        if(this.editPayment) {
-            /* Funktioniert noch nicht, da jedes Mitglied einzeln betrachtet werden muss. 
-             * Fehler sobald man in einem Beitrag von einem involvierten Member zu zweien wechselt, 
-             * da beim zweiten der Betrag vom ersten verrechnet wird. */
-            //int originalAmountMembers = this.originalPayment.getInvolvedMembers().size();
-            System.out.println("Edit Payment");
-            /*BigDecimal originalBalanceTotal = this.originalPayment.getSum();
-            System.out.println("3 OriginalBalance: " + originalBalanceTotal);
-            BigDecimal originalBalancePerMember = originalBalanceTotal.divide(BigDecimal.valueOf(originalAmountMembers));
-            System.out.println("4 originalBalancePerMember: " + originalBalancePerMember);
+        if(this.deletePayment | this.editPayment) {
+            /* Bei dem Loeschen eines Payment-Objekts ist der nachfolgende Schritt obsolet. Bei der
+             * Editierung ist dieser jedoch notwendig, da sich die Anzahl der involvierten Mitglieder
+             * und alle weiteren Angaben nach der Editierung geaendert haben koennen. In diesem Fall
+             * muss aber das vorherige Payment-Objekt entfernt und im Folgenden das neue hinzugefuegt 
+             * werden. */
+            List<Member> involvedMembersForReverse = involvedMembers;
+            int amountMembersForReverse = amountMembers;
+            BigDecimal balanceTotalForReverse = balanceTotal;
+            BigDecimal balancePerMemberForReverse = balancePerMember;
             
+            if(this.editPayment) {
+                involvedMembersForReverse.clear();
+                amountMembersForReverse = this.originalPayment.getInvolvedMembers().size();
+                for(int i = 0; i < amountMembersForReverse; i++) {
+                    Long tempID = this.originalPayment.getInvolvedMembers().get(i).getId();
+                    Member tempMember = this.findMemberByID(tempID);
+                    involvedMembersForReverse.add(tempMember);
+                }
+                balanceTotalForReverse = this.originalPayment.getSum();
+                balancePerMemberForReverse = balanceTotalForReverse.divide(BigDecimal.valueOf(amountMembersForReverse));
+            } 
             
-            balanceTotal = balanceTotal.subtract(originalBalanceTotal);
-            balancePerMember = balancePerMember.add(originalBalancePerMember);
-            System.out.println("5 BalancePerMember: " + balancePerMember);*/
-            
-        } 
-        
-        if(this.deletePayment) {
-            /* Die Betrage, die unter addPayment hinzugefuegt werden, werden einfach negiert
-             * und daher in diesem Fall abgezogen. */
-            balanceTotal = balanceTotal.multiply(new BigDecimal(-1));
-            balancePerMember = balancePerMember.multiply(new BigDecimal(-1));
-            System.out.println("Ich werde ausgeführt!");
+            /* Der gezahlte Gesamtbetrag wird hier beim Geldgebener wieder abgezogen und bei 
+             * den involvierten Mitgliedern hinzugefuegt. */
+            giver.getDetails().subtractCashBalance(balanceTotalForReverse);
+            for(int i = 0; i < amountMembersForReverse; i++) {
+                Member tempMember = involvedMembersForReverse.get(i);
+                tempMember.getDetails().addCashBalance(balancePerMemberForReverse);
+                if(tempMember.getId().equals(giver.getId())) {
+                    isGiverInvolved = true;
+                }
+            }
         }
         
-        
-        
-        //if(this.addPayment) {
+        if(this.addPayment | this.editPayment) {
             /* Dem Geldgeber wird der gesamte Betrag positiv angerechnet. Falls dieser sich aber 
              * ebenfalls in der Liste der involvierten Mitgiedern befindet, wird in der folgenden 
              * Schleife der Betrag, den er dementsprechend nur fuer sich bezahlt hat, 
              * von seiner Cashbalance angezogen. */
-            giver.getDetails().calcCashBalance(balanceTotal);
-            /* Update der Members-Liste zur Anzeige auf der JSF-Seite */
-            Member objFromMembers = this.findMemberByID(giver.getId());
-            objFromMembers.getDetails().setCashBalance(giver.getDetails().getCashBalance());
-            
-            boolean isGiverInvolved = false;
+            giver.getDetails().addCashBalance(balanceTotal);
             for(int i = 0; i < amountMembers; i++) {
-                Member currentMember = involvedMembers.get(i);
-                System.out.println("Hier wird was gerechnet: " + balancePerMember);
-                System.out.println(currentMember.getName() + ": " + currentMember.getDetails().getCashBalance());
-                currentMember.getDetails().calcCashBalance(balancePerMember);
-                System.out.println("Ergebnis: " + currentMember.getDetails().getCashBalance());
-                if(currentMember.getId().equals(giver.getId())) {
+                Member tempMember = involvedMembers.get(i);
+                tempMember.getDetails().subtractCashBalance(balancePerMember);
+                if(tempMember.getId().equals(giver.getId())) {
                     isGiverInvolved = true;
                 }
-                /* Update der Members-Liste zur Anzeige auf der JSF-Seite */
-                objFromMembers = this.findMemberByID(currentMember.getId());
-                objFromMembers.getDetails().setCashBalance(currentMember.getDetails().getCashBalance());
             }
-
-            if(!isGiverInvolved) {
-                /* Falls der Geldgeber nicht zu den involvierten Mitgliedern gehoert, wird dieses Mitglied
-                 * einer Kopie der Liste hinzugefuegt, damit alle in der Liste enthaltenen Mitglieder 
-                 * in der Datenbank geupdatet werden koennen. */
-                List<Member> copy = new ArrayList<>();
-                copy.addAll(involvedMembers);
-                copy.add(giver);
-                this.updateCashbalanceInDatabase(copy);
-            } else {
-                /* Falls der Geldgeber zu den involvierten Mitgliedern gehoert, kann einfach die Liste
-                 * "involvedMembers" in der Datenbank geupdatet werden. */
-                this.updateCashbalanceInDatabase(involvedMembers);
-            }
-            
-        //}
-        
-        
+        }
+        if(!isGiverInvolved) {
+            /* Falls der Geldgeber nicht zu den involvierten Mitgliedern gehoert, wird dieses Mitglied
+             * einer Kopie der Liste hinzugefuegt, damit alle in der Liste enthaltenen Mitglieder 
+             * in der Datenbank geupdatet werden koennen. */
+            involvedMembers.add(giver);
+        } 
+        this.updateCashbalanceInDatabase(involvedMembers);
     }
     
     private void updateCashbalanceInDatabase(List<Member> members) {
