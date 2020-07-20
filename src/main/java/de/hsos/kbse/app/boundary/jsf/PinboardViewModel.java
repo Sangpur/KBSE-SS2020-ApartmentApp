@@ -103,34 +103,37 @@ public class PinboardViewModel implements Serializable {
     
     public void deleteNote(Note note){
         System.out.println("deleteNote()");
-        /* try {
+        try {
             this.pinboard.deleteNote(note);
+            removeFromNoteList(note);
         } catch (AppException ex) {
             Logger.getLogger(PinboardViewModel.class.getName()).log(Level.SEVERE, null, ex);
-        } */
+        }
     }
     
     public String saveNote(){
         System.out.println("saveNote()");
         
         this.currentNote.setApartmentID(apartmentID);
-        this.currentNote.setTimestamp(new Date());
-        this.currentNote.setAuthor(loggedInMember);
         
         if(this.addNote && !this.editNote){
-            /* try {
+            this.currentNote.setTimestamp(new Date());
+            this.currentNote.setAuthor(loggedInMember);
+            
+            try {
                 this.pinboard.createNote(currentNote);
             } catch (AppException ex) {
                 Logger.getLogger(PinboardViewModel.class.getName()).log(Level.SEVERE, null, ex);
-            } */
-            addNoteToList();
-        }else{
-            /* try {
+            }
+            addNoteToList(this.currentNote);
+        }else if(!this.addNote && this.editNote){
+            this.currentNote.setTimestamp(new Date());
+            try {
                 this.pinboard.updateNote(currentNote);
             } catch (AppException ex) {
                 Logger.getLogger(PinboardViewModel.class.getName()).log(Level.SEVERE, null, ex);
-            } */
-            updateNoteList();
+            }
+            updateNoteList(this.currentNote);
         }
         
         return "pinboard";
@@ -150,79 +153,56 @@ public class PinboardViewModel implements Serializable {
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
-    private void updateNoteList(){
-        System.out.println("updateNoteList()");
-        this.notes.forEach((note) -> {
-            if(note.getId().equals(currentNote.getId())){
-                note = currentNote;
+    
+    private void removeFromNoteList(Note n){
+        System.out.println("removeFromNoteList()");
+        for(int i = 0; i < this.notes.size(); i++){
+            if(this.notes.get(i).equals(n)){
+                this.notes.remove(i);
             }
-        });
+        }
+        /* Collections.sort(this.notes);
+        Collections.reverse(this.notes); */
     }
     
-    private void addNoteToList(){
+    private void updateNoteList(Note n){
+        System.out.println("updateNoteList()");
+        this.notes.forEach((note) -> {
+            if(note.getId().equals(n.getId())){
+                note = n;
+            }
+        });
+        Collections.sort(this.notes);
+        Collections.reverse(this.notes);
+    }
+    
+    private void addNoteToList(Note n){
         System.out.println("addNoteToList()");
-        int countUrgent = 0;
-        boolean added = false;
-             
-        for(int i = 0; i < this.notes.size(); i++){
-           if(this.notes.get(i).getCategory().equals(NoteCategory.URGENT)){
-               countUrgent++;
-            }
-        }
-        if(this.currentNote.getCategory().equals(NoteCategory.URGENT)){
-            for(int i = 0; i < countUrgent; i++){
-                if(this.currentNote.getTimestamp().after(this.notes.get(i).getTimestamp())){
-                    this.notes.add(i, currentNote);
-                    added = true;
-                }
-            }
-            if(!added){
-               this.notes.add(countUrgent + 1, currentNote);
-            }
-        }else{
-            for(int k = countUrgent; k < this.notes.size();k++){
-                if(this.currentNote.getTimestamp().after(this.notes.get(k).getTimestamp())){
-                    this.notes.add(k, currentNote);
-                    added = true;
-                }
-            }
-            if(!added){
-               this.notes.add(currentNote);
-            }
-        }
+        this.notes.add(n);
+        Collections.sort(notes);
+        Collections.reverse(notes);
     }
     
     private void initNoteList() {
+        System.out.println("initNoteList()");
         try {
             List<Note> tmp = this.pinboard.getAllNotesFrom(apartmentID);
-            List<Note> tmpUrgent = new LinkedList<>();
-            List<Note> tmpNormal = new LinkedList<>();
             Date lastWeek = java.sql.Date.valueOf(LocalDate.now().minusDays(7));
             
             tmp.forEach((note) -> {
                 if(note.getTimestamp().after(lastWeek)){
-                    if(note.getCategory().equals(NoteCategory.URGENT)){
-                        tmpUrgent.add(note);
-                    }else{
-                        tmpNormal.add(note);
-                    }
+                    this.notes.add(note);
                 }   
             });
             
-            Collections.sort(tmpUrgent);
-            Collections.sort(tmpNormal);
-            Collections.reverse(tmpUrgent);
-            Collections.reverse(tmpNormal);
-            
-            this.notes.addAll(tmpUrgent);
-            this.notes.addAll(tmpNormal);
-            
+            Collections.sort(this.notes);
+            Collections.reverse(this.notes);
+
         } catch(AppException ex) {
             String msg = ex.getMessage();
             FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage(msg));
         }
     }
-    
     
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {

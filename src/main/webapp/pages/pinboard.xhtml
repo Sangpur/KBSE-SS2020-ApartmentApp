@@ -57,7 +57,7 @@
                             <ui:fragment rendered="#{pinboardVM.checkAccessRights(note)}">
                                 <h:form>
                                     <p:commandButton action="#{pinboardVM.editNote(note)}" icon="pi pi-pencil" class="form__button" />
-                                    <p:commandButton action="#{pinboardVM.deleteNote(note)}" icon="pi pi-trash" class="form__button" />
+                                    <p:commandButton action="#{pinboardVM.deleteNote(note)}" ajax="false" icon="pi pi-trash" class="form__button" />
                                 </h:form>
                              </ui:fragment>
                         </div>
