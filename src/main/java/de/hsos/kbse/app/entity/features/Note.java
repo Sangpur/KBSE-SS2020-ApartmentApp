@@ -56,9 +56,18 @@ public class Note implements Serializable, Comparable<Note> {
     
     @Override
     public int compareTo(Note n) {
-      if (this.timestamp == null || n.getTimestamp()== null)
-        return 0;
-      return this.timestamp.compareTo(n.getTimestamp());
+        System.out.println("compareTo()");
+        
+        if (this.timestamp == null || n.getTimestamp()== null ){
+            return 0;
+        }else if(this.category.equals(NoteCategory.URGENT) && n.getCategory().equals(NoteCategory.URGENT)){
+          return this.timestamp.compareTo(n.getTimestamp());
+        }else if(this.category.equals(NoteCategory.URGENT) && !n.getCategory().equals(NoteCategory.URGENT)){
+            return 1;
+        }else if(!this.category.equals(NoteCategory.URGENT) && n.getCategory().equals(NoteCategory.URGENT)){
+          return -1;
+        }
+        return this.timestamp.compareTo(n.getTimestamp());
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
