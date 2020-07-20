@@ -12,6 +12,11 @@ INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, tit
 INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, title) VALUES (2, 1000, '2020-07-21 12:00:00', 'APPOINTMENT', '2020-07-21 14:00:00', 'Termin Vermieter')
 
 INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (1, 1000, 'URGENT', 'Bitte Putzplan einhalten!', '2020-07-21 12:13:20', 2)
+INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (2, 1000, 'TODO', 'Bitte einkaufen gehen!', '2020-07-21 17:13:20', 3)
+INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (3, 1000, 'INFO', 'Ab 22 Uhr nur noch Zimmerlautstärke', '2020-07-22 09:13:20', 1)
+INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (4, 1000, 'URGENT', 'Bitte Fahrräder nicht vor der Haustür abstellen!', '2020-07-15 12:13:20', 2)
+INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (5, 1000, 'INFO', 'Bitte Wäsche rechtzeitig aus der Waschmaschine nehmen!', '2020-07-05 14:13:20', 1)
+INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (6, 1000, 'TODO', 'Geschirr gehört abgewaschen und nicht in die Spüle gestellt!', '2020-07-19 09:13:20', 3)
 
 INSERT INTO payment (id, apartment_id, day, description, amount, giver_id) VALUES (1, 1000, '2020-06-01', 'Einkauf', 27.30, 1)
 INSERT INTO payment (id, apartment_id, day, description, amount, giver_id) VALUES (2, 1000, '2020-06-02', 'Getränke', 12.99, 3)

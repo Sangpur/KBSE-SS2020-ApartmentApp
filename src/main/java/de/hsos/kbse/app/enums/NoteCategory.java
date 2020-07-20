@@ -10,11 +10,22 @@ package de.hsos.kbse.app.enums;
  */
 public enum NoteCategory {
     
-    INFO, TODO, URGENT;
+    INFO("Info"), 
+    TODO("ToDo"), 
+    URGENT("Dringend");
+    
+    private final String status;
+    
+    private NoteCategory(String status){
+        this.status = status;
+    }
     
     @Override
     public String toString() {
         return super.toString();
     }
     
+    public String getStatus(){
+        return status;
+    }
 }

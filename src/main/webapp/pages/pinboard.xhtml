@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Pinnwand</title>
     </h:head>
@@ -35,6 +36,33 @@
                 </p:messages>
 
                 YOUR CONTENT.
+                
+                <div class="cards">
+                    <p:dataGrid var="note" value="#{pinboardVM.notes}" columns="4" layout="grid" rows="8" paginator="false">
+                        <div class="card card--#{note.author.details.color}">
+                            <p class="card__name">
+                                <h:outputText value="#{note.author.name}" />
+                            </p>
+                            <p class="card__category">
+                                <h:outputText value="#{note.category}" />
+                            </p>
+                            <p class="card__content">
+                                <h:outputText value="#{note.message}" />
+                            </p>
+                            <p class="card__content">
+                                <h:outputText value="#{note.timestamp}"> 
+                                    <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                </h:outputText>
+                            </p>
+                            <ui:fragment rendered="#{pinboardVM.checkAccessRights(note)}">
+                                <h:form>
+                                    <p:commandButton action="#{pinboardVM.editNote(note)}" icon="pi pi-pencil" class="form__button" />
+                                    <p:commandButton action="#{pinboardVM.deleteNote(note)}" ajax="false" icon="pi pi-trash" class="form__button" />
+                                </h:form>
+                             </ui:fragment>
+                        </div>
+                    </p:dataGrid>
+                </div>
                 
             </main>
         </div>
