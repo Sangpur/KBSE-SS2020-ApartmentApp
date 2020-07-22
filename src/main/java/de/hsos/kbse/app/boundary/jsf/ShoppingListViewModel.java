@@ -58,12 +58,6 @@ public class ShoppingListViewModel implements Serializable {
         this.conversation = conversation;
     }
     
-    @PostConstruct
-    public static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
-    
     public String addItem() {
         System.out.println("addItem()");
         this.currentItem = new ShoppingItem();
@@ -71,6 +65,12 @@ public class ShoppingListViewModel implements Serializable {
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
+    
+    @PostConstruct
+    private static void setUpValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
     
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {
