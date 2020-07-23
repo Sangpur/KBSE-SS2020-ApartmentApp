@@ -234,8 +234,6 @@ public class PinboardViewModel implements Serializable {
         Collections.reverse(notes);
     }
     
-
-    
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {
         /* Die Methode validate() gibt ein Set von ConstraintViolations zurueck, in dem alle moeglicherweise begangenen Verstoesse aufgefuehrt

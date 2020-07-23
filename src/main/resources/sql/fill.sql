@@ -8,9 +8,10 @@ INSERT INTO members (id, apartment_id, memberrole, name, password, details_id) V
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id) VALUES (2, 1000, 'ADMIN', 'Christoph', '123', 2)
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id) VALUES (3, 1000, 'ADMIN', 'Annika', '123', 3)
 
-INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, title, author_id) VALUES (1, 1000, '2020-06-30 15:30:00', 'APPOINTMENT', '2020-06-30 16:00:00', 'Termin Handwerker', 1)
-INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, title, author_id) VALUES (2, 1000, '2020-07-21 12:00:00', 'APPOINTMENT', '2020-07-21 14:00:00', 'Termin Vermieter', 2)
-
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (1, 1000, '2020-07-21 12:00:00', 'APPOINTMENT', '2020-07-21 16:00:00', 0, 'Termin Handwerker', 1)
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (2, 1000, '2020-07-21 12:00:00', 'APPOINTMENT', '2020-07-21 14:00:00', 0,  'Termin Vermieter', 2)
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (3, 1000, '2020-07-23 12:00:00', 'VACATION', '2020-07-29 14:00:00', 0,  'Urlaub Schloss Schreckenstein', 3)
+ 
 INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (1, 1000, 'URGENT', 'Bitte Putzplan einhalten!', '2020-07-21 12:13:20', 2)
 INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (2, 1000, 'TODO', 'Bitte einkaufen gehen!', '2020-07-21 17:13:20', 3)
 INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (3, 1000, 'INFO', 'Ab 22 Uhr nur noch Zimmerlautstärke', '2020-07-22 09:13:20', 1)
