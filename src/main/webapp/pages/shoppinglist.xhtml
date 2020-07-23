@@ -36,22 +36,29 @@
                 </p:messages>
                 
                 <p:dataTable id="items__list" var="item" value="#{shoppingVM.items}">
-                    <p:column headerText="Bezeichnung" class="table__cell">
-                        Status <h:outputText value="#{item.name}" />
+                    <p:column class="table__cell table__cell--smallest table__cell--center table__cell--disable-#{item.checked}">
+                        <h:form>
+                            <p:selectBooleanCheckbox value="#{item.checked}">
+                                <p:ajax update="items__list" listener="#{shoppingVM.changeStatus(item)}" />
+                            </p:selectBooleanCheckbox>
+                        </h:form>
                     </p:column>
-
-                    <p:column headerText="Datum" class="table__cell table__cell--medium table__cell--center">
-                        <h:outputText value="#{item.getDateFormat()}" />
-                    </p:column>
-
-                    <p:column headerText="Menge" class="table__cell">
-                        <h:outputText value="#{item.amount}" />
+                    <p:column headerText="Menge" class="table__cell table__cell--small table__cell--center table__cell--disable-#{item.checked}">
+                        <h:outputText value="#{item.amount}" />x
                     </p:column>
                     
-                    <p:column class="table__cell table__cell--center">
+                    <p:column headerText="Bezeichnung" class="table__cell table__cell--disable-#{item.checked}">
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+                    
+                    <p:column headerText="Datum" class="table__cell table__cell--medium table__cell--center table__cell--disable-#{item.checked}">
+                        <h:outputText value="#{item.getDateFormat()}" />
+                    </p:column>
+                    
+                    <p:column class="table__cell table__cell--edit table__cell--center table__cell--disable-#{item.checked}">
                         <h:form>
                             <p:commandButton action="#{shoppingVM.editItem(item)}" icon="pi pi-pencil" class="form__button" />
-                            <p:commandButton action="#{shoppingVM.deleteItem(item)}" icon="pi pi-trash" class="form__button" update="items__list">
+                            <p:commandButton action="#{shoppingVM.deleteItem(item)}" icon="pi pi-trash" class="form__button button--no-margin" update="items__list">
                                 <p:confirm header="Löschen des Artikels" message="Soll der Artikel wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">

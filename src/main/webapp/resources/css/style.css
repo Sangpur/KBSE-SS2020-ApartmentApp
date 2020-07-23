@@ -380,13 +380,20 @@ table__cell {
     
 }
 
-.table__cell--medium {
-    width: 8em;
+.table__cell--smallest {
+    width: 3em;
 }
 
 .table__cell--small {
     width: 5em;
-    
+}
+
+.table__cell--medium {
+    width: 8em;
+}
+
+.table__cell--edit {
+    width: 6em;
 }
 
 .table__cell--center {
@@ -395,6 +402,11 @@ table__cell {
 
 .table__cell--right {
     text-align: right;
+}
+
+.table__cell--disable-true {
+    background: #e3e3e3;
+    color: #a8a8a8;
 }
 
 
@@ -419,6 +431,10 @@ body .ui-button.ui-button-text-only .ui-button-text {
 body .ui-datagrid .ui-datagrid-content {
     padding: 1em 0;
     border: none;
+}
+
+.button--no-margin {
+    margin: 0 !important;
 }
 
 /* ----------------- Table ----------------- */

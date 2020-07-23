@@ -8,6 +8,8 @@ import de.hsos.kbse.app.entity.features.ShoppingItem;
 import de.hsos.kbse.app.entity.features.ShoppingItemManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
@@ -77,9 +79,13 @@ public class ShoppingList implements ShoppingItemManager, Serializable {
     @Override
     public List<ShoppingItem> getAllShoppingItemsFrom(Long apartmentID) throws AppException {
         try {
-            String str = "SELECT s FROM ShoppingItem s WHERE s.apartmentID = :id";
+            Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(3));
+            String str = "SELECT s FROM ShoppingItem s "
+                         + "WHERE s.apartmentID = :id AND s.checkdate = null "
+                         + "OR s.apartmentID = :id AND s.checkdate > :threeDaysAgo";
             TypedQuery<ShoppingItem> querySelect = em.createQuery(str, ShoppingItem.class);
             querySelect.setParameter("id", apartmentID);
+            querySelect.setParameter("threeDaysAgo", date);
             List<ShoppingItem> results = querySelect.getResultList();
             return results;
         } catch(Exception ex) {

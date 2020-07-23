@@ -6,6 +6,7 @@ package de.hsos.kbse.app.entity.features;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.Column;
@@ -29,7 +30,7 @@ public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
     
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "modShoppingItem")
-    @TableGenerator(name = "modShoppingItem", initialValue = 2)
+    @TableGenerator(name = "modShoppingItem", initialValue = 8)
     private Long id;
     
     private String name;
@@ -40,7 +41,11 @@ public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
     @Column(name="day")
     private Date date;
     
-    private boolean checked;    // boolean fuer ausstehend (= false) oder erledigt (= true)
+    private boolean checked;   // boolean fuer ausstehend (= false) oder erledigt (= true)
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name="checkday")
+    private Date checkdate;     // Datum, an dem Artikel als "erledigt" markiert wurde
     
     @Column(name="apartment_id")
     private Long apartmentID;
@@ -49,9 +54,14 @@ public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
     
     @Override
     public int compareTo(ShoppingItem s) {
-        if (this.name == null || s.getName() == null)
+        if(this.name == null || s.getName() == null) {
             return 0;
-        return this.name.compareTo(s.getName());
+        } else if(this.checked && !s.isChecked()) { // Item 1 ist checked, Item 2 ist unchecked
+            return 1;
+        } else if(!this.checked && s.isChecked()) { // Item 1 ist unchecked, Item 2 ist checked
+            return -1;
+        }
+        return this.name.compareTo(s.getName());    // Beide Items haben den gleichen Status
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
@@ -102,6 +112,15 @@ public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+        if(this.checked) {
+            this.checkdate = java.sql.Date.valueOf(LocalDate.now());
+        } else {
+            this.checkdate = null;
+        }
+    }
+
+    public Date getCheckdate() {
+        return checkdate;
     }
 
     public Long getApartmentID() {

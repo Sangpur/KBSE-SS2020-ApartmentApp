@@ -14,8 +14,10 @@ import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +68,19 @@ public class ShoppingListViewModel implements Serializable {
         this.initItemsList();
     }
     
+    public void changeStatus(ShoppingItem item) {
+        try {
+            /* Bestehendes ShoppingItem-Objekt in der Datenbank updaten */
+            this.shoppinglist.updateShoppingItem(item);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+        /* Erneute alphabetische Sortierung der Artikel anhand des Status */
+        Collections.sort(this.items);
+    }
+    
     public String addItem() {
         System.out.println("addItem()");
         this.currentItem = new ShoppingItem();
@@ -91,13 +106,13 @@ public class ShoppingListViewModel implements Serializable {
     private void initItemsList() {
         try {
             this.items = this.shoppinglist.getAllShoppingItemsFrom(apartmentID);
-            /* Absteigende Sortierung der Zahlungen anhand des Datums */
-            Collections.sort(this.items);
         } catch(AppException ex) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
             facesContext.addMessage("Error",msg);
         }
+        /* Alphabetische Sortierung der Artikel anhand des Status */
+        Collections.sort(this.items);
     }
     
     @Logable(LogLevel.INFO)
