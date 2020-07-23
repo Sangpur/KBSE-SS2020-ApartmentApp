@@ -27,7 +27,7 @@
                 <h:form>
                     <p:commandButton value="Login" action="pages/apartment?faces-redirect=true">
                         <f:actionListener binding="#{apartmentVM.login()}"/>
-                        <f:actionListener binding="#{calenderVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
+                        <f:actionListener binding="#{calendarVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
                         <f:actionListener binding="#{cashflowVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
                         <f:actionListener binding="#{pinboardVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
                         <f:actionListener binding="#{shoppingVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>

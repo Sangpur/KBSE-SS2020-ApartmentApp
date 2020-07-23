@@ -9,6 +9,10 @@ import de.hsos.kbse.app.enums.EventCategory;
 import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.CascadeType;
@@ -39,7 +43,7 @@ public class Event implements Serializable, Comparable<Event> {
     
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "modEvent")
-    @TableGenerator(name = "modEvent", initialValue = 3)
+    @TableGenerator(name = "modEvent", initialValue = 4)
     private Long id;
     
     @NotNull(groups = {General.class, Condition.class}, message="Der Titel darf nicht leer sein!")
@@ -64,23 +68,54 @@ public class Event implements Serializable, Comparable<Event> {
     @Column(name="apartment_id")
     private Long apartmentID;
     
+    @Column(name="allDayEvent")
+    private boolean allDayEvent;
+    
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    public Event(){
+        
+    }
+    
+    public Event(Member author, Long apartmentID){
+        this.apartmentID = apartmentID;
+        this.author = author;
+    }
+    
+    public Event(Event e){
+        this.apartmentID = e.getApartmentID();
+        this.author = e.getAuthor();
+        this.begin = e.getBegin();
+        this.category = e.getCategory();
+        this.end = e.getEnd();
+        this.title = e.getTitle();
+    }
     
     @Override
     public int compareTo(Event e) {
-        System.out.println("compareTo()");
-        
+        /* Sortiert Events basierend auf Startdatum und falls diese gleich sind, findet ein Vergleich mit Enddatum statt */
         if (this.begin == null || this.end == null || e.getBegin() == null || e.getEnd() == null){
             return 0;
+        }else if(this.begin.before(e.getBegin())){
+            return 1;
+        }else if(this.begin.after(e.getBegin())){
+            return -1;
+        }else if(this.begin.equals(e.getBegin())){
+            if(this.end.before(e.getEnd())){
+                return 1;
+            }else if(this.end.after(e.getEnd())){
+                return -1;
+            }else if(this.end.equals(e.getEnd())){
+                return 0;
+            }
         }
-        return this.begin.compareTo(e.getBegin());
-
+        return this.compareTo(e);
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-
+    
     public Long getId() {
         return id;
     }
@@ -136,6 +171,59 @@ public class Event implements Serializable, Comparable<Event> {
     public void setAuthor(Member author) {
         this.author = author;
     }
-    
-    
+
+    public boolean isAllDayEvent() {
+        return allDayEvent;
+    }
+
+    public void setAllDayEvent(boolean allDayEvent) {
+        this.allDayEvent = allDayEvent;
+    }
+     
+    public String getDateFormatBegin(Event event, LocalDate begin) {
+        /* Formatiert das Datum des Starts zur korrekten Ausgabe */
+        SimpleDateFormat formatter;
+        String strDate;
+        
+        LocalDateTime tmpBegin = event.getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime tmpEnd = event.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime ldtDate = begin.atStartOfDay();
+        
+        if(tmpBegin.getDayOfMonth() < ldtDate.getDayOfMonth() && ldtDate.getDayOfMonth() < tmpEnd.getDayOfMonth()){
+            return "ganztägig";
+        }
+        /* Datum hat gleichen Tag wie Beginn oder Ende -> Ausgabe mit Zeit */
+        if(tmpBegin.getDayOfMonth() == ldtDate.getDayOfMonth() || tmpBegin.isEqual(ldtDate)){
+            formatter = new SimpleDateFormat("HH:mm");
+            strDate = "ab " + formatter.format(event.getBegin()) + " Uhr";
+            return strDate; 
+        }
+        /* Alle anderen Ausgaben */
+        else {
+            return "";
+        }
+    }
+    public String getDateFormatEnd(Event event, LocalDate end) {
+        /* Formatiert das Datum des Endes zur korrekten Ausgabe */
+        SimpleDateFormat formatter;
+        String strDate;
+        
+        LocalDateTime tmpBegin = event.getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime tmpEnd = event.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime ldtDate = end.atStartOfDay();
+        
+        if(tmpBegin.getDayOfMonth() < ldtDate.getDayOfMonth() && ldtDate.getDayOfMonth() < tmpEnd.getDayOfMonth()){
+            return "";
+        }
+        /* Datum hat gleichen Tag wie Beginn oder Ende -> Ausgabe mit Zeit */
+        if(tmpEnd.getDayOfMonth() == ldtDate.getDayOfMonth() || tmpEnd.isEqual(ldtDate)){
+            formatter = new SimpleDateFormat("HH:mm");
+            strDate = "bis " + formatter.format(event.getEnd()) + " Uhr";
+            return strDate; 
+        }
+        /* Alle anderen Ausgaben */
+        else {            
+            return "";
+        }
+    }
 }
