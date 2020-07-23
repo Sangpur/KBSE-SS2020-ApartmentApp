@@ -4,6 +4,8 @@
  */
 package de.hsos.kbse.app.entity.features;
 
+import de.hsos.kbse.app.util.Condition;
+import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -17,6 +19,10 @@ import javax.persistence.Id;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -33,8 +39,12 @@ public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
     @TableGenerator(name = "modShoppingItem", initialValue = 8)
     private Long id;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Die Bezeichnung darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Die Bezeichnung muss zwischen 3 und 50 Zeichen liegen!")
+    @Pattern(groups = {General.class, Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\+\\s]+$", message="Die Bezeichnung enthält ungültige Bezeichner!")
     private String name;
     
+    @Min(groups = {General.class, Condition.class}, value = 1, message="Die Menge muss mindestens 1 betragen!")
     private int amount;
     
     @Temporal(TemporalType.DATE)
@@ -51,6 +61,20 @@ public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
     private Long apartmentID;
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    public ShoppingItem() {}
+    
+    public ShoppingItem(Date date, Long apartmentID) {
+        this.amount = 1;
+        this.date = date;
+    }
+    
+    public ShoppingItem(ShoppingItem obj) {
+        this.name = obj.getName();
+        this.amount = obj.getAmount();
+        this.date = obj.getDate();
+        this.apartmentID = obj.getApartmentID();
+    }
     
     @Override
     public int compareTo(ShoppingItem s) {

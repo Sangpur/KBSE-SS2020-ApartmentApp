@@ -26,15 +26,21 @@
                 <h:form>
                     <div class="form">
                         <div class="input__wrap">
-                            <div class="input__label">Textfeld:</div>
-                            <div class="input">
-                                <p:inputText value="" />
+                            <div class="input__label">Bezeichnung:</div>
+                            <div class="input input--big">
+                                <p:inputText value="#{shoppingVM.currentItem.name}" />
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Menge:</div>
+                            <div class="input input--small">
+                                <p:inputText value="#{shoppingVM.currentItem.amount}" />
                             </div>
                         </div>
                     </div>
                     <div class="form__buttons">
-                        <p:commandButton value="Speichern" class="form__button" />
-                        <p:commandButton value="Abbrechen" class="form__button" />
+                        <p:commandButton value="Speichern" action="#{shoppingVM.saveItem()}" class="form__button" />
+                        <p:commandButton value="Abbrechen" action="#{shoppingVM.discardItem()}" class="form__button" />
                     </div>
                 </h:form>
 

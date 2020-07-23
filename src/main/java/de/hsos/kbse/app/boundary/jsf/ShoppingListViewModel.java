@@ -52,10 +52,13 @@ public class ShoppingListViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
+    private Long apartmentID = 1000L;   // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
     private List<ShoppingItem> items;
     private Member loggedInMember;
     private ShoppingItem currentItem;
+    private ShoppingItem originalItem;  // Sicherung des zu bearbeitenden ShoppingItem-Objekts
+    private boolean addItem;            // true = addItem()
+    private boolean editItem;           // true = editItem()
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -81,18 +84,88 @@ public class ShoppingListViewModel implements Serializable {
         Collections.sort(this.items);
     }
     
+    public boolean checkAccessRights(ShoppingItem item) {
+        /* Es muss geprueft werden, ob der jeweilige Artikel bereits als "erledigt" markiert ist, da in
+         * diesem Fall ein Bearbeiten und Loeschen nicht mehr moeglich sein soll. Im Gegensatz zu den 
+         * anderen Funktionen duerfen hier ansonsten alle Mitglieder editieren oder loeschen. */
+        return !item.isChecked();
+    }
+    
+    @Logable(LogLevel.INFO)
     public String addItem() {
-        System.out.println("addItem()");
-        this.currentItem = new ShoppingItem();
+        /* Neues Payment-Objekt initiieren */
+        this.currentItem = new ShoppingItem(new Date(), this.apartmentID);
+        this.addItem = true;
+        this.editItem = false;
         return "shoppinglist-add";
     }
     
-    public void editItem(ShoppingItem item) {
-        System.out.println("editItem()");
+    @Logable(LogLevel.INFO)
+    public String editItem(ShoppingItem item) {
+        /* Ausgewaehltes ShoppingItem-Objekt setzen und Sicherungskopie anlegen */
+        this.currentItem = item;
+        this.originalItem = new ShoppingItem(item);
+        this.editItem = true;
+        this.addItem = false;
+        return "shoppinglist-add";
     }
     
+    @Logable(LogLevel.INFO)
     public void deleteItem(ShoppingItem item) {
-        System.out.println("deleteItem()");
+        try {
+            /* Bestehendes ShoppingItem-Objekt aus der Datenbank entfernen */
+            this.shoppinglist.deleteShoppingItem(item);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+        /* Bestehendes ShoppingItem-Objekt aus der Items-Liste entfernen */
+        this.items.remove(item);
+    }
+    
+    @Logable(LogLevel.INFO)
+    public String saveItem() {
+        if(this.validateInput(ValidationGroup.GENERAL)) {   // Gueltige Eingabe
+            if(this.addItem) {   // ShoppingItem hinzufuegen
+                try {
+                    /* Neues ShoppingItem-Objekt der Datenbank hinzufügen */
+                    this.shoppinglist.createShoppingItem(currentItem);
+                } catch(AppException ex) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
+                /* Neues ShoppingItem-Objekt der zu Anfang initialisierten Items-Liste hinzufügen */
+                this.items.add(currentItem);
+                /* Erneute alphabetische Sortierung der Artikel anhand des Status */
+                Collections.sort(this.items);
+            }
+            if(this.editItem) {  // Bestehendes ShoppingItem updaten
+                try {
+                    /* Bestehendes ShoppingItem-Objekt in der Datenbank updaten */
+                    this.shoppinglist.updateShoppingItem(currentItem);
+                } catch(AppException ex) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
+            }
+        } else {    // Ungueltige Eingabe
+            return "";
+        }
+        return "shoppinglist";
+    }
+    
+    @Logable(LogLevel.INFO)
+    public String discardItem() {
+        if(this.editItem) {
+            /* Falls ein vorhandenes Objekt bearbeitet werden sollte und diese Aktion abgebrochen wurde,
+             * muss dieses auf seinen Originalzustand zurückgesetzt werden.*/
+            this.currentItem.setName(this.originalItem.getName());
+            this.currentItem.setAmount(this.originalItem.getAmount());
+        }
+        return "shoppinglist";
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
@@ -121,14 +194,9 @@ public class ShoppingListViewModel implements Serializable {
          * sind. Dieses Set ist leer, falls die Eingabe gueltig ist. Durch die Gruppierung der Constraints, hier General.class, besteht die
          * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird.
          * s. https://www.baeldung.com/javax-validation-groups */
-        Set<ConstraintViolation<ShoppingListViewModel>> constraintViolations = null;
+        Set<ConstraintViolation<ShoppingItem>> constraintViolations = null;
         if(group == ValidationGroup.GENERAL) {
-            // Moeglichkeit 1 -> diese Klasse selbst validieren
-            constraintViolations = validator.validate( this, General.class );
-            // Moeglichkeit 1 -> Sub-Klasse validieren
-            //constraintViolations = validator.validate( this.subklasse, General.class );
-        } else if(group == ValidationGroup.CONDITION) {
-            constraintViolations = validator.validate( this, Condition.class );
+            constraintViolations = validator.validate( this.currentItem, General.class );
         }
 
         if(constraintViolations != null && constraintViolations.isEmpty()) {
@@ -137,7 +205,7 @@ public class ShoppingListViewModel implements Serializable {
         } else {
             /* Ungueltige Eingabe */
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Iterator<ConstraintViolation<ShoppingListViewModel>> iter = constraintViolations.iterator();
+            Iterator<ConstraintViolation<ShoppingItem>> iter = constraintViolations.iterator();
             while (iter.hasNext()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", iter.next().getMessage());
                 facesContext.addMessage("Constraint Violation",msg);
@@ -155,5 +223,13 @@ public class ShoppingListViewModel implements Serializable {
     public void setLoggedInMember(Member loggedInMember) {
         this.loggedInMember = loggedInMember;
     }
-    
+
+    public ShoppingItem getCurrentItem() {
+        return currentItem;
+    }
+
+    public void setCurrentItem(ShoppingItem currentItem) {
+        this.currentItem = currentItem;
+    }
+
 }

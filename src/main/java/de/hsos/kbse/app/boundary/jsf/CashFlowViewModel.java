@@ -94,7 +94,7 @@ public class CashFlowViewModel implements Serializable {
     }
     
     public boolean checkAccessRights(Payment payment) {
-        /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
+        /* Es muss geprueft werden, ob die jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
         return this.admin || payment.getGiver().getId().equals(this.loggedInMember.getId());
     }
