@@ -9,11 +9,15 @@ import de.hsos.kbse.app.entity.features.ShoppingItem;
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.ValidationGroup;
+import de.hsos.kbse.app.util.AppException;
 import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
@@ -46,6 +50,8 @@ public class ShoppingListViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
+    private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
+    private List<ShoppingItem> items;
     private Member loggedInMember;
     private ShoppingItem currentItem;
     
@@ -56,6 +62,8 @@ public class ShoppingListViewModel implements Serializable {
     public ShoppingListViewModel(ShoppingList shoppinglist, Conversation conversation) {
         this.shoppinglist = shoppinglist;
         this.conversation = conversation;
+        this.items = new ArrayList();
+        this.initItemsList();
     }
     
     public String addItem() {
@@ -64,12 +72,32 @@ public class ShoppingListViewModel implements Serializable {
         return "shoppinglist-add";
     }
     
+    public void editItem(ShoppingItem item) {
+        System.out.println("editItem()");
+    }
+    
+    public void deleteItem(ShoppingItem item) {
+        System.out.println("deleteItem()");
+    }
+    
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
     @PostConstruct
     private static void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+    
+    private void initItemsList() {
+        try {
+            this.items = this.shoppinglist.getAllShoppingItemsFrom(apartmentID);
+            /* Absteigende Sortierung der Zahlungen anhand des Datums */
+            Collections.sort(this.items);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
     }
     
     @Logable(LogLevel.INFO)
@@ -104,6 +132,10 @@ public class ShoppingListViewModel implements Serializable {
     }
      
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+
+    public List<ShoppingItem> getItems() {
+        return items;
+    }
     
     public void setLoggedInMember(Member loggedInMember) {
         this.loggedInMember = loggedInMember;

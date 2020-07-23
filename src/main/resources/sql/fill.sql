@@ -29,3 +29,7 @@ INSERT INTO payment_members (payment_id, involvedmembers_id) VALUES (2, 2)
 INSERT INTO payment_members (payment_id, involvedmembers_id) VALUES (3, 1)
 
 INSERT INTO shoppingitem (id, amount, apartment_id, day, checked, name) VALUES (1, 2, 1000, '2020-06-01', 0, 'Mineralwasser')
+INSERT INTO shoppingitem (id, amount, apartment_id, day, checked, name) VALUES (2, 1, 1000, '2020-07-03', 0, 'Zahnpasta')
+INSERT INTO shoppingitem (id, amount, apartment_id, day, checked, name) VALUES (3, 4, 1000, '2020-07-20', 0, 'Äpfel')
+INSERT INTO shoppingitem (id, amount, apartment_id, day, checked, name) VALUES (4, 1, 1000, '2020-07-20', 0, 'Brot')
+INSERT INTO shoppingitem (id, amount, apartment_id, day, checked, name) VALUES (5, 2, 1000, '2020-07-21', 0, 'Joghurt')

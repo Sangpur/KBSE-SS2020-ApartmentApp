@@ -8,9 +8,11 @@ import de.hsos.kbse.app.entity.features.ShoppingItem;
 import de.hsos.kbse.app.entity.features.ShoppingItemManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 /**
@@ -72,8 +74,23 @@ public class ShoppingList implements ShoppingItemManager, Serializable {
         return item;
     }
     
+    @Override
+    public List<ShoppingItem> getAllShoppingItemsFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "SELECT s FROM ShoppingItem s WHERE s.apartmentID = :id";
+            TypedQuery<ShoppingItem> querySelect = em.createQuery(str, ShoppingItem.class);
+            querySelect.setParameter("id", apartmentID);
+            List<ShoppingItem> results = querySelect.getResultList();
+            return results;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Artikel der WG "+ apartmentID +" konnten nicht gefunden werden!");
+        }
+    }
+    
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+
     
 }

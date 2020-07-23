@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.entity.features;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.Column;
@@ -18,11 +19,11 @@ import javax.persistence.TemporalType;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock
  */
 @Entity
 @Vetoed
-public class ShoppingItem implements Serializable {
+public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
     
     /* ----------------------------------------- ATTRIBUTES ---------------------------------------- */
     
@@ -45,6 +46,13 @@ public class ShoppingItem implements Serializable {
     private Long apartmentID;
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    @Override
+    public int compareTo(ShoppingItem s) {
+        if (this.name == null || s.getName() == null)
+            return 0;
+        return this.name.compareTo(s.getName());
+    }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
@@ -76,6 +84,12 @@ public class ShoppingItem implements Serializable {
 
     public Date getDate() {
         return date;
+    }
+    
+    public String getDateFormat() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");  
+        String strDate = formatter.format(this.date);  
+        return strDate;
     }
 
     public void setDate(Date date) {

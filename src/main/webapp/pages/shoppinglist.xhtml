@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
     <h:head>
         <title>Einkaufsliste</title>
     </h:head>
@@ -34,7 +35,32 @@
                     <p:autoUpdate />
                 </p:messages>
                 
-                YOUR CONTENT.
+                <p:dataTable id="items__list" var="item" value="#{shoppingVM.items}">
+                    <p:column headerText="Bezeichnung" class="table__cell">
+                        Status <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column headerText="Datum" class="table__cell table__cell--medium table__cell--center">
+                        <h:outputText value="#{item.getDateFormat()}" />
+                    </p:column>
+
+                    <p:column headerText="Menge" class="table__cell">
+                        <h:outputText value="#{item.amount}" />
+                    </p:column>
+                    
+                    <p:column class="table__cell table__cell--center">
+                        <h:form>
+                            <p:commandButton action="#{shoppingVM.editItem(item)}" icon="pi pi-pencil" class="form__button" />
+                            <p:commandButton action="#{shoppingVM.deleteItem(item)}" icon="pi pi-trash" class="form__button" update="items__list">
+                                <p:confirm header="Löschen des Artikels" message="Soll der Artikel wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                            </p:confirmDialog> 
+                        </h:form>
+                    </p:column>
+                </p:dataTable>
                 
             </main>
         </div>
