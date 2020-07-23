@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <f:metadata>
+        <f:viewAction action="#{apartmentVM.initConversation()}" />
+    </f:metadata>
+    <h:head>
+        <title>WG-Planer</title>
+    </h:head>
+    <h:body>
+        <h:outputStylesheet name="css/style.css"  />
+        <div id="wrapper" class="ui-g">
+            <header>
+                <div class="header__content">
+                    <h1 class="header__title">
+                        Hello<span>.</span>
+                    </h1>
+                </div>
+            </header>
+            <main>
+                
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:autoUpdate />
+                </p:messages>
+                
+                <h:form>
+                    <div class="form">
+                        <div class="input__wrap">
+                            <div class="input__label">Username:</div>
+                            <div class="input input--big">
+                                <p:inputText value="#{authVM.username}" />
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Passwort:</div>
+                            <div class="input input--small">
+                                <p:inputText type="password" value="#{authVM.password}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__buttons">
+                        <p:commandButton value="Login" action="#{authVM.login()}" class="form__button" /><br/><br/>
+                        <p:commandButton value="Register an apartment" action="register?faces-redirect=true" class="form__button__secondary" />
+                    </div>
+                </h:form>
+                
+            </main>
+        </div>
+    </h:body>
+</html>
+

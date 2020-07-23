@@ -74,6 +74,23 @@ public class MemberRepository implements MemberManager, Serializable {
         }
         return member;
     }
+    
+    // Does not throw Exception because it is expected that users won't be found during the login process
+    @Override
+    public Member findMemberByName(String name) throws AppException {
+        Member member = null;
+        try {
+            String str = "SELECT m FROM Members m WHERE m.name = :name";
+            TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
+            querySelect.setParameter("name", name);
+            member = querySelect.getSingleResult();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Mitglied konnte nicht gefunden werden!");
+        }
+        return member;
+    }
+
 
     @Override
     public List<Member> getAllMembersFrom(Long apartmentID) throws AppException {

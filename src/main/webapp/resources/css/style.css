@@ -331,6 +331,12 @@ main {
     margin-right: .5em !important;
 }
 
+.form__button__secondary {
+    margin-right: .5em !important;
+    background-color: lightgrey !important;
+    border-color: lightgrey !important;
+}
+
 .input__wrap {
     margin-bottom: .4em;
     display: flex;
