@@ -5,7 +5,7 @@
 package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.Calendar;
-import de.hsos.kbse.app.entity.features.Day;
+import de.hsos.kbse.app.entity.features.CalendarDay;
 import de.hsos.kbse.app.entity.features.Event;
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.EventCategory;
@@ -63,7 +63,7 @@ public class CalendarViewModel implements Serializable {
     private Event originalEvent;
     private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
     private List<Event> events;
-    private List<Day> month;
+    private List<CalendarDay> month;
     private boolean admin;           // true = ADMIN, false = USER
     private boolean addEvent;         // true = addNote()
     private boolean editEvent;        // true = editNote()
@@ -286,7 +286,7 @@ public class CalendarViewModel implements Serializable {
         
         for(int i = 0; i < daysInMonth; i++){
             LocalDate tmp = LocalDate.of(yearValue, monthValue, (i + 1));
-            Day tmpD = createNewDay(tmp, (i + 1));
+            CalendarDay tmpD = createNewDay(tmp, (i + 1));
             this.month.add(tmpD);
         }
     }
@@ -307,12 +307,12 @@ public class CalendarViewModel implements Serializable {
         return tmp;
     }
     
-    private Day createNewDay(LocalDate date, int index){
+    private CalendarDay createNewDay(LocalDate date, int index){
         /* Erstellt das Objekt Tag für den Monat */
         LocalDate tmpLD = date;
         List<Event> tmpEList = this.getEventsOfDay(date);
         boolean hasEvents = !tmpEList.isEmpty();  
-        return new Day(tmpLD, tmpEList, hasEvents);
+        return new CalendarDay(tmpLD, tmpEList, hasEvents);
     }
     
     private boolean isLeapYear(int year){
@@ -427,11 +427,11 @@ public class CalendarViewModel implements Serializable {
         this.header = header;
     }
 
-    public List<Day> getMonth() {
+    public List<CalendarDay> getMonth() {
         return month;
     }
 
-    public void setMonth(List<Day> month) {
+    public void setMonth(List<CalendarDay> month) {
         this.month = month;
     }
 

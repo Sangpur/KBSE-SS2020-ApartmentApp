@@ -17,18 +17,18 @@ import java.util.List;
  *
  * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
  */
-public class Day {
+public class CalendarDay {
     
     private LocalDate date;
     private List<Event> events;
     private boolean hasEvents;
     
-    public Day(){
+    public CalendarDay(){
         this.events = new LinkedList<>();
         this.hasEvents = false;
     }
     
-    public Day(LocalDate date, List<Event> events, boolean hasEvents){
+    public CalendarDay(LocalDate date, List<Event> events, boolean hasEvents){
         this.date = date;
         this.events = events;
         this.hasEvents = hasEvents;
