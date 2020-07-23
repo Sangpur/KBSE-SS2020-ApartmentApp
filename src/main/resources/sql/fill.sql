@@ -8,9 +8,10 @@ INSERT INTO members (id, apartment_id, memberrole, name, password, details_id) V
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id) VALUES (2, 1000, 'ADMIN', 'Christoph', '123', 2)
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id) VALUES (3, 1000, 'ADMIN', 'Annika', '123', 3)
 
-INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (1, 1000, '2020-07-21 12:00:00', 'APPOINTMENT', '2020-07-21 16:00:00', 0, 'Termin Handwerker', 1)
-INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (2, 1000, '2020-07-21 12:00:00', 'APPOINTMENT', '2020-07-21 14:00:00', 0,  'Termin Vermieter', 2)
-INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (3, 1000, '2020-07-23 12:00:00', 'VACATION', '2020-07-29 14:00:00', 0,  'Urlaub Schloss Schreckenstein', 3)
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (1, 1000, '2020-07-01 12:00:00', 'APPOINTMENT', '2020-07-01 16:00:00', 0, 'Termin Handwerker', 1)
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (2, 1000, '2020-07-01 12:00:00', 'APPOINTMENT', '2020-07-01 14:00:00', 0,  'Termin Vermieter', 2)
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (3, 1000, '2020-07-21 12:00:00', 'VACATION', '2020-08-03 15:00:00', 0,  'Urlaub in Bayern', 3)
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (4, 1000, '2020-08-10 18:00:00', 'VACATION', '2020-08-13 20:00:00', 0,  'Festival', 3)
  
 INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (1, 1000, 'URGENT', 'Bitte Putzplan einhalten!', '2020-07-21 12:13:20', 2)
 INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (2, 1000, 'TODO', 'Bitte einkaufen gehen!', '2020-07-21 17:13:20', 3)

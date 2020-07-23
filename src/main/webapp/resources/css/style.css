@@ -9,7 +9,6 @@ body {
 
 #wrapper {
     max-width: 900px;
-    height: 95vh;
     margin: auto;
     background: #fff;
     border-radius: .5em;
@@ -64,7 +63,6 @@ header:after {
 
 main {
     width: 100%;
-    height: 77vh;
     padding: 1.5em 2em;
     border-bottom-left-radius: .5em;
     border-bottom-right-radius: .5em;
@@ -380,6 +378,10 @@ table__cell {
     
 }
 
+.table__cell--top {
+    vertical-align: top;
+}
+
 .table__cell--smallest {
     width: 3em;
 }
@@ -407,6 +409,95 @@ table__cell {
 .table__cell--disable-true {
     background: #e3e3e3;
     color: #a8a8a8;
+}
+
+/* ----------------- Calendar ----------------- */
+
+#calendar__header {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    margin-bottom: 1em;
+}
+
+.calendar__header--date {
+    padding: 0 1em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.calendar .ui-datalist .ui-datalist-content {
+    padding: 0;
+    border: none;
+    color: #000000;
+}
+
+.calendar .ui-datalist-data {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.calendar .ui-datalist-data .ui-datalist-item {
+    position: relative;
+    margin-bottom: 1em;
+    padding: .5em 1em;
+    min-height: 5em;
+    background: #f8f8f8;
+    border: 1px solid #d7d7d7;
+    border-radius: .5em;
+}
+
+.calendar .ui-datalist-data .ui-datalist-item:last-child {
+    margin-bottom: 0;
+}
+
+.calendar .ui-datalist-data .ui-datalist-item p {
+    padding: 0;
+    margin: 0;
+}
+
+.calendar-entry__header {
+    height: 1em;
+    font-size: .8em;
+    text-transform: uppercase;
+}
+
+.calendar-entry__content {
+    padding: .5em 0 0 0 !important;
+    padding-right: 7em !important;
+    font-weight: bold;
+}
+
+.calendar-entry__footer {
+    
+}
+
+.calendar .ui-datalist-data .ui-datalist-item form {
+    position: absolute;
+    bottom: .5em;
+    right: .5em;
+}
+
+.calendar-entry__date {
+    color: #43d7a6;
+    font-weight: bold;
+}
+
+.calendar-entry__weekday {
+    display: inline-block;
+    width: 1.8em;
+}
+
+.calender-entry__time {
+    display: inline-block;
+    min-width: 9em;
+    font-weight: normal;
+}
+
+.calender-entry__author {
+    font-size: .8em;
+    text-transform: uppercase;
 }
 
 

@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * ENTITY CLASS CalenderDay
+ *
  */
 package de.hsos.kbse.app.entity.features;
 
@@ -19,9 +18,13 @@ import java.util.List;
  */
 public class CalendarDay {
     
+    /* ----------------------------------------- ATTRIBUTES ---------------------------------------- */
+    
     private LocalDate date;
     private List<Event> events;
     private boolean hasEvents;
+    
+    /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
     public CalendarDay(){
         this.events = new LinkedList<>();
@@ -34,6 +37,8 @@ public class CalendarDay {
         this.hasEvents = hasEvents;
         prepareEventList();
     }
+    
+    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
 
     private void prepareEventList(){
         /* Setzt allDayEvent-boolean Flag und sortiert die Event-Liste */
@@ -52,9 +57,23 @@ public class CalendarDay {
         Collections.sort(events);
         Collections.reverse(events);
     }
+    
+    /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
     public LocalDate getDate() {
         return date;
+    }
+    
+    public String getDateFormat(){
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM");
+        String strDate = formatter.format(java.sql.Date.valueOf(this.date));
+        return strDate;
+    }
+    
+    public String getWeekday(){
+        SimpleDateFormat formatter = new SimpleDateFormat("E");
+        String strDate = formatter.format(java.sql.Date.valueOf(this.date));
+        return strDate;
     }
 
     public void setDate(LocalDate date) {
@@ -76,11 +95,5 @@ public class CalendarDay {
     public void setHasEvents(boolean hasEvents) {
         this.hasEvents = hasEvents;
     }
-    
-    public String convertToDate(LocalDate lDate){
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM");
-        String strDate = formatter.format(java.sql.Date.valueOf(date));
-        return strDate;
-    }
-  
+
 }
