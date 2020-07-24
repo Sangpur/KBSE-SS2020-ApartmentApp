@@ -10,7 +10,7 @@ INSERT INTO members (id, apartment_id, memberrole, name, password, details_id) V
 
 INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (1, 1000, '2020-07-01 12:00:00', 'APPOINTMENT', '2020-07-01 16:00:00', 0, 'Termin Handwerker', 1)
 INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (2, 1000, '2020-07-01 12:00:00', 'APPOINTMENT', '2020-07-01 14:00:00', 0,  'Termin Vermieter', 2)
-INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (3, 1000, '2020-07-21 12:00:00', 'VACATION', '2020-08-03 15:00:00', 0,  'Urlaub in Bayern', 3)
+INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (3, 1000, '2020-07-28 12:00:00', 'VACATION', '2020-08-03 15:00:00', 0,  'Urlaub in Bayern', 3)
 INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (4, 1000, '2020-08-10 18:00:00', 'VACATION', '2020-08-13 20:00:00', 0,  'Festival', 3)
  
 INSERT INTO note (id, apartment_id, category, message, datetime, author_id) VALUES (1, 1000, 'URGENT', 'Bitte Putzplan einhalten!', '2020-07-21 12:13:20', 2)
@@ -34,6 +34,6 @@ INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name
 INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (2, 1, 1000, null, '2020-07-03', 0, 'Zahnpasta')
 INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (3, 4, 1000, null, '2020-07-20', 0, 'Äpfel')
 INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (4, 1, 1000, null, '2020-07-20', 0, 'Brot')
-INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (5, 2, 1000, '2020-07-21', '2020-07-21', 1, 'Joghurt')
-INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (6, 2, 1000, '2020-07-20', '2020-07-18', 1, 'Toast')
+INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (5, 2, 1000, '2020-07-24', '2020-07-21', 1, 'Joghurt')
+INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (6, 2, 1000, '2020-07-22', '2020-07-18', 1, 'Toast')
 INSERT INTO shoppingitem (id, amount, apartment_id, checkday, day, checked, name) VALUES (7, 2, 1001, '2020-07-23', '2020-07-20', 1, 'Butter')

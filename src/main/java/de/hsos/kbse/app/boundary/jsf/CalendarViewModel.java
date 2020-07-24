@@ -64,7 +64,6 @@ public class CalendarViewModel implements Serializable {
     private Event currentEvent;
     private Event originalEvent;
     private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
-    private List<Event> events;
     
     private boolean admin;              // true = ADMIN, false = USER
     private boolean addEvent;           // true = addEvent()
@@ -83,17 +82,13 @@ public class CalendarViewModel implements Serializable {
     public CalendarViewModel(Calendar calendar, Conversation conversation) {
         this.calendar = calendar;
         this.conversation = conversation;
-        this.events = new ArrayList();
         this.currentMonthEvents = new ArrayList();
         this.currentMonthDays = new ArrayList();
         this.categories = EventCategory.values();
-        this.initEventList();
-
         this.today = LocalDate.now(ZoneId.systemDefault());
         this.currentMonth = this.today.withDayOfMonth(5);
-        //this.initCalendarForMonth();
-        
         this.initCurrentMonth();
+        this.initLoggedInMember();
         
     }
     
@@ -246,7 +241,6 @@ public class CalendarViewModel implements Serializable {
     public boolean checkAccessRightAndDate(LocalDate currentDay, Event currentEvent) {
         /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        this.admin = false;
         boolean access = this.admin || currentEvent.getAuthor().getId().equals(this.loggedInMember.getId());
         boolean isFutureDate = currentDay.isAfter(today.minusDays(1));
         return access && isFutureDate;
@@ -312,14 +306,13 @@ public class CalendarViewModel implements Serializable {
         return eventList;
     }
     
-    private void initEventList(){
-        /* Lädt Liste der Events */
-        try {
-            this.events = this.calendar.getAllEventsFrom(apartmentID);
-        } catch(AppException ex) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
-            facesContext.addMessage("Error",msg);
+    public void initLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+
+        this.loggedInMember = (Member) session.getAttribute("user");
+        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
+            this.admin = true;
         }
     }
     
@@ -372,13 +365,6 @@ public class CalendarViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-    
-    public void setLoggedInMember(Member loggedInMember) {
-        this.loggedInMember = loggedInMember;
-        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
-            this.admin = true;
-        }
-    }
 
     public Event getCurrentEvent() {
         return currentEvent;
@@ -395,23 +381,7 @@ public class CalendarViewModel implements Serializable {
     public void setApartmentID(Long apartmentID) {
         this.apartmentID = apartmentID;
     }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
-    }
-
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
-    }
-
+    
     public boolean isAddEvent() {
         return addEvent;
     }

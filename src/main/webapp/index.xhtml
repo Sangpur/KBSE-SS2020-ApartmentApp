@@ -25,13 +25,7 @@
                 Hello from Facelets
                 <h:link value="Go to Test" outcome="/pages/test.xhtml"/><br/>
                 <h:form>
-                    <p:commandButton value="Login" action="pages/apartment?faces-redirect=true">
-                        <f:actionListener binding="#{apartmentVM.login()}"/>
-                        <f:actionListener binding="#{calendarVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
-                        <f:actionListener binding="#{cashflowVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
-                        <f:actionListener binding="#{pinboardVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
-                        <f:actionListener binding="#{shoppingVM.setLoggedInMember(apartmentVM.loggedInMember)}"/>
-                    </p:commandButton>
+                    <p:commandButton value="Login" action="pages/apartment?faces-redirect=true" />
                 </h:form>
                 
             </main>
