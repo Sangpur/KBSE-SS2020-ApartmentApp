@@ -28,6 +28,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -54,7 +55,6 @@ public class ShoppingListViewModel implements Serializable {
     
     private Long apartmentID = 1000L;   // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
     private List<ShoppingItem> items;
-    private Member loggedInMember;
     private ShoppingItem currentItem;
     private ShoppingItem originalItem;  // Sicherung des zu bearbeitenden ShoppingItem-Objekts
     private boolean addItem;            // true = addItem()
@@ -218,10 +218,6 @@ public class ShoppingListViewModel implements Serializable {
 
     public List<ShoppingItem> getItems() {
         return items;
-    }
-    
-    public void setLoggedInMember(Member loggedInMember) {
-        this.loggedInMember = loggedInMember;
     }
 
     public ShoppingItem getCurrentItem() {

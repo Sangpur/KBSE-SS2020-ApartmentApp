@@ -30,6 +30,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -77,6 +78,7 @@ public class CashFlowViewModel implements Serializable {
         this.payments = new LinkedList(); // Hier kann das neuste Element an Position 0 eingefuegt werden
         this.initPaymentsList();
         this.initMemberList();
+        this.initLoggedInMember();
     }
     
     @PostConstruct
@@ -211,6 +213,16 @@ public class CashFlowViewModel implements Serializable {
         }
     }
     
+    private void initLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+
+        this.loggedInMember = (Member) session.getAttribute("user");
+        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
+            this.admin = true;
+        }
+    }
+    
     private Member findMemberByID(Long id) {
         /* Auffinden eines Mitglieds mit der uebergebenen ID in der Members-Liste */
         for(int i = 0; i < this.members.size(); i++) {
@@ -221,7 +233,6 @@ public class CashFlowViewModel implements Serializable {
         }
         return null;
     }
-    
     
     private void calculateBalance(Payment payment) {
         /* Die Member-Objekte in dem Payment-Objekt sollen nicht innerhalb des Payment-Objekts 
@@ -348,21 +359,6 @@ public class CashFlowViewModel implements Serializable {
 
     public List<Member> getMembers() {
         return members;
-    }
-
-    public void setLoggedInMember(Member loggedInMember) {
-        this.loggedInMember = loggedInMember;
-        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
-            this.admin = true;
-        }
-    }
-
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
     }
 
     public Payment getCurrentPayment() {
