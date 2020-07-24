@@ -25,6 +25,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -52,7 +53,6 @@ public class ApartmentViewModel implements Serializable {
     
     private Apartment apartment;
     private List<Member> members;
-    private Member loggedInMember;
     private Member newMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
@@ -66,8 +66,9 @@ public class ApartmentViewModel implements Serializable {
         this.initApartmentByID(1000L); // TODO: Bei Login-Prozess entsprechende ID setzen
     }
     
+    
     @PostConstruct
-    public static void setUpValidator() {
+    public void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -84,11 +85,6 @@ public class ApartmentViewModel implements Serializable {
         if(!conversation.isTransient()) {
             conversation.end();
         }
-    }
-    
-    public void login() {
-        this.loggedInMember = members.get(0);
-        //return "pages/apartment";
     }
     
     public String addMember() {
@@ -147,7 +143,10 @@ public class ApartmentViewModel implements Serializable {
     }
 
     public Member getLoggedInMember() {
-        System.out.println("getLoggedInMember: " + this.loggedInMember.getName());
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+
+        Member loggedInMember = (Member) session.getAttribute("user");
         return loggedInMember;
     }
     

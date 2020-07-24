@@ -117,4 +117,10 @@ public class Member implements Serializable {
         this.apartmentID = apartmentID;
     }
 
+    @Override
+    public String toString() {
+        return "Member{" + "id=" + id + ", name=" + name + ", memberRole=" + memberRole + ", password=" + password + ", details=" + details + ", apartmentID=" + apartmentID + '}';
+    }
+
+    
 }

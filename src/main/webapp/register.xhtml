@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <f:metadata>
+    </f:metadata>
+    <h:head>
+        <title>WG-Planer</title>
+    </h:head>
+    <h:body>
+        <h:outputStylesheet name="css/style.css"  />
+        <div id="wrapper" class="ui-g">
+            <header>
+                <div class="header__content">
+                    <h1 class="header__title">
+                        Hello<span>.</span>
+                    </h1>
+                </div>
+            </header>
+            <main>
+                
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:autoUpdate />
+                </p:messages>
+                
+                <h:form>
+                    <div class="form">
+                        <div class="input__wrap">
+                            <div class="input__label">WG-Name:</div>
+                            <div class="input input--big">
+                                <p:inputText value="#{authVM.apartmentName}" />
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Benutzername:</div>
+                            <div class="input input--big">
+                                <p:inputText value="#{authVM.username}" />
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Geburtstag</div>
+                            <div class="input input--big">
+                                <p:inputText value="#{authVM.username}" />
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Passwort:</div>
+                            <div class="input input--big">
+                                <p:inputText type="password" value="#{authVM.password}"/>
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Passwort (Wh.):</div>
+                            <div class="input input--big">
+                                <p:inputText type="password" value="#{authVM.repassword}"/>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="form__buttons">
+                        <p:commandButton value="Registrieren" action="#{authVM.register()}" class="form__button" />
+                        <p:commandButton value="Abbrechen" action="login?faces-redirect=true" class="form__button" />
+                    </div>
+                </h:form>
+                
+            </main>
+        </div>
+    </h:body>
+</html>
+
