@@ -24,7 +24,7 @@
                     </div>
                 </div>
             </header>
-            <main class="calender">
+            <main class="calendar">
 
                 <div class="addbutton__wrap">
                     <h:form>
@@ -39,39 +39,45 @@
                 <div>
                     <h:form id="calendar__header">
                         <p:commandButton action="#{calendarVM.backwards()}" update="calendar__header, calendar__body" icon="pi pi-angle-left" />
-                        <h:outputText value="#{calendarVM.getHeaderTitle()}"/>                        
+                        <div class="calendar__header--date">
+                            <h:outputText value="#{calendarVM.getCurrentMonthFormat()}"/>      
+                        </div>                
                         <p:commandButton action="#{calendarVM.forwards()}" update="calendar__header, calendar__body" icon="pi pi-angle-right" />
                     </h:form>
                 </div>
                
-                <h:form id="calendar__body">
-                    <p:dataTable value="#{calendarVM.month}" var="day">
-                        <p:column>
-                            <h:outputText value="#{day.convertToDate(day.date)}" />
-                        </p:column>
-                        <p:column>
-                            <p:repeat value="#{day.events}" var="event" rendered="#{day.hasEvents}">
-                                    <div>#{event.category.status}, #{event.getDateFormatBegin(event, day.date)} #{event.getDateFormatEnd(event, day.date)}, #{event.title}, #{event.author.name}
-                                        <ui:fragment> 
-                                            <h:form>
-                                                <p:commandButton action="#{calendarVM.editEvent(event)}" icon="pi pi-pencil" class="form__button" ajax="false" rendered="#{calendarVM.checkIfInPast(event)}"/>
-                                                <p:commandButton action="#{calendarVM.deleteEvent(event)}" icon="pi pi-trash" class="form__button" update="calendar__body">
-                                                    <p:confirm header="Löschen des Events" message="Soll das Event wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
-                                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-                                                        <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
-                                                        <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                                                    </p:confirmDialog> 
-                                                </p:commandButton>
-                                               
-                                            </h:form>
-                                        </ui:fragment>
-                                    </div>
-                                
-                            </p:repeat>
-                        </p:column>
-                    </p:dataTable>
-
-                </h:form>
+                <p:dataTable id="calendar__body" var="day" value="#{calendarVM.monthsDayList}">
+                    <p:column headerText="Datum" class="table__cell table__cell--small table__cell--top">
+                        <span class="calendar-entry__weekday">#{day.getWeekday()}</span>
+                        <span class="calendar-entry__date">#{day.getDateFormat()}</span>
+                    </p:column>
+                    <p:column class="table__cell">
+                        <p:dataList var="event" value="#{day.events}" rendered="#{day.hasEvents}">
+                            <p class="calendar-entry__header">
+                                #{event.category.status}
+                            </p>
+                            <p class="calendar-entry__content">
+                                <span class="calender-entry__time">#{event.getDateFormat(event, day.date)}</span>
+                                <span>#{event.title}</span>
+                            </p>
+                            <p class="calendar-entry__footer card--#{event.author.details.color}">
+                                <span class="calender-entry__author">#{event.author.name}</span>
+                                <ui:fragment rendered="#{calendarVM.checkAccessRightAndDate(day.date, event)}">
+                                <h:form>
+                                    <p:commandButton action="#{calendarVM.editEvent(event)}" icon="pi pi-pencil" class="form__button" />
+                                    <p:commandButton action="#{calendarVM.deleteEvent(event)}" icon="pi pi-trash" class="form__button" update="calendar__body">
+                                        <p:confirm header="Löschen des Events" message="Soll das Event wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                            <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                                            <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                        </p:confirmDialog> 
+                                    </p:commandButton>
+                                </h:form>
+                                </ui:fragment>
+                            </p>
+                        </p:dataList>
+                    </p:column>
+                </p:dataTable>
                 
             </main>
         </div>

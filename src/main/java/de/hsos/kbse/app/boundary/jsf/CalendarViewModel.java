@@ -13,6 +13,7 @@ import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.AppException;
+import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
@@ -20,10 +21,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -63,15 +64,16 @@ public class CalendarViewModel implements Serializable {
     private Event originalEvent;
     private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
     private List<Event> events;
-    private List<CalendarDay> month;
-    private boolean admin;           // true = ADMIN, false = USER
-    private boolean addEvent;         // true = addNote()
-    private boolean editEvent;        // true = editNote()
+    
+    private boolean admin;              // true = ADMIN, false = USER
+    private boolean addEvent;           // true = addEvent()
+    private boolean editEvent;          // true = editEvent()
     private EventCategory[] categories;
-    private LocalDate today;    // Heutiges Datum der System-Zeitzone
-    private LocalDate header;   // Datum des Headers, immer der fünfte Tag eines Monats
+    private LocalDate today;            // Heutiges Datum der System-Zeitzone
+    private LocalDate currentMonth;     // Datum des Headers, immer der fünfte Tag eines Monats
     
-    
+    private List<Event> currentMonthEvents;
+    private List<CalendarDay> currentMonthDays;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -80,17 +82,17 @@ public class CalendarViewModel implements Serializable {
     public CalendarViewModel(Calendar calendar, Conversation conversation) {
         this.calendar = calendar;
         this.conversation = conversation;
-        this.events = new LinkedList<>();
-        
-        this.currentEvent = new Event();
-        this.originalEvent = new Event();
+        this.events = new ArrayList();
+        this.currentMonthEvents = new ArrayList();
+        this.currentMonthDays = new ArrayList();
         this.categories = EventCategory.values();
         this.initEventList();
 
         this.today = LocalDate.now(ZoneId.systemDefault());
-        this.header = this.today.withDayOfMonth(5);
-        this.month = new LinkedList<>();
-        this.initCalendarForMonth();
+        this.currentMonth = this.today.withDayOfMonth(5);
+        //this.initCalendarForMonth();
+        
+        this.initCurrentMonth();
         
     }
     
@@ -103,7 +105,7 @@ public class CalendarViewModel implements Serializable {
     @Logable(LogLevel.INFO)
     public String addEvent() {
         /* Neues Event-Objekt initiieren */
-        this.currentEvent = new Event(this.loggedInMember, this.apartmentID);
+        this.currentEvent = new Event(this.loggedInMember, new Date(), new Date(), this.apartmentID);
         this.originalEvent = new Event(this.currentEvent);
         this.addEvent = true;
         this.editEvent = false;
@@ -123,13 +125,10 @@ public class CalendarViewModel implements Serializable {
     
     @Logable(LogLevel.INFO)
     public void deleteEvent(Event event){
-        /* Löscht das Event-Objekt aus der Datenbank und Event-Liste */
-        System.out.println("deleteEvent()");
-        System.out.println("Title: " + event.getTitle());
-
         this.addEvent = false;
         this.editEvent = false;
         try {
+            /* Entfernen ded Event-Objekts aus der Datenbank */
             this.calendar.deleteEvent(event);
         } catch (AppException ex) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -137,15 +136,15 @@ public class CalendarViewModel implements Serializable {
             facesContext.addMessage("Error",msg);
         }
         /* Bestehendes Event-Objekt aus der Liste entfernen */
-        removeFromEventList(event);
+        this.currentMonthEvents.remove(event);
+        this.initCurrentMonthView();
 
     }
     
     @Logable(LogLevel.INFO)
     public String saveEvent(){
-        System.out.println("Save Event");
-        if(this.validateInput(ValidationGroup.GENERAL)) { // Gültige Eingabe
-            if(this.addEvent ){ // Neues Event 
+        if(this.addEvent ){ // Neues Event 
+            if(this.validateInput(ValidationGroup.GENERAL)) { // Gültige Eingabe
                 try {
                     /* Neues Event-Objekt der Datenbank hinzufügen */
                     this.calendar.createEvent(currentEvent);
@@ -155,56 +154,62 @@ public class CalendarViewModel implements Serializable {
                     facesContext.addMessage("Error",msg);
                 }
                 /* Hinzufügen in die Liste der Events */
-                addEventToList(this.currentEvent);
-            }else if(this.editEvent){ // Bestehendes Event bearbeiten
+                this.addToEventsList(this.currentEvent);
+                this.initCurrentMonthView();
+                return "calendar";
+            }
+        } else if(this.editEvent){ // Bestehendes Event bearbeiten
+            boolean valid;
+            if(this.originalEvent.getBegin().before(new Date())) {
+                valid = this.validateInput(ValidationGroup.CONDITION);
+            } else {
+                valid = this.validateInput(ValidationGroup.GENERAL);
+            }
+            if(valid) { // Gültige Eingabe
                 try {
                     /* Bestehendes Event-Objekt wird in der Datenbank aktualisiert */
                     this.calendar.updateEvent(currentEvent);
-
                 } catch (AppException ex) {
                     FacesContext facesContext = FacesContext.getCurrentInstance();
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
                     facesContext.addMessage("Error",msg);
                 }
-                
-                /* Bestehendes Event-Objekt in der Liste wird aktualisiert */
-                updateEventList(this.currentEvent);
+                this.initCurrentMonthView();
+                return "calendar";
             }
         }
-        return "calendar";
+        return "";
     }
     
     public String discardEvent(){
         /* Falls ein vorhandenes Objekt bearbeitet werden sollte und diese Aktion abgebrochen wurde,
          * muss dieses auf seinen Originalzustand zurückgesetzt werden.*/
         if(this.editEvent){
-            this.currentEvent = new Event(this.getOriginalEvent());
+            /* Falls ein vorhandenes Objekt bearbeitet werden sollte und diese Aktion abgebrochen wurde,
+             * muss dieses auf seinen Originalzustand zurückgesetzt werden.*/
+            this.currentEvent.setTitle(this.originalEvent.getTitle());
+            this.currentEvent.setBegin(this.originalEvent.getBegin());
+            this.currentEvent.setEnd(this.originalEvent.getEnd());
+            this.currentEvent.setCategory(this.originalEvent.getCategory());
         }
         return "calendar";
-    }
-    
-    public String getHeaderTitle(){
-        /* Generiert den String des Monats und Jahres im Header des Kalenders */
-        String tmpM = this.header.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault());
-        int year = this.header.getYear();
-        return tmpM + ", " + year;
     }
        
     public void backwards(){
         /* Geht einen Monat in die Vergangenheit, setzt Header auf den fünften Tag des Monats */
-        this.header = this.header.minusMonths(1).withDayOfMonth(5);
-        this.initCalendarForMonth();
+        this.currentMonth = this.currentMonth.minusMonths(1).withDayOfMonth(5);
+        this.initCurrentMonth();
     }
     
     public void forwards(){
         /* Geht einen Monat in die Zukunft, setzt Header auf den fünften Tag des Monats */
-        this.header = this.header.plusMonths(1).withDayOfMonth(5);
-        this.initCalendarForMonth();
+        this.currentMonth = this.currentMonth.plusMonths(1).withDayOfMonth(5);
+        this.initCurrentMonth();
     }
       
     public void setBackToToday(){
         /* Setzt den Kalender auf Heute zurück */
-        this.header = this.today.withDayOfMonth(5);
+        this.currentMonth = this.today.withDayOfMonth(5);
     }
        
     public void onSelectStartDate(){
@@ -212,9 +217,14 @@ public class CalendarViewModel implements Serializable {
         this.currentEvent.setEnd(null);
     }
     
-    public boolean checkIfInPast(Event e){
-        /* Überprüft ob Event in der Vergangenheit liegt oder noch in der Zukunft und somit zu Bearbeiten ist */
-        return !e.getEnd().before(java.sql.Timestamp.valueOf(LocalDateTime.now(ZoneId.systemDefault())));
+    public boolean editBeginInPast() {
+        Date date = this.currentEvent.getBegin();
+        return this.editEvent && date.before(new Date());
+    }
+    
+    public boolean editBeginInFuture() {
+        Date date = this.currentEvent.getBegin();
+        return this.editEvent && date.after(new Date());
     }
     
     public LocalDateTime compareBeginToday(Date begin){
@@ -226,42 +236,79 @@ public class CalendarViewModel implements Serializable {
             return LocalDateTime.now(ZoneId.systemDefault());
         }
     }
+    
+    public boolean isFutureDate(LocalDate date){
+        /* Überprüft ob Event in der Vergangenheit liegt oder noch in der Zukunft und somit zu Bearbeiten ist */
+        return date.isAfter(today.minusDays(1));
+    }
 
-    public boolean checkAccessRights(Event event) {
+    public boolean checkAccessRightAndDate(LocalDate currentDay, Event currentEvent) {
         /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        return this.admin || event.getAuthor().getId().equals(this.loggedInMember.getId());
+        this.admin = false;
+        boolean access = this.admin || currentEvent.getAuthor().getId().equals(this.loggedInMember.getId());
+        boolean isFutureDate = currentDay.isAfter(today.minusDays(1));
+        return access && isFutureDate;
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
-       
-    private void removeFromEventList(Event e){
-        /* Entfernt das gesuchte Event aus der Liste und initiiert den Monat anschließend neu */
-        for(int i = 0; i < this.events.size(); i++){
-            if(this.events.get(i).equals(e)){
-                this.events.remove(i);
+    
+    private void initCurrentMonth() {
+        this.initCurrentMonthEvents();
+        this.initCurrentMonthView();
+    }
+    
+    private void initCurrentMonthEvents() {
+        int year = this.currentMonth.getYear();
+        int month = this.currentMonth.getMonthValue();
+        int totalDays = this.currentMonth.getMonth().length(isLeapYear(this.currentMonth.getYear()));
+        try {
+            /* Abruf der Events aus dem aktuellen Monat aus der Datenbank */
+            this.currentMonthEvents = this.calendar.getAllEventsFromMonth(this.apartmentID, year, month, totalDays);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+    }
+    
+    private void initCurrentMonthView() {
+        /* Initialisiert CalenderDay-Objekte zur Anzeige des gesamten Monats */
+        this.currentMonthDays.clear();
+        int year = this.currentMonth.getYear();
+        int month = this.currentMonth.getMonthValue();
+        int totalDays = this.currentMonth.getMonth().length(isLeapYear(this.currentMonth.getYear()));
+        for(int i = 0; i < totalDays; i++){
+            LocalDate tmpDate = LocalDate.of(year, month, (i + 1));
+            CalendarDay tempDay = initCalenderDay(tmpDate);
+            this.currentMonthDays.add(tempDay);
+        } 
+    }
+    
+    private CalendarDay initCalenderDay(LocalDate date){
+        /* Initialisiert CalendarDay-Objekt mit zugehoeriger Eventsliste und einem Boolean zur
+         * Anzeige, der abspeichert, ob ueberhaupt Events vorhanden sind. */
+        List<Event> eventList = this.getEventsListOf(date);
+        boolean hasEvents = !eventList.isEmpty();  
+        return new CalendarDay(date, eventList, hasEvents);
+    }
+    
+    private List<Event> getEventsListOf(LocalDate currentDate){
+        /* Erstellt eine Liste der für den Tag vorliegenden Events */
+        List<Event> eventList = new ArrayList();
+        /* Innerhalb der Liste werden alle Events des aktuellen Monats durchlaufen und zu den entsprechenden Tagen zugeordnet. */
+        for(int i = 0; i < this.currentMonthEvents.size(); i++){
+            Event tmpEvent = this.currentMonthEvents.get(i);
+            /* Konvertierung des Date-Objekts in LocalDate für nachfolgenden Vergleich */
+            LocalDate eventBegin = tmpEvent.getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();   // Beginn des Events
+            LocalDate eventEnd = tmpEvent.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();       // Ende des Events
+            /* Das Event wird der Liste nur dann hinzugefuegt, wenn der Eventbeginn vor oder am aktuellen Tag und das
+             * Event-Ende gleich nach oder am aktuellen Tag stattfindet. */
+            if(eventBegin.isBefore(currentDate) && eventEnd.isAfter(currentDate) || currentDate.isEqual(eventBegin) || currentDate.isEqual(eventEnd)) {
+                eventList.add(tmpEvent);
             }
         }
-        
-        initCalendarForMonth();
-        
-    }
-    
-    private void updateEventList(Event e){
-        /* Das Event wird in der Liste aktualisiert und initiiert den Monat anschließend neu */
-        this.events.forEach((event) -> {
-            if(event.getId().equals(e.getId())){
-                event = e;
-            }
-        });
-        
-        initCalendarForMonth();
-    }
-    
-    private void addEventToList(Event e){
-        /* Ein neues Event wird erstellt und der Liste hinzugefügt. Anschließend wird der Monat neu initiiert */
-        this.events.add(e);
-        initCalendarForMonth();
+        return eventList;
     }
     
     private void initEventList(){
@@ -275,44 +322,19 @@ public class CalendarViewModel implements Serializable {
         }
     }
     
-    private void initCalendarForMonth(){
-        /* Initiiert den Kalender für den angezeigten Monat */
-        System.out.println("initCalendarForMonth()");
-        this.month = new LinkedList<>();
-
-        int yearValue = this.header.getYear();
-        int monthValue = this.header.getMonthValue();
-        int daysInMonth = this.header.getMonth().length(isLeapYear(this.header.getYear()));
-        
-        for(int i = 0; i < daysInMonth; i++){
-            LocalDate tmp = LocalDate.of(yearValue, monthValue, (i + 1));
-            CalendarDay tmpD = createNewDay(tmp, (i + 1));
-            this.month.add(tmpD);
+    private void addToEventsList(Event event){
+        LocalDate eventBegin = event.getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate eventEnd = event.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        int month = this.currentMonth.getMonthValue();      // aktueller Monat
+        int eventBeginMonth = eventBegin.getMonthValue();
+        int eventEndMonth = eventEnd.getMonthValue();
+        /* Nur falls das neu hinzugefuegte Event in dem gerade angezeigten Monat liegt, muss eine Aktualisierung der Liste "currentMonthEvents"
+         * stattfinden. Im anderen Fall wird dieses Event erst mit dem Monatswechsel entsprechend aus der Datenbank bezogen. */
+        if(eventBeginMonth == month || eventEndMonth == month || (eventBeginMonth < month && eventEndMonth > month)) {
+            /* Hinzufuegen des neuen Event-Objekts zur Liste und erneute Initiierung der Monats-Uebersicht */
+            this.currentMonthEvents.add(event);
+            this.initCurrentMonthView();
         }
-    }
-    
-    private List<Event> getEventsOfDay(LocalDate date){
-        /* Erstellt eine Liste der für den Index (Tag) vorliegenden Events */
-        List<Event> tmp = new LinkedList<>();
-        
-        for(int i = 0; i < this.events.size(); i++){
-            /* Umrechnung der Dates in LocalDate für Vergleich */
-            LocalDate ldBegin = this.events.get(i).getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate ldEnd = this.events.get(i).getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            
-            if(ldBegin.getDayOfMonth() <= date.getDayOfMonth() && date.getDayOfMonth() <= ldEnd.getDayOfMonth() || date.isEqual(ldBegin) || date.isEqual(ldEnd)){
-                tmp.add(this.events.get(i));
-            }
-        }
-        return tmp;
-    }
-    
-    private CalendarDay createNewDay(LocalDate date, int index){
-        /* Erstellt das Objekt Tag für den Monat */
-        LocalDate tmpLD = date;
-        List<Event> tmpEList = this.getEventsOfDay(date);
-        boolean hasEvents = !tmpEList.isEmpty();  
-        return new CalendarDay(tmpLD, tmpEList, hasEvents);
     }
     
     private boolean isLeapYear(int year){
@@ -329,6 +351,8 @@ public class CalendarViewModel implements Serializable {
         Set<ConstraintViolation<Event>> constraintViolations = null;
         if(group == ValidationGroup.GENERAL) {
             constraintViolations = validator.validate( this.currentEvent, General.class );
+        } else if(group == ValidationGroup.CONDITION) {
+            constraintViolations = validator.validate( this.currentEvent, Condition.class );
         }
 
         if(constraintViolations != null && constraintViolations.isEmpty()) {
@@ -353,14 +377,6 @@ public class CalendarViewModel implements Serializable {
         if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
             this.admin = true;
         }
-    }
-
-    public static Validator getValidator() {
-        return validator;
-    }
-
-    public static void setValidator(Validator validator) {
-        CalendarViewModel.validator = validator;
     }
 
     public Event getCurrentEvent() {
@@ -419,28 +435,27 @@ public class CalendarViewModel implements Serializable {
         this.categories = categories;
     }
 
-    public LocalDate getHeader() {
-        return header;
+    public LocalDate getCurrentMonth() {
+        return currentMonth;
+    }
+    
+    public String getCurrentMonthFormat(){
+        /* Generiert den String des Monats und Jahres im Header des Kalenders */
+        String tmpM = this.currentMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault());
+        int year = this.currentMonth.getYear();
+        return tmpM + " " + year;
     }
 
-    public void setHeader(LocalDate header) {
-        this.header = header;
+    public void setCurrentMonth(LocalDate currentMonth) {
+        this.currentMonth = currentMonth;
     }
 
-    public List<CalendarDay> getMonth() {
-        return month;
+    public List<CalendarDay> getMonthsDayList() {
+        return currentMonthDays;
     }
 
-    public void setMonth(List<CalendarDay> month) {
-        this.month = month;
-    }
-
-    public Event getOriginalEvent() {
-        return originalEvent;
-    }
-
-    public void setOriginalEvent(Event originalEvent) {
-        this.originalEvent = originalEvent;
+    public void setMonthsDayList(List<CalendarDay> monthsDayList) {
+        this.currentMonthDays = monthsDayList;
     }
 
     public LocalDate getToday() {

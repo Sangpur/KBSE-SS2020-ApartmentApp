@@ -24,7 +24,7 @@
                     <p:autoUpdate />
                 </p:messages>
                 
-                <h:form id="calendar__add">
+                <h:form>
                     <div class="form">
                         <div class="input__wrap">
                             <div class="input__label">Titel:</div>
@@ -33,46 +33,47 @@
                             </div>
                         </div>
                         <div class="input__wrap">
-                            <div class="input__label">Kategorie auswählen:</div>
-                            <div class="input">
-                                <ui:fragment >
-                                    <p:selectOneMenu value="#{calendarVM.currentEvent.category}"  rendered="#{calendarVM.addEvent}">
-                                        <f:selectItems value="#{calendarVM.categories}" var="category" itemLabel="#{category.status}" itemValue="#{category}" />
-                                    </p:selectOneMenu>
-                                </ui:fragment>
-                                <ui:fragment >
-                                    <!-- bereits ausgewaehlte Elemente schon auswaehlen -->
-                                    <p:selectOneMenu value="#{calendarVM.currentEvent.category}"  rendered="#{calendarVM.editEvent}">
-                                        <f:selectItems value="#{calendarVM.categories}" var="category" itemLabel="#{category.status}" itemValue="#{category}"/>
-                                    </p:selectOneMenu>
-                                </ui:fragment>
+                            <div class="input__label">Kategorie:</div>
+                            <div class="input input__select">
+                                <p:selectOneMenu value="#{calendarVM.currentEvent.category}"  rendered="#{calendarVM.addEvent}">
+                                    <f:selectItems value="#{calendarVM.categories}" var="category" itemLabel="#{category.status}" itemValue="#{category}" />
+                                </p:selectOneMenu>
+                                <!-- bereits ausgewaehlte Elemente schon auswaehlen -->
+                                <p:selectOneMenu value="#{calendarVM.currentEvent.category}" rendered="#{calendarVM.editEvent}">
+                                    <f:selectItems value="#{calendarVM.categories}" var="category" itemLabel="#{category.status}" itemValue="#{category}"/>
+                                </p:selectOneMenu>
                             </div>
                         </div>
                         <div class="input__wrap">
-                            <div class="input__label">Start:</div>
-                            <div class="input">
+                            <div class="input__label">Beginn:</div>
+                            <div class="input input--big">
                                 <ui:fragment rendered="#{calendarVM.addEvent}"> 
-                                    <p:datePicker id="begin" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" mindate="#{calendarVM.today}" disabled="false" required="true">
-                                        <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="begin"/>
+                                    <p:datePicker id="beginAdd" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy">
+                                        <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginAdd"/>
                                     </p:datePicker>
                                 </ui:fragment>
-                                <ui:fragment rendered="#{calendarVM.editEvent}">
-                                    <p:datePicker id="begin" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" mindate="#{calendarVM.compareBeginToday(calendarVM.currentEvent.begin)}" disabled="false" required="true">
-                                        <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="begin"/>
-                                    </p:datePicker>
+                                <ui:fragment rendered="#{calendarVM.editBeginInFuture()}">
+                                <p:datePicker id="beginEdit" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy">
+                                    <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginEdit"/>
+                                </p:datePicker>
+                                </ui:fragment>
+                                <ui:fragment rendered="#{calendarVM.editBeginInPast()}">
+                                <p:datePicker id="beginEdit-dis" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" disabled="true">
+                                    <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginEdit"/>
+                                </p:datePicker>
                                 </ui:fragment>
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Ende:</div>
-                            <div class="input">
+                            <div class="input input--big">
                                 <ui:fragment>
-                                    <p:datePicker id="end" showTime="true" value="#{calendarVM.currentEvent.end}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" mindate="#{calendarVM.currentEvent.begin}" required="true"/>
+                                    <p:datePicker id="end" showTime="true" value="#{calendarVM.currentEvent.end}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" />
                                 </ui:fragment>
                             </div>
                         </div>
                         <div class="form__buttons">
-                            <p:commandButton value="Speichern" action="#{calendarVM.saveEvent()}" class="form__button"/>
+                            <p:commandButton value="Speichern" action="#{calendarVM.saveEvent()}" class="form__button" />
                             <p:commandButton value="Abbrechen" action="#{calendarVM.discardEvent()}" class="form__button" />
                         </div>
                     </div>
