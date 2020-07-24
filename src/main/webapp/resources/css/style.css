@@ -70,6 +70,34 @@ main {
     border-bottom-right-radius: .5em;
 }
 
+.registration {
+    width: 25em;
+    padding: 1em 1.5em;
+    background: #f8f8f8;
+    border: 1px solid #d7d7d7;
+    border-radius: .5em;
+}
+
+.registration p {
+    width: auto;
+}
+
+.registration >p span {
+    color: #43d7a6;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+body .registration .form__button, body .registration .form__button:visited {
+    background-color: #43d7a6;
+    border-color: #43d7a6;
+}
+
+body .registration .form__button:hover, body .registration .form__button:focus {
+    background-color: #35be91;
+    border-color: #35be91;
+}
+
 .overview_head {
     max-width: 55em;
     padding: 0 1em;
@@ -331,19 +359,13 @@ main {
     margin-right: .5em !important;
 }
 
-.form__button__secondary {
-    margin-right: .5em !important;
-    background-color: lightgrey !important;
-    border-color: lightgrey !important;
-}
-
 .input__wrap {
     margin-bottom: .4em;
     display: flex;
 }
 
 .input__label {
-    min-width: 8em;
+    min-width: 9em;
     padding: .5em;
 }
 
