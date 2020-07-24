@@ -26,15 +26,55 @@
                 <h:form>
                     <div class="form">
                         <div class="input__wrap">
-                            <div class="input__label">Textfeld:</div>
-                            <div class="input">
-                                <p:inputText value="" />
+                            <div class="input__label">Username:</div>
+                            <div class="input input--big">
+                                <p:inputText value="#{apartmentVM.currentMember.name}" />
                             </div>
                         </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Birthdate</div>
+                            <div class="input input--big">
+                                <p:datePicker id="popup" value="#{apartmentVM.currentMember.details.birthday}" />
+                            </div>
+                        </div>
+                        <p:outputPanel class="input__wrap" rendered="#{!apartmentVM.editMode}">
+                            <div class="input__label" style="font-size: 16px;">Passwort:</div>
+                            <div class="input input--small">
+                                <p:inputText type="password" value="#{apartmentVM.currentMember.password}"/>
+                            </div>
+                        </p:outputPanel>
+                        <p:outputPanel class="input__wrap" rendered="#{apartmentVM.editMode}">
+                            <div class="input__label" style="font-size: 16px;">Neues Passwort:</div>
+                            <div class="input input--small">
+                                <p:inputText type="password" value="#{apartmentVM.newpassword}"/>
+                            </div>
+                        </p:outputPanel>
+                        <div class="input__wrap">
+                            <div class="input__label">Wiederhole Passwort:</div>
+                            <div class="input input--small">
+                                <p:inputText type="password" value="#{apartmentVM.repassword}"/>
+                            </div>
+                        </div>
+                        <div class="input__wrap">
+                            <div class="input__label">Farbe:</div>
+                            <div class="input input--small">
+                                <p:selectOneMenu id="color" value="#{apartmentVM.currentMember.details.color}">
+                                    <f:selectItems value="#{apartmentVM.colors}" />
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <p:outputPanel class="input__wrap" rendered="#{apartmentVM.isAdmin()}">
+                            <div class="input__label" style="font-size: 16px;">Rolle:</div>
+                            <div class="input input--small">
+                                <p:selectOneMenu id="role" value="#{apartmentVM.currentMember.memberRole}">
+                                    <f:selectItems value="#{apartmentVM.roles}" />
+                                </p:selectOneMenu>
+                            </div>
+                        </p:outputPanel>
                     </div>
                     <div class="form__buttons">
-                        <p:commandButton value="Speichern" class="form__button" />
-                        <p:commandButton value="Abbrechen" class="form__button" />
+                        <p:commandButton value="Speichern" action="#{apartmentVM.saveMember()}" class="form__button" />
+                        <p:commandButton value="Abbrechen" action="#{apartmentVM.resetMember()}" class="form__button" />
                     </div>
                 </h:form>
 

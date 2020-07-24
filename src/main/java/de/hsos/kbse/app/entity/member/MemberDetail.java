@@ -5,8 +5,11 @@
 package de.hsos.kbse.app.entity.member;
 
 import de.hsos.kbse.app.enums.MemberColor;
+import de.hsos.kbse.app.util.Condition;
+import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.Column;
@@ -20,6 +23,7 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -36,6 +40,7 @@ public class MemberDetail implements Serializable {
     @TableGenerator(name = "modMemberDetail", initialValue = 4)
     private Long id;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Das Geburtsdatum darf nicht leer sein!")
     @Temporal(TemporalType.DATE)
     private Date birthday;
     
@@ -65,6 +70,12 @@ public class MemberDetail implements Serializable {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+    
+    public String getBirthdayFormat() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");  
+        String strDate = formatter.format(this.birthday);  
+        return strDate;
     }
 
     public MemberColor getColor() {

@@ -6,6 +6,8 @@ package de.hsos.kbse.app.entity.member;
 
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
+import de.hsos.kbse.app.util.Condition;
+import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
@@ -19,6 +21,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -35,12 +39,17 @@ public class Member implements Serializable {
     @TableGenerator(name = "modMember", initialValue = 4)
     private Long id;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Der Name darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Der Name muss zwischen 3 und 50 Zeichen liegen!")
     private String name;
     
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Das Passwort darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Das Passwort muss zwischen 3 und 50 Zeichen liegen!")
     private String password;
+    
     
     @OneToOne(cascade = CascadeType.ALL)
     private MemberDetail details;
