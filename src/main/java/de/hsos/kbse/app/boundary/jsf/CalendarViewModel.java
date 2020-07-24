@@ -143,7 +143,6 @@ public class CalendarViewModel implements Serializable {
     
     @Logable(LogLevel.INFO)
     public String saveEvent(){
-        System.out.println("Save Event");
         if(this.addEvent ){ // Neues Event 
             if(this.validateInput(ValidationGroup.GENERAL)) { // Gültige Eingabe
                 try {
@@ -160,7 +159,13 @@ public class CalendarViewModel implements Serializable {
                 return "calendar";
             }
         } else if(this.editEvent){ // Bestehendes Event bearbeiten
-            if(this.validateInput(ValidationGroup.CONDITION)) { // Gültige Eingabe
+            boolean valid;
+            if(this.originalEvent.getBegin().before(new Date())) {
+                valid = this.validateInput(ValidationGroup.CONDITION);
+            } else {
+                valid = this.validateInput(ValidationGroup.GENERAL);
+            }
+            if(valid) { // Gültige Eingabe
                 try {
                     /* Bestehendes Event-Objekt wird in der Datenbank aktualisiert */
                     this.calendar.updateEvent(currentEvent);
@@ -212,9 +217,14 @@ public class CalendarViewModel implements Serializable {
         this.currentEvent.setEnd(null);
     }
     
-    public boolean checkIfInPast(LocalDate date){
-        /* Überprüft ob Event in der Vergangenheit liegt oder noch in der Zukunft und somit zu Bearbeiten ist */
-        return !date.isBefore(today.minusDays(1));
+    public boolean editBeginInPast() {
+        Date date = this.currentEvent.getBegin();
+        return this.editEvent && date.before(new Date());
+    }
+    
+    public boolean editBeginInFuture() {
+        Date date = this.currentEvent.getBegin();
+        return this.editEvent && date.after(new Date());
     }
     
     public LocalDateTime compareBeginToday(Date begin){
@@ -226,11 +236,19 @@ public class CalendarViewModel implements Serializable {
             return LocalDateTime.now(ZoneId.systemDefault());
         }
     }
+    
+    public boolean isFutureDate(LocalDate date){
+        /* Überprüft ob Event in der Vergangenheit liegt oder noch in der Zukunft und somit zu Bearbeiten ist */
+        return date.isAfter(today.minusDays(1));
+    }
 
-    public boolean checkAccessRights(Event event) {
+    public boolean checkAccessRightAndDate(LocalDate currentDay, Event currentEvent) {
         /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        return this.admin || event.getAuthor().getId().equals(this.loggedInMember.getId());
+        this.admin = false;
+        boolean access = this.admin || currentEvent.getAuthor().getId().equals(this.loggedInMember.getId());
+        boolean isFutureDate = currentDay.isAfter(today.minusDays(1));
+        return access && isFutureDate;
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */

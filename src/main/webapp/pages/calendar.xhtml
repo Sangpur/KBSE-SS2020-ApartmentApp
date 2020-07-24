@@ -62,7 +62,7 @@
                             </p>
                             <p class="calendar-entry__footer card--#{event.author.details.color}">
                                 <span class="calender-entry__author">#{event.author.name}</span>
-                                <ui:fragment rendered="#{calendarVM.checkIfInPast(day.date)}">
+                                <ui:fragment rendered="#{calendarVM.checkAccessRightAndDate(day.date, event)}">
                                 <h:form>
                                     <p:commandButton action="#{calendarVM.editEvent(event)}" icon="pi pi-pencil" class="form__button" />
                                     <p:commandButton action="#{calendarVM.deleteEvent(event)}" icon="pi pi-trash" class="form__button" update="calendar__body">
