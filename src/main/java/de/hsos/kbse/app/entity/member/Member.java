@@ -56,19 +56,23 @@ public class Member implements Serializable {
     
     @Column(name="apartment_id")
     private Long apartmentID;
+    
+    @Column(columnDefinition="BOOLEAN DEFAULT FALSE")
+    private boolean deleted;
 
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
     public Member() {
         this.details = new MemberDetail();
+        this.deleted = false;
     }
     
     public Member(String name, MemberRole memberRole, String password, Date birthday, MemberColor color) {
         this.name = name;
         this.memberRole = memberRole;
         this.password = password;
-        
+        this.deleted = false;
         this.details = new MemberDetail();
         this.details.setBirthday(birthday);
         this.details.setColor(color);
@@ -124,6 +128,14 @@ public class Member implements Serializable {
 
     public void setApartmentID(Long apartmentID) {
         this.apartmentID = apartmentID;
+    }
+    
+    public boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @Override

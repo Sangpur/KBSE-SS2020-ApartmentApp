@@ -115,9 +115,14 @@ public class ApartmentViewModel implements Serializable {
             return "";
         }
         try {
-            this.memberRepository.deleteMember(currentMember);
-        } catch (AppException ex) {
-            Logger.getLogger(ApartmentViewModel.class.getName()).log(Level.SEVERE, null, ex);
+            currentMember.setDeleted(true);
+            this.memberRepository.updateMember(currentMember);
+            initApartmentByID(apartment.getId());
+            FacesContext.getCurrentInstance().addMessage("Succes", new FacesMessage("Member was deleted."));
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            facesContext.getExternalContext().redirect("/ApartmentApp/faces/pages/members.xhtml");
+        } catch (Exception e) {
+            Logger.getLogger(ApartmentViewModel.class.getName()).log(Level.SEVERE, null, e);
             FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage("Member with id " + id + "could not be deleted."));
         }
         initApartmentByID(apartment.getId());
