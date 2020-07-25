@@ -98,13 +98,13 @@ public class CashFlowViewModel implements Serializable {
     public boolean checkAccessRights(Payment payment) {
         /* Es muss geprueft werden, ob die jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        return this.admin || payment.getGiver().getId().equals(this.getLoggedInMember().getId());
+        return this.admin || payment.getGiver().getId().equals(this.loggedInMember.getId());
     }
     
     @Logable(LogLevel.INFO)
     public String addPayment() {
         /* Neues Payment-Objekt initiieren */
-        this.currentPayment = new Payment(this.getLoggedInMember(), new Date(), this.apartmentID);
+        this.currentPayment = new Payment(this.loggedInMember, new Date(), this.apartmentID);
         this.addPayment = true;
         this.editPayment = false;
         this.deletePayment = false;
