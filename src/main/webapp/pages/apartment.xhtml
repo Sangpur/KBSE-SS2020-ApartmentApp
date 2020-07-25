@@ -13,7 +13,7 @@
             <header>
                 <div class="header__content">
                     <h1 class="header__title">
-                        WG <span>#</span>4538
+                        WG <span>#</span>#{authVM.loggedInMember.apartmentID}
                     </h1>
                 </div>
             </header>
@@ -22,6 +22,7 @@
                     <div class="overview_head">
                         <span>Angemeldet als <h:outputText value="#{authVM.loggedInMember.name}" /></span> | 
                         <p:commandButton value="Mitglieder" action="members?faces-redirect=true" class="overview_link" />
+                        <h:commandButton value="Logout" actionListener="#{authVM.logout()}" class="overview_link" />
                     </div>
                     <div class="overview">
                         <div class="overview_element">

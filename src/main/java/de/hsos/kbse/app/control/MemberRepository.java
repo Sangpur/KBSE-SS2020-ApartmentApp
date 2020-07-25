@@ -80,7 +80,7 @@ public class MemberRepository implements MemberManager, Serializable {
     public Member findMemberByName(String name) throws AppException {
         Member member = null;
         try {
-            String str = "SELECT m FROM Members m WHERE m.name = :name";
+            String str = "SELECT m FROM Members m WHERE m.name = :name AND m.deleted = FALSE";
             TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
             querySelect.setParameter("name", name);
             member = querySelect.getSingleResult();
@@ -95,7 +95,7 @@ public class MemberRepository implements MemberManager, Serializable {
     @Override
     public List<Member> getAllMembersFrom(Long apartmentID) throws AppException {
         try {
-            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id";
+            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id AND m.deleted = FALSE";
             TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
             querySelect.setParameter("id", apartmentID);
             List<Member> results = querySelect.getResultList();

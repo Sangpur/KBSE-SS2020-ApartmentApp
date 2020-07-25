@@ -6,6 +6,8 @@ package de.hsos.kbse.app.entity.member;
 
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
+import de.hsos.kbse.app.util.Condition;
+import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
@@ -19,6 +21,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -35,31 +39,40 @@ public class Member implements Serializable {
     @TableGenerator(name = "modMember", initialValue = 4)
     private Long id;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Der Name darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Der Name muss zwischen 3 und 50 Zeichen liegen!")
     private String name;
     
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Das Passwort darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Das Passwort muss zwischen 3 und 50 Zeichen liegen!")
     private String password;
+    
     
     @OneToOne(cascade = CascadeType.ALL)
     private MemberDetail details;
     
     @Column(name="apartment_id")
     private Long apartmentID;
+    
+    @Column(columnDefinition="BOOLEAN DEFAULT FALSE")
+    private boolean deleted;
 
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
     public Member() {
         this.details = new MemberDetail();
+        this.deleted = false;
     }
     
     public Member(String name, MemberRole memberRole, String password, Date birthday, MemberColor color) {
         this.name = name;
         this.memberRole = memberRole;
         this.password = password;
-        
+        this.deleted = false;
         this.details = new MemberDetail();
         this.details.setBirthday(birthday);
         this.details.setColor(color);
@@ -115,6 +128,14 @@ public class Member implements Serializable {
 
     public void setApartmentID(Long apartmentID) {
         this.apartmentID = apartmentID;
+    }
+    
+    public boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @Override
