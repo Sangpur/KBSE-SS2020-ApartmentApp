@@ -3,7 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Kalender</title>
     </h:head>
@@ -22,7 +24,7 @@
                     </div>
                 </div>
             </header>
-            <main class="calender">
+            <main class="calendar">
 
                 <div class="addbutton__wrap">
                     <h:form>
@@ -33,17 +35,49 @@
                 <p:messages id="messages" showDetail="true" closable="true">
                     <p:autoUpdate />
                 </p:messages>
-                
-                YOUR CONTENT.
-                
+
                 <div>
-                    <h:form>
-                        <p:commandButton action="#{calendarVM.backward()}" icon="pi pi-angle-left" />
-                        <h:outputText value="Monat Jahreszahl"/>
-                        <p:commandButton action="#{calendarVM.forward()}" icon="pi pi-angle-right" />
+                    <h:form id="calendar__header">
+                        <p:commandButton action="#{calendarVM.backwards()}" update="calendar__header, calendar__body" icon="pi pi-angle-left" />
+                        <div class="calendar__header--date">
+                            <h:outputText value="#{calendarVM.getCurrentMonthFormat()}"/>      
+                        </div>                
+                        <p:commandButton action="#{calendarVM.forwards()}" update="calendar__header, calendar__body" icon="pi pi-angle-right" />
                     </h:form>
                 </div>
-
+               
+                <p:dataTable id="calendar__body" var="day" value="#{calendarVM.monthsDayList}">
+                    <p:column headerText="Datum" class="table__cell table__cell--small table__cell--top">
+                        <span class="calendar-entry__weekday">#{day.getWeekday()}</span>
+                        <span class="calendar-entry__date">#{day.getDateFormat()}</span>
+                    </p:column>
+                    <p:column class="table__cell">
+                        <p:dataList var="event" value="#{day.events}" rendered="#{day.hasEvents}">
+                            <p class="calendar-entry__header">
+                                #{event.category.status}
+                            </p>
+                            <p class="calendar-entry__content">
+                                <span class="calender-entry__time">#{event.getDateFormat(event, day.date)}</span>
+                                <span>#{event.title}</span>
+                            </p>
+                            <p class="calendar-entry__footer card--#{event.author.details.color}">
+                                <span class="calender-entry__author">#{event.author.name}</span>
+                                <ui:fragment rendered="#{calendarVM.checkAccessRightAndDate(day.date, event)}">
+                                <h:form>
+                                    <p:commandButton action="#{calendarVM.editEvent(event)}" icon="pi pi-pencil" class="form__button" />
+                                    <p:commandButton action="#{calendarVM.deleteEvent(event)}" icon="pi pi-trash" class="form__button" update="calendar__body">
+                                        <p:confirm header="Löschen des Events" message="Soll das Event wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                            <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                                            <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                        </p:confirmDialog> 
+                                    </p:commandButton>
+                                </h:form>
+                                </ui:fragment>
+                            </p>
+                        </p:dataList>
+                    </p:column>
+                </p:dataTable>
                 
             </main>
         </div>

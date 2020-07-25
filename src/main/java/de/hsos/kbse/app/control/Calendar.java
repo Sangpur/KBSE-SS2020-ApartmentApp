@@ -8,6 +8,8 @@ import de.hsos.kbse.app.entity.features.Event;
 import de.hsos.kbse.app.entity.features.EventManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
@@ -88,8 +90,45 @@ public class Calendar implements EventManager, Serializable {
         }
     }
     
+    @Override
+    public List<Event> getAllEventsFromMonth(Long apartmentID, int year, int month, int totalDays) throws AppException {
+        System.out.println("Monat: " + month + " " + year);
+        
+        Date beginMonth = java.sql.Date.valueOf(LocalDate.of(year, month, 1));
+        Date endMonth = java.sql.Date.valueOf(LocalDate.of(year, month, totalDays));
+        
+        System.out.println("Eintraege zwischen " + beginMonth + " und " + endMonth);
+        
+        
+        
+        try {
+            String str = "SELECT e FROM Event e "
+                         + "WHERE e.apartmentID = :id AND e.begin >= :beginMonth AND e.begin <= :endMonth "
+                         + "OR e.apartmentID = :id AND e.end >= :beginMonth AND e.end <= :endMonth";
+            TypedQuery<Event> querySelect = em.createQuery(str, Event.class);
+            querySelect.setParameter("id", apartmentID);
+            querySelect.setParameter("beginMonth", beginMonth);
+            querySelect.setParameter("endMonth", endMonth);
+            List<Event> results = querySelect.getResultList();
+            
+            System.out.println("Gefundene Events: ");
+            for(int i = 0; i < results.size(); i++) {
+                Event test = results.get(i);
+                System.out.println(test.getTitle() + " am " + test.getBegin());
+            }
+            
+            
+            return results;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Events der WG "+ apartmentID +" konnten nicht gefunden werden!");
+        }
+    }
+    
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+
+    
     
 }

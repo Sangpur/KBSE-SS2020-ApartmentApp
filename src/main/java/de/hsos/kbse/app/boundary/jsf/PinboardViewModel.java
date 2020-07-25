@@ -29,6 +29,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -74,7 +75,7 @@ public class PinboardViewModel implements Serializable {
         this.conversation = conversation;
         this.notes = new LinkedList<>();
         this.initNoteList();
-        this.currentNote = new Note();
+        this.initLoggedInMember();
         this.categories = NoteCategory.values();
     }
     
@@ -203,6 +204,16 @@ public class PinboardViewModel implements Serializable {
         }
     }
     
+    private void initLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+
+        this.loggedInMember = (Member) session.getAttribute("user");
+        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
+            this.admin = true;
+        }
+    }
+    
     private void removeFromNoteList(Note n){
         /* Das Notiz-Objekt wird aus der Notizen-Liste entfernt */
         for(int i = 0; i < this.notes.size(); i++){
@@ -234,8 +245,6 @@ public class PinboardViewModel implements Serializable {
         Collections.reverse(notes);
     }
     
-
-    
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {
         /* Die Methode validate() gibt ein Set von ConstraintViolations zurueck, in dem alle moeglicherweise begangenen Verstoesse aufgefuehrt
@@ -263,13 +272,6 @@ public class PinboardViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-    
-    public void setLoggedInMember(Member loggedInMember) {
-        this.loggedInMember = loggedInMember;
-        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
-            this.admin = true;
-        }
-    }
 
     public Note getCurrentNote() {
         return currentNote;

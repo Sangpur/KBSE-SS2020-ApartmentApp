@@ -9,6 +9,10 @@ import de.hsos.kbse.app.enums.EventCategory;
 import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.CascadeType;
@@ -23,6 +27,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -39,7 +45,7 @@ public class Event implements Serializable, Comparable<Event> {
     
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "modEvent")
-    @TableGenerator(name = "modEvent", initialValue = 3)
+    @TableGenerator(name = "modEvent", initialValue = 5)
     private Long id;
     
     @NotNull(groups = {General.class, Condition.class}, message="Der Titel darf nicht leer sein!")
@@ -50,10 +56,14 @@ public class Event implements Serializable, Comparable<Event> {
     @OneToOne(cascade = CascadeType.MERGE)
     private Member author;
     
+    @NotNull(groups = {General.class}, message="Der Beginn muss gesetzt werden!")
+    @FutureOrPresent(groups = {General.class}, message="Der Beginn darf nicht in der Vergangenheit liegen!")
     @Column(name="datetime_begin")
     @Temporal(TemporalType.TIMESTAMP)   // TemporalType enthaelt Datum und Zeit
     private Date begin;
     
+    @NotNull(groups = {General.class, Condition.class}, message="Das Ende muss gesetzt werden!")
+    @Future(groups = {General.class, Condition.class}, message="Das Ende muss in der Zukunft liegen!")
     @Column(name="datetime_end")
     @Temporal(TemporalType.TIMESTAMP)
     private Date end;
@@ -64,23 +74,56 @@ public class Event implements Serializable, Comparable<Event> {
     @Column(name="apartment_id")
     private Long apartmentID;
     
+    @Column(name="allDayEvent")
+    private boolean allDayEvent;
+    
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
+    
+    public Event(){
+        
+    }
+    
+    public Event(Member author, Date begin, Date end, Long apartmentID){
+        this.author = author;
+        this.begin = begin;
+        this.end = end;
+        this.apartmentID = apartmentID;
+    }
+    
+    public Event(Event e){
+        this.apartmentID = e.getApartmentID();
+        this.author = e.getAuthor();
+        this.begin = e.getBegin();
+        this.category = e.getCategory();
+        this.end = e.getEnd();
+        this.title = e.getTitle();
+    }
     
     @Override
     public int compareTo(Event e) {
-        System.out.println("compareTo()");
-        
+        /* Sortiert Events basierend auf Startdatum und falls diese gleich sind, findet ein Vergleich mit Enddatum statt */
         if (this.begin == null || this.end == null || e.getBegin() == null || e.getEnd() == null){
             return 0;
+        }else if(this.begin.before(e.getBegin())){
+            return 1;
+        }else if(this.begin.after(e.getBegin())){
+            return -1;
+        }else if(this.begin.equals(e.getBegin())){
+            if(this.end.before(e.getEnd())){
+                return 1;
+            }else if(this.end.after(e.getEnd())){
+                return -1;
+            }else if(this.end.equals(e.getEnd())){
+                return 0;
+            }
         }
-        return this.begin.compareTo(e.getBegin());
-
+        return this.compareTo(e);
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-
+    
     public Long getId() {
         return id;
     }
@@ -136,6 +179,35 @@ public class Event implements Serializable, Comparable<Event> {
     public void setAuthor(Member author) {
         this.author = author;
     }
+
+    public boolean isAllDayEvent() {
+        return allDayEvent;
+    }
+
+    public void setAllDayEvent(boolean allDayEvent) {
+        this.allDayEvent = allDayEvent;
+    }
     
+    public String getDateFormat(Event event, LocalDate currentCalenderDay) {
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        LocalDate eventBegin = event.getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate eventEnd = event.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        
+        if(eventBegin.isEqual(currentCalenderDay) && eventEnd.isEqual(currentCalenderDay)) {
+            /* Das Event ist beginnt und endet am aktuell betrachteten Tag. */
+            return formatter.format(event.getBegin()) + " – " + formatter.format(event.getEnd()) + " Uhr";
+        } else if(eventBegin.isBefore(currentCalenderDay) && eventEnd.isAfter(currentCalenderDay)) {
+            /* Das Event ist mehrtaegig und der aktuell betrachtete Tag liegt mitten innerhalb der
+             * Event-Zeit.*/
+            return "ganztägig";
+        } else if(eventBegin.isEqual(currentCalenderDay)) {
+            /* Das Event beginnt am aktuell betrachteten Tag. */
+            return "ab " + formatter.format(event.getBegin()) + " Uhr";
+        } else if(eventEnd.isEqual(currentCalenderDay)) {
+            /* Das Event endet am aktuell betrachteten Tag. */
+            return "bis " + formatter.format(event.getEnd()) + " Uhr";
+        }
+        return "";
+    }
     
 }

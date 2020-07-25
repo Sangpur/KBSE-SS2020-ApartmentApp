@@ -28,40 +28,40 @@
                 <h:form>
                     <div class="form">
                         <div class="input__wrap">
-                            <div class="input__label">Apartment name:</div>
+                            <div class="input__label">WG-Name:</div>
                             <div class="input input--big">
                                 <p:inputText value="#{authVM.apartmentName}" />
                             </div>
                         </div>
                         <div class="input__wrap">
-                            <div class="input__label">Username:</div>
+                            <div class="input__label">Benutzername:</div>
                             <div class="input input--big">
                                 <p:inputText value="#{authVM.username}" />
                             </div>
                         </div>
                         <div class="input__wrap">
-                            <div class="input__label">Birthdate</div>
+                            <div class="input__label">Geburtstag</div>
                             <div class="input input--big">
                                 <p:datePicker id="popup" value="#{authVM.birthday}" />
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Passwort:</div>
-                            <div class="input input--small">
+                            <div class="input input--big">
                                 <p:inputText type="password" value="#{authVM.password}"/>
                             </div>
                         </div>
                         <div class="input__wrap">
-                            <div class="input__label">Repeat Passwort:</div>
-                            <div class="input input--small">
+                            <div class="input__label">Passwort (Wh.):</div>
+                            <div class="input input--big">
                                 <p:inputText type="password" value="#{authVM.repassword}"/>
                             </div>
                         </div>
                         
                     </div>
                     <div class="form__buttons">
-                        <p:commandButton value="Register" action="#{authVM.register()}" class="form__button" /><br/><br/>
-                        <p:commandButton value="Back to Login" action="login?faces-redirect=true" class="form__button__secondary" />
+                        <p:commandButton value="Registrieren" action="#{authVM.register()}" class="form__button" />
+                        <p:commandButton value="Abbrechen" action="login?faces-redirect=true" class="form__button" />
                     </div>
                 </h:form>
                 
