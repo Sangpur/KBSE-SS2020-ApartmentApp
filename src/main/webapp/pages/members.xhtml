@@ -27,7 +27,7 @@
                 
                 <div class="addbutton__wrap">
                     <h:form>
-                        <p:commandButton value="+" action="#{apartmentVM.goToAddMember()}" class="addbutton" />
+                        <p:commandButton value="+" action="#{apartmentVM.addMember()}" class="addbutton" />
                     </h:form>
                 </div>
                 
@@ -45,19 +45,20 @@
                     </p:column>
 
                     <p:column headerText="Rolle" class="table__cell">
-                        <h:outputText value="#{member.memberRole}" />
+                        <h:outputText value="#{member.memberRole.title}" />
                     </p:column>
                     
                     <p:column headerText="Farbe" class="table__cell">
-                        <h:outputText value="#{member.details.color}" />
+                        <h:outputText value="#{member.details.color.name}" />
                     </p:column>
                     
                     <p:column class="table__cell table__cell--center">
                         <ui:fragment rendered="#{apartmentVM.isAllowedToChangeMember(member.id)}">
                             <h:form>
-                                <p:commandButton action="#{apartmentVM.editMember(member.id)}" icon="pi pi-pencil" class="form__button" />
-                                <p:commandButton action="#{apartmentVM.deleteMember(member.id)}" icon="pi pi-trash" class="form__button">
-                                    <p:confirm header="Löschen der Zahlung" message="Soll der Mitglied wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                <p:commandButton action="#{apartmentVM.changePassword(member)}" icon="pi pi-lock" class="form__button" rendered="#{apartmentVM.isLoggedInMember(member)}" />
+                                <p:commandButton action="#{apartmentVM.editMember(member)}" icon="pi pi-pencil" class="form__button" />
+                                <p:commandButton action="#{apartmentVM.deleteMember(member)}" icon="pi pi-trash" class="form__button" update="member__list">
+                                    <p:confirm header="Löschen des Mitglieds" message="Soll das Mitglied wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                                 <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                                     <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
