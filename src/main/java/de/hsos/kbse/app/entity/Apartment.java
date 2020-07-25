@@ -44,6 +44,10 @@ public class Apartment implements Serializable {
         //this.members = new ArrayList();
     }
     
+    public Apartment(String name) {
+        this.name = name;
+    }
+    
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */

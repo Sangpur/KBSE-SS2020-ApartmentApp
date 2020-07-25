@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.entity;
 
 import de.hsos.kbse.app.util.AppException;
+import java.util.List;
 
 /**
  *
@@ -16,5 +17,5 @@ public interface ApartmentManager {
     public void deleteApartment(Apartment apartment) throws AppException;
     public Apartment updateApartment(Apartment apartment) throws AppException;
     public Apartment findApartment(Long id) throws AppException;
-    
+    public List<Apartment> getAllApartments() throws AppException;
 }
