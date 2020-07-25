@@ -21,7 +21,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
@@ -36,11 +38,12 @@ public class Member implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "modMember")
-    @TableGenerator(name = "modMember", initialValue = 4)
+    @TableGenerator(name = "modMember", initialValue = 5)
     private Long id;
     
     @NotNull(groups = {General.class, Condition.class}, message="Der Name darf nicht leer sein!")
     @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Der Name muss zwischen 3 und 50 Zeichen liegen!")
+    @Pattern(groups = {General.class, Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Der Name enthält ungültige Bezeichner!")
     private String name;
     
     @Enumerated(EnumType.STRING)
@@ -50,14 +53,13 @@ public class Member implements Serializable {
     @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Das Passwort muss zwischen 3 und 50 Zeichen liegen!")
     private String password;
     
-    
     @OneToOne(cascade = CascadeType.ALL)
+    @Valid
     private MemberDetail details;
     
     @Column(name="apartment_id")
     private Long apartmentID;
     
-    @Column(columnDefinition="BOOLEAN DEFAULT FALSE")
     private boolean deleted;
 
     

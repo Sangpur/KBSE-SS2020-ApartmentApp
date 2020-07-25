@@ -75,15 +75,23 @@ public class MemberRepository implements MemberManager, Serializable {
         return member;
     }
     
-    // Does not throw Exception because it is expected that users won't be found during the login process
     @Override
     public Member findMemberByName(String name) throws AppException {
         Member member = null;
         try {
-            String str = "SELECT m FROM Members m WHERE m.name = :name AND m.deleted = FALSE";
+            String str = "SELECT m FROM Members m WHERE m.name = :name AND m.deleted = :deleted";
             TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
             querySelect.setParameter("name", name);
-            member = querySelect.getSingleResult();
+            querySelect.setParameter("deleted", false);
+            /* Es ist grundsaetzlich sinnvoll, auch bei nur einem erwarteten Ergebnis eine ResultList zurueckgeben zu lassen,
+             * da die Methode getSingleResult() eine Exception ausloest, falls der gesuchte Eintrag nicht existiert, die
+             * hier nicht gewuenscht ist, da kein Hinweis darauf gegeben werden soll, wenn ein User nicht existiert. */
+            List<Member> result = querySelect.getResultList();
+            if (result == null || result.isEmpty()) {
+                return null;
+            } else if (result.size() == 1) {
+                return result.get(0);
+            }
         } catch(Exception ex) {
             ex.printStackTrace();
             throw new AppException("Mitglied konnte nicht gefunden werden!");
@@ -91,13 +99,13 @@ public class MemberRepository implements MemberManager, Serializable {
         return member;
     }
 
-
     @Override
     public List<Member> getAllMembersFrom(Long apartmentID) throws AppException {
         try {
-            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id AND m.deleted = FALSE";
+            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id AND m.deleted = :deleted";
             TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
             querySelect.setParameter("id", apartmentID);
+            querySelect.setParameter("deleted", false);
             List<Member> results = querySelect.getResultList();
             return results;
         } catch(Exception ex) {

@@ -22,8 +22,8 @@ import javax.persistence.Id;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 /**
  *
@@ -41,6 +41,7 @@ public class MemberDetail implements Serializable {
     private Long id;
     
     @NotNull(groups = {General.class, Condition.class}, message="Das Geburtsdatum darf nicht leer sein!")
+    @Past(groups = {General.class, Condition.class}, message="Das Geburtsdatum muss in der Vergangenheit liegen!")
     @Temporal(TemporalType.DATE)
     private Date birthday;
     

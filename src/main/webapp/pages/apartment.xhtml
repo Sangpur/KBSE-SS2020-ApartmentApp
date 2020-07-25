@@ -22,7 +22,9 @@
                     <div class="overview_head">
                         <span>Angemeldet als <h:outputText value="#{authVM.loggedInMember.name}" /></span> | 
                         <p:commandButton value="Mitglieder" action="members?faces-redirect=true" class="overview_link" />
-                        <h:commandButton value="Logout" actionListener="#{authVM.logout()}" class="overview_link" />
+                        <p:commandButton value="Logout" action="#{authVM.logout()}" class="overview_link">
+                            
+                        </p:commandButton>
                     </div>
                     <div class="overview">
                         <div class="overview_element">

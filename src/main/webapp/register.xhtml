@@ -15,7 +15,7 @@
             <header>
                 <div class="header__content">
                     <h1 class="header__title">
-                        Hello<span>.</span>
+                        Registrierung<span>.</span>
                     </h1>
                 </div>
             </header>
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <div class="input__wrap">
-                            <div class="input__label">Benutzername:</div>
+                            <div class="input__label">Username:</div>
                             <div class="input input--big">
                                 <p:inputText value="#{authVM.username}" />
                             </div>
@@ -42,7 +42,7 @@
                         <div class="input__wrap">
                             <div class="input__label">Geburtstag</div>
                             <div class="input input--big">
-                                <p:datePicker id="popup" value="#{authVM.birthday}" />
+                                <p:calendar id="german" value="#{authVM.birthday}" locale="de" navigator="true" pattern="dd.MM.yyyy" yearRange="-100:+0" />
                             </div>
                         </div>
                         <div class="input__wrap">
@@ -61,7 +61,7 @@
                     </div>
                     <div class="form__buttons">
                         <p:commandButton value="Registrieren" action="#{authVM.register()}" class="form__button" />
-                        <p:commandButton value="Abbrechen" action="login?faces-redirect=true" class="form__button" />
+                        <p:commandButton value="Abbrechen" action="#{authVM.discardRegistration()}" class="form__button" />
                     </div>
                 </h:form>
                 
