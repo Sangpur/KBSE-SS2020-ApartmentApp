@@ -41,19 +41,8 @@ public class CalendarDay {
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
 
     private void prepareEventList(){
-        /* Setzt allDayEvent-boolean Flag und sortiert die Event-Liste */
-        LocalDateTime midNight = this.date.atStartOfDay();
-        LocalDateTime beforeMidNight = midNight.plusHours(23).plusMinutes(59).plusSeconds(59);
-        
-        for(int i = 0; i < this.events.size(); i++){
-            LocalDateTime tmpBegin = this.events.get(i).getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();;
-            LocalDateTime tmpEnd = this.events.get(i).getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            
-            if(tmpBegin.isBefore(midNight) && tmpEnd.isAfter(beforeMidNight)){
-                this.events.get(i).setAllDayEvent(true);
-            }
-        }
-        
+        /* sortiert die Event-Liste */
+
         Collections.sort(events);
         Collections.reverse(events);
     }

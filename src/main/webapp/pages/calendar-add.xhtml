@@ -44,34 +44,57 @@
                                 </p:selectOneMenu>
                             </div>
                         </div>
-                        <div class="input__wrap">
-                            <div class="input__label">Beginn:</div>
-                            <div class="input input--big">
-                                <ui:fragment rendered="#{calendarVM.addEvent}"> 
-                                    <p:datePicker id="beginAdd" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy">
-                                        <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginAdd"/>
+                        
+                        <p:selectOneRadio id="allDayEvent" value="#{calendarVM.isWholeDay}" unselectable="true" >
+                            <f:selectItem itemLabel="bestimmte Zeit" itemValue="false" />
+                            <f:selectItem itemLabel="ganztägig" itemValue="true" />
+                            <p:ajax update="@form" />
+                        </p:selectOneRadio>
+                        
+                        <ui:fragment rendered="#{!calendarVM.isWholeDay}" >
+                            <div class="input__wrap">
+                                <div class="input__label">Beginn:</div>
+                                <div class="input input--big">
+                                    <ui:fragment rendered="#{calendarVM.addEvent}"> 
+                                        <p:datePicker id="beginAdd" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy">
+                                            <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginAdd"/>
+                                        </p:datePicker>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{calendarVM.editBeginInFuture()}">
+                                    <p:datePicker id="beginEdit" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy">
+                                        <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginEdit"/>
                                     </p:datePicker>
-                                </ui:fragment>
-                                <ui:fragment rendered="#{calendarVM.editBeginInFuture()}">
-                                <p:datePicker id="beginEdit" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy">
-                                    <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginEdit"/>
-                                </p:datePicker>
-                                </ui:fragment>
-                                <ui:fragment rendered="#{calendarVM.editBeginInPast()}">
-                                <p:datePicker id="beginEdit-dis" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" disabled="true">
-                                    <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginEdit"/>
-                                </p:datePicker>
-                                </ui:fragment>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{calendarVM.editBeginInPast()}">
+                                    <p:datePicker id="beginEdit-dis" showTime="true" value="#{calendarVM.currentEvent.begin}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" disabled="true">
+                                        <p:ajax event="dateSelect" listener="#{calendarVM.onSelectStartDate()}" update="end" parent="beginEdit"/>
+                                    </p:datePicker>
+                                    </ui:fragment>
+                                </div>
                             </div>
-                        </div>
-                        <div class="input__wrap">
-                            <div class="input__label">Ende:</div>
-                            <div class="input input--big">
-                                <ui:fragment>
-                                    <p:datePicker id="end" showTime="true" value="#{calendarVM.currentEvent.end}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" />
-                                </ui:fragment>
+                        </ui:fragment>
+                        
+                        <ui:fragment rendered="#{!calendarVM.isWholeDay}" >
+                            <div class="input__wrap">
+                                <div class="input__label">Ende:</div>
+                                <div class="input input--big">
+                                    <ui:fragment>
+                                        <p:datePicker id="end" showTime="true" value="#{calendarVM.currentEvent.end}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" />
+                                    </ui:fragment>
+                                </div>
                             </div>
-                        </div>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{calendarVM.isWholeDay}">
+                            <div class="input__wrap">
+                                <div class="input__label">Datum: </div>
+                                <div class="input input--big">
+                                    <ui:fragment>
+                                        <p:datePicker id="endAllDay" value="#{calendarVM.currentEvent.end}" locale="de" monthNavigator="true" pattern="dd.MM.yyyy" />
+                                    </ui:fragment>
+                                </div>
+                            </div>
+                        </ui:fragment>
+                        
                         <div class="form__buttons">
                             <p:commandButton value="Speichern" action="#{calendarVM.saveEvent()}" class="form__button" />
                             <p:commandButton value="Abbrechen" action="#{calendarVM.discardEvent()}" class="form__button" />
