@@ -289,6 +289,7 @@ public class CalendarViewModel implements Serializable {
     
     private void initCurrentMonthView() {
         /* Initialisiert CalenderDay-Objekte zur Anzeige des gesamten Monats */
+        this.setIsWholeDay(false);
         this.currentMonthDays.clear();
         int year = this.currentMonth.getYear();
         int month = this.currentMonth.getMonthValue();

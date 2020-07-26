@@ -45,12 +45,17 @@
                             </div>
                         </div>
                         
-                        <p:selectOneRadio id="allDayEvent" value="#{calendarVM.isWholeDay}" unselectable="true" >
-                            <f:selectItem itemLabel="bestimmte Zeit" itemValue="false" />
-                            <f:selectItem itemLabel="ganztägig" itemValue="true" />
-                            <p:ajax update="@form" />
-                        </p:selectOneRadio>
-                        
+                        <div class="input__wrap">
+                            <div class="input__label">Auswahl: </div>
+                            <div class="input">
+                                <p:selectOneRadio id="allDayEvent" value="#{calendarVM.isWholeDay}" unselectable="true" >
+                                <f:selectItem itemLabel="bestimmte Zeit" itemValue="false" />
+                                <f:selectItem itemLabel="ganztägig" itemValue="true" />
+                                    <p:ajax update="@form" />
+                                </p:selectOneRadio>                            
+                            </div>
+                        </div>
+
                         <ui:fragment rendered="#{!calendarVM.isWholeDay}" >
                             <div class="input__wrap">
                                 <div class="input__label">Beginn:</div>

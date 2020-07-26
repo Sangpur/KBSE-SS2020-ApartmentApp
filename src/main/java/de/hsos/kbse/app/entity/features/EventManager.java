@@ -5,8 +5,6 @@
 package de.hsos.kbse.app.entity.features;
 
 import de.hsos.kbse.app.util.AppException;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**
