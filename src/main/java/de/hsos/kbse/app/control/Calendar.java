@@ -92,15 +92,8 @@ public class Calendar implements EventManager, Serializable {
     
     @Override
     public List<Event> getAllEventsFromMonth(Long apartmentID, int year, int month, int totalDays) throws AppException {
-        System.out.println("Monat: " + month + " " + year);
-        
         Date beginMonth = java.sql.Date.valueOf(LocalDate.of(year, month, 1));
         Date endMonth = java.sql.Date.valueOf(LocalDate.of(year, month, totalDays));
-        
-        System.out.println("Eintraege zwischen " + beginMonth + " und " + endMonth);
-        
-        
-        
         try {
             String str = "SELECT e FROM Event e "
                          + "WHERE e.apartmentID = :id AND e.begin >= :beginMonth AND e.begin <= :endMonth "
@@ -110,14 +103,6 @@ public class Calendar implements EventManager, Serializable {
             querySelect.setParameter("beginMonth", beginMonth);
             querySelect.setParameter("endMonth", endMonth);
             List<Event> results = querySelect.getResultList();
-            
-            System.out.println("Gefundene Events: ");
-            for(int i = 0; i < results.size(); i++) {
-                Event test = results.get(i);
-                System.out.println(test.getTitle() + " am " + test.getBegin());
-            }
-            
-            
             return results;
         } catch(Exception ex) {
             ex.printStackTrace();
@@ -134,7 +119,7 @@ public class Calendar implements EventManager, Serializable {
             querySelect.executeUpdate();
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Alle Events der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+            throw new AppException("Die Events der WG "+ apartmentID +" konnten nicht gelöscht werden!");
         }
     }
 }

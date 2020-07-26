@@ -80,6 +80,12 @@ public class PinboardViewModel implements Serializable {
         this.categories = NoteCategory.values();
     }
     
+    public boolean checkAccessRights(Note note) {
+        /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
+         * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
+        return this.admin || note.getAuthor().getId().equals(this.loggedInMember.getId());
+    }
+    
     @Logable(LogLevel.INFO)
     public String addNote() {
         /* Neues Note-Objekt initiieren */
@@ -167,10 +173,16 @@ public class PinboardViewModel implements Serializable {
         return "pinboard";
     }
     
-    public boolean checkAccessRights(Note note) {
-        /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
-         * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        return this.admin || note.getAuthor().getId().equals(this.loggedInMember.getId());
+    @Logable(LogLevel.INFO)
+    public void deleteAllNotes() {
+        try {
+            /* Bestehende Note-Objekte in der Datenbank loeschen */
+            this.pinboard.deleteAllNotesFrom(this.apartmentID);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */

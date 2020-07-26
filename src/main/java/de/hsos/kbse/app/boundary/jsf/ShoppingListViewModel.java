@@ -172,6 +172,18 @@ public class ShoppingListViewModel implements Serializable {
         return "shoppinglist";
     }
     
+    @Logable(LogLevel.INFO)
+    public void deleteAllItems() {
+        try {
+            /* Bestehende ShoppingItem-Objekte in der Datenbank loeschen */
+            this.shoppinglist.deleteAllShoppingItemsFrom(this.apartmentID);
+        } catch (AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+    }
+    
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
     @PostConstruct

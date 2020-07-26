@@ -97,7 +97,7 @@ public class Pinboard implements NoteManager, Serializable {
             querySelect.executeUpdate();
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Alle Notes der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+            throw new AppException("Die Notizen der WG "+ apartmentID +" konnten nicht gelöscht werden!");
         }
     }
 }

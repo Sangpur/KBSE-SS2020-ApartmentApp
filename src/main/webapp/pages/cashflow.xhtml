@@ -82,7 +82,7 @@
                             <h:form>
                                 <p:commandButton action="#{cashflowVM.editPayment(payment)}" icon="pi pi-pencil" class="form__button" />
                                 <p:commandButton action="#{cashflowVM.deletePayment(payment)}" icon="pi pi-trash" class="form__button button--no-margin" update="payments__balance, payments__list">
-                                    <p:confirm header="Löschen der Zahlung" message="Soll die Zahlung wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                    <p:confirm header="Löschen der Zahlung" message="Soll die Zahlung wirklich gelöscht werden?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                                 <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                                     <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />

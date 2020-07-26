@@ -165,22 +165,15 @@ public class ApartmentViewModel implements Serializable {
     }
     
     public void deleteLoggedInMember() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        System.out.println("deleteLoggedInMember()");
         try {
             /* Das gerade eingeloggte Mitglied wird beim Loeschen ebenfalls mit dem Status "deleted = true"
              * geupdatet und danach automatisch ausgeloggt. */
             this.loggedInMember.setDeleted(true);
             this.memberRepository.updateMember(this.loggedInMember);
             this.members.remove(this.loggedInMember);
-            /* Conversation beenden */
-            this.endConversation();
-            /* Session beenden */
-            HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
-            session.invalidate();
-            /* Redirect zur Startseite */
-            facesContext.getExternalContext().redirect("/KBSE-SS2020-ApartmentApp/faces/login.xhtml");
-        } catch (Exception ex) {
+            this.resetApplicationAfterDelete();
+        } catch (AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
             facesContext.addMessage("Error",msg);
         }
@@ -271,6 +264,21 @@ public class ApartmentViewModel implements Serializable {
         return "members";
     }
     
+    @Logable(LogLevel.INFO)
+    public void deleteApartment() {
+        try {
+            /* Bestehende Member-Objekte in der Datenbank loeschen */
+            this.memberRepository.deleteAllMembersFrom(this.apartment.getId());
+            /* Bestehendes Apartment-Objekt in der Datenbank loeschen */
+            this.repository.deleteApartment(this.apartment);
+            this.resetApplicationAfterDelete();
+        } catch (AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+    }
+    
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
     @PostConstruct
@@ -323,9 +331,22 @@ public class ApartmentViewModel implements Serializable {
     }
     
     @Logable(LogLevel.INFO)
-    private void endConversation(){
+    private void resetApplicationAfterDelete() {
+        /* Conversation beenden */
         if(!conversation.isTransient()) {
             conversation.end();
+        }
+        try {
+            /* Session beenden */
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
+            session.invalidate();
+            /* Redirect zur Startseite */
+            facesContext.getExternalContext().redirect("/KBSE-SS2020-ApartmentApp/faces/login.xhtml");
+        } catch(Exception ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
         }
     }
     

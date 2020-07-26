@@ -90,7 +90,39 @@ public class CalendarViewModel implements Serializable {
         this.initLoggedInMember();
         this.apartmentID = this.loggedInMember.getApartmentID();
         this.initCurrentMonth();
-        
+    }
+    
+    public boolean editBeginInPast() {
+        Date date = this.currentEvent.getBegin();
+        return this.editEvent && date.before(new Date());
+    }
+    
+    public boolean editBeginInFuture() {
+        Date date = this.currentEvent.getBegin();
+        return this.editEvent && date.after(new Date());
+    }
+    
+    public LocalDateTime compareBeginToday(Date begin){
+        /* Beschränkt das Startdatum beim Bearbeiten eines Events */
+        LocalDateTime tmpBegin = begin.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if(tmpBegin.isBefore(LocalDateTime.now(ZoneId.systemDefault()))){
+            return tmpBegin;
+        }else{
+            return LocalDateTime.now(ZoneId.systemDefault());
+        }
+    }
+    
+    public boolean isFutureDate(LocalDate date){
+        /* Überprüft ob Event in der Vergangenheit liegt oder noch in der Zukunft und somit zu Bearbeiten ist */
+        return date.isAfter(today.minusDays(1));
+    }
+
+    public boolean checkAccessRightAndDate(LocalDate currentDay, Event currentEvent) {
+        /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
+         * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
+        boolean access = this.admin || currentEvent.getAuthor().getId().equals(this.loggedInMember.getId());
+        boolean isFutureDate = currentDay.isAfter(today.minusDays(1));
+        return access && isFutureDate;
     }
     
     @Logable(LogLevel.INFO)
@@ -186,6 +218,17 @@ public class CalendarViewModel implements Serializable {
         return "calendar";
     }
        
+    public void deleteAllEvents() {
+        try {
+            /* Bestehende Event-Objekte in der Datenbank loeschen */
+            this.calendar.deleteAllEventsFrom(this.apartmentID);
+        } catch (AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+    }
+    
     public void backwards(){
         /* Geht einen Monat in die Vergangenheit, setzt Header auf den fünften Tag des Monats */
         this.currentMonth = this.currentMonth.minusMonths(1).withDayOfMonth(5);
@@ -208,38 +251,7 @@ public class CalendarViewModel implements Serializable {
         this.currentEvent.setEnd(null);
     }
     
-    public boolean editBeginInPast() {
-        Date date = this.currentEvent.getBegin();
-        return this.editEvent && date.before(new Date());
-    }
     
-    public boolean editBeginInFuture() {
-        Date date = this.currentEvent.getBegin();
-        return this.editEvent && date.after(new Date());
-    }
-    
-    public LocalDateTime compareBeginToday(Date begin){
-        /* Beschränkt das Startdatum beim Bearbeiten eines Events */
-        LocalDateTime tmpBegin = begin.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        if(tmpBegin.isBefore(LocalDateTime.now(ZoneId.systemDefault()))){
-            return tmpBegin;
-        }else{
-            return LocalDateTime.now(ZoneId.systemDefault());
-        }
-    }
-    
-    public boolean isFutureDate(LocalDate date){
-        /* Überprüft ob Event in der Vergangenheit liegt oder noch in der Zukunft und somit zu Bearbeiten ist */
-        return date.isAfter(today.minusDays(1));
-    }
-
-    public boolean checkAccessRightAndDate(LocalDate currentDay, Event currentEvent) {
-        /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
-         * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        boolean access = this.admin || currentEvent.getAuthor().getId().equals(this.loggedInMember.getId());
-        boolean isFutureDate = currentDay.isAfter(today.minusDays(1));
-        return access && isFutureDate;
-    }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
