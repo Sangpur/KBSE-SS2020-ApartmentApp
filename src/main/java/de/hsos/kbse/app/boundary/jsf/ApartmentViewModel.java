@@ -76,10 +76,7 @@ public class ApartmentViewModel implements Serializable {
         this.colors = MemberColor.values();
         this.memberRoles = MemberRole.values();
         this.initLoggedInMember();
-        System.out.println("Eingeloggt: " + this.loggedInMember.getName());
         this.initApartmentByID(this.loggedInMember.getApartmentID());
-        System.out.println("ApartmentID: " + this.apartment.getId());
-        System.out.println("Member: " + this.members.size());
     }
     
     public boolean checkAccessRights(Member member) {
@@ -93,8 +90,14 @@ public class ApartmentViewModel implements Serializable {
         return this.loggedInMember.getMemberRole().equals(MemberRole.ADMIN);
     }
     
-    public boolean isLoggedInMember(Member member) {
+    public Boolean isLoggedInMember(Member member) {
         return this.loggedInMember.getId().equals(member.getId());
+    }
+    
+    public Boolean isLoggedInAndLastMember(Member member) {
+        Boolean isLoggedIn = this.loggedInMember.getId().equals(member.getId());
+        Boolean isLast = this.members.size() == 1;
+        return isLoggedIn && isLast;
     }
     
     public String addMember() {
@@ -141,8 +144,8 @@ public class ApartmentViewModel implements Serializable {
             /* Bestehendes Mitglied wird auch beim Loeschen in der Datenbank geupdaten und der deleted-Status
              * auf true gesetzt. So wird verhindert, dass ein kaskadierendes Loeschen von Eintraegen notwendig
              * ist und von dem Mitglied erstellte Beitraege erhalten bleiben. */
-            currentMember.setDeleted(true);
-            this.memberRepository.updateMember(currentMember);
+            this.currentMember.setDeleted(true);
+            this.memberRepository.updateMember(this.currentMember);
             /* Entfernen des Members aus der Members-List */
             this.members.remove(this.currentMember);
             String message = "Mitglied erfolgreich geloescht!";
@@ -153,6 +156,28 @@ public class ApartmentViewModel implements Serializable {
             facesContext.addMessage("Error",msg);
         }
         return "";
+    }
+    
+    public void deleteLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        System.out.println("deleteLoggedInMember()");
+        try {
+            /* Das gerade eingeloggte Mitglied wird beim Loeschen ebenfalls mit dem Status "deleted = true"
+             * geupdatet und danach automatisch ausgeloggt. */
+            this.loggedInMember.setDeleted(true);
+            this.memberRepository.updateMember(this.loggedInMember);
+            this.members.remove(this.loggedInMember);
+            /* Conversation beenden */
+            this.endConversation();
+            /* Session beenden */
+            HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
+            session.invalidate();
+            /* Redirect zur Startseite */
+            facesContext.getExternalContext().redirect("/KBSE-SS2020-ApartmentApp/faces/login.xhtml");
+        } catch (Exception ex) {
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
     }
     
     public String saveMember() {
@@ -288,6 +313,13 @@ public class ApartmentViewModel implements Serializable {
                 facesContext.addMessage("Constraint Violation",msg);
             }
             return false;
+        }
+    }
+    
+    @Logable(LogLevel.INFO)
+    private void endConversation(){
+        if(!conversation.isTransient()) {
+            conversation.end();
         }
     }
     

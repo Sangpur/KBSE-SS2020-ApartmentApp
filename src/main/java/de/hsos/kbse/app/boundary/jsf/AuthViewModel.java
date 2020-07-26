@@ -18,6 +18,7 @@ import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.PostConstruct;
@@ -141,6 +142,7 @@ public class AuthViewModel implements Serializable {
                     this.currentMember.setMemberRole(MemberRole.ADMIN);
                     this.currentMember.setApartmentID(this.currentApartment.getId());
                     this.currentMember.getDetails().setColor(MemberColor.RED);
+                    this.currentMember.getDetails().setCashBalance(new BigDecimal(0));
                     memberRepository.createMember(this.currentMember);
                     /* FacesMessage fuer erfolgreiches Anlegen einer Wohngemeinschaft */
                     String message = "WG #" + this.currentApartment.getId() + " erfolgreich angelegt!";

@@ -59,8 +59,18 @@
                             <h:form>
                                 <p:commandButton action="#{apartmentVM.changePassword(member)}" icon="pi pi-lock" class="form__button" rendered="#{apartmentVM.isLoggedInMember(member)}" />
                                 <p:commandButton action="#{apartmentVM.editMember(member)}" icon="pi pi-pencil" class="form__button" />
-                                <p:commandButton action="#{apartmentVM.deleteMember(member)}" icon="pi pi-trash" class="form__button" update="member__list">
+                                <!-- Loeschen eines anderen Members -->
+                                <p:commandButton action="#{apartmentVM.deleteMember(member)}" icon="pi pi-trash" class="form__button" update="member__list" rendered="#{!apartmentVM.isLoggedInMember(member)}">
                                     <p:confirm header="Löschen des Mitglieds" message="Soll das Mitglied wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <!-- Loeschen des eingeloggten Members -->
+                                <p:commandButton action="#{apartmentVM.deleteLoggedInMember()}" icon="pi pi-lock" class="form__button" rendered="#{!apartmentVM.isLoggedInAndLastMember(member)}">
+                                    <p:confirm header="Löschen des Mitglieds" message="Soll das Mitglied wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <!-- Loeschen des letzten Mitglieds und damit kaskadierendes Loeschen der gesamten WG-->
+                                <p:commandButton action="#{apartmentVM.deleteLoggedInMember()}" icon="pi pi-lock" class="form__button" rendered="#{apartmentVM.isLoggedInAndLastMember(member)}">
+                                    <p:confirm header="Löschen des Mitglieds und der WG" message="Sollen das letzte Mitglied und damit auch die WG wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
+                                    <f:actionListener binding="#{cashflowVM.test()}"/>
                                 </p:commandButton>
                                 <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                                     <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />

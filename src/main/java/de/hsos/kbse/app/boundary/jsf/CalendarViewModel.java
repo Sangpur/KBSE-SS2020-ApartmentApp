@@ -60,10 +60,10 @@ public class CalendarViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
+    private Long apartmentID;
     private Member loggedInMember;
     private Event currentEvent;
     private Event originalEvent;
-    private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
     
     private boolean admin;              // true = ADMIN, false = USER
     private boolean addEvent;           // true = addEvent()
@@ -87,15 +87,10 @@ public class CalendarViewModel implements Serializable {
         this.categories = EventCategory.values();
         this.today = LocalDate.now(ZoneId.systemDefault());
         this.currentMonth = this.today.withDayOfMonth(5);
-        this.initCurrentMonth();
         this.initLoggedInMember();
+        this.apartmentID = this.loggedInMember.getApartmentID();
+        this.initCurrentMonth();
         
-    }
-    
-    @PostConstruct
-    public static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
     }
     
     @Logable(LogLevel.INFO)
@@ -248,6 +243,22 @@ public class CalendarViewModel implements Serializable {
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
+    @PostConstruct
+    private void setUpValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+    
+    private void initLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+
+        this.loggedInMember = (Member) session.getAttribute("user");
+        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
+            this.admin = true;
+        }
+    }
+    
     private void initCurrentMonth() {
         this.initCurrentMonthEvents();
         this.initCurrentMonthView();
@@ -304,16 +315,6 @@ public class CalendarViewModel implements Serializable {
             }
         }
         return eventList;
-    }
-    
-    public void initLoggedInMember() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-
-        this.loggedInMember = (Member) session.getAttribute("user");
-        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
-            this.admin = true;
-        }
     }
     
     private void addToEventsList(Event event){

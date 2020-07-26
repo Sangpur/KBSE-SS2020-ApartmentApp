@@ -56,7 +56,7 @@ public class CashFlowViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID = 1000L; // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
+    private Long apartmentID;
     private List<Payment> payments;
     private List<Member> members;
     private Member loggedInMember;
@@ -67,6 +67,10 @@ public class CashFlowViewModel implements Serializable {
     private boolean editPayment;        // true = editPayment()
     private boolean deletePayment;      // true = deletePayment();
     
+    public void test() {
+        System.out.println("ich werde schon ausgefuhert!");
+    }
+    
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
     @Inject
@@ -76,15 +80,10 @@ public class CashFlowViewModel implements Serializable {
         this.memberRepository = memberRepository;
         this.conversation = conversation;
         this.payments = new LinkedList(); // Hier kann das neuste Element an Position 0 eingefuegt werden
+        this.initLoggedInMember();
+        this.apartmentID = this.loggedInMember.getApartmentID();
         this.initPaymentsList();
         this.initMemberList();
-        this.initLoggedInMember();
-    }
-    
-    @PostConstruct
-    public static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
     }
     
     public boolean checkBalance(float sum) {
@@ -190,6 +189,22 @@ public class CashFlowViewModel implements Serializable {
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
+    @PostConstruct
+    private static void setUpValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+    
+    private void initLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+
+        this.loggedInMember = (Member) session.getAttribute("user");
+        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
+            this.admin = true;
+        }
+    }
+    
     private void initPaymentsList() {
         try {
             this.payments = this.cashflow.getAllPaymentsFrom(apartmentID);
@@ -210,16 +225,6 @@ public class CashFlowViewModel implements Serializable {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
             facesContext.addMessage("Error",msg);
-        }
-    }
-    
-    private void initLoggedInMember() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-
-        this.loggedInMember = (Member) session.getAttribute("user");
-        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
-            this.admin = true;
         }
     }
     
