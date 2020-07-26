@@ -9,6 +9,7 @@ import de.hsos.kbse.app.entity.member.MemberDetail;
 import de.hsos.kbse.app.entity.member.MemberManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
@@ -106,8 +107,41 @@ public class MemberRepository implements MemberManager, Serializable {
         }
     }
     
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
-    /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-    
+    @Override
+    public void deleteAllMembersFrom(Long apartmentID) throws AppException {
+        List<Member> members;
+        List<Long> detailIds = new ArrayList();
+        try {
+            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id";
+            TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
+            querySelect.setParameter("id", apartmentID);
+            members = querySelect.getResultList();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Mitglieder der WG "+ apartmentID +" konnten nicht gefunden werden!");
+        }
+        for(int i = 0; i < members.size(); i++){
+            detailIds.add(members.get(i).getDetails().getId());
+        }
+        try {
+            String str = "DELETE FROM Members m WHERE m.apartmentID = :id";
+            TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
+            querySelect.setParameter("id", apartmentID);
+            querySelect.executeUpdate();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Alle Member der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+        }
+        for(int i = 0; i < detailIds.size(); i++){
+            try {
+            String str = "DELETE FROM MemberDetail m WHERE m.id = :id";
+            TypedQuery<MemberDetail> querySelect = em.createQuery(str, MemberDetail.class);
+            querySelect.setParameter("id", detailIds.get(i));
+            querySelect.executeUpdate();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("MemberDetails mit der id " + detailIds.get(i) + " der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+        }
+        }
+    }
 }

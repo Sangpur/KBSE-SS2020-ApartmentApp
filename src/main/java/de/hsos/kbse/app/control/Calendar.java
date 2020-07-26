@@ -125,10 +125,16 @@ public class Calendar implements EventManager, Serializable {
         }
     }
     
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
-    /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-
-    
-    
+    @Override
+    public void deleteAllEventsFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "DELETE FROM Event e WHERE e.apartmentID = :id";
+            TypedQuery<Event> querySelect = em.createQuery(str, Event.class);
+            querySelect.setParameter("id", apartmentID);
+            querySelect.executeUpdate();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Alle Events der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+        }
+    }
 }

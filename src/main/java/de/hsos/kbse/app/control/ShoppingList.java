@@ -94,9 +94,16 @@ public class ShoppingList implements ShoppingItemManager, Serializable {
         }
     }
     
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
-    /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-
-    
+    @Override
+    public void deleteAllShoppingItemsFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "DELETE FROM Event e WHERE e.apartmentID = :id";
+            TypedQuery<ShoppingItem> querySelect = em.createQuery(str, ShoppingItem.class);
+            querySelect.setParameter("id", apartmentID);
+            querySelect.executeUpdate();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Alle ShoppingItems der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+        }
+    }
 }

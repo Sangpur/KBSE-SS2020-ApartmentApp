@@ -26,6 +26,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -60,7 +61,7 @@ public class MemberResource implements Serializable {
     @Context
     UriInfo uriInfo;
     
-    private static final SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd" );
+    private static final SimpleDateFormat DF = new SimpleDateFormat( "yyyy-MM-dd" );
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -115,17 +116,15 @@ public class MemberResource implements Serializable {
         } catch(NumberFormatException e) {
             return Response.status(400, "Bad Request: url id is not a number").build();
         }
-        System.out.println(jsonb.toJson(parameters));
-        
         Apartment a = null;
         try {
-            apartmentRepo.findApartment(apartmentId);
+            a = apartmentRepo.findApartment(apartmentId);
         } catch (AppException ex) {
             Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
             return Response.status(500, "Server Error: Failed while trying to find apartment.").build();
         }
         if(a == null){
-            return Response.status(400, "Bad Request: birthdate format has to be yyyy-mm-dd").build();
+            return Response.status(400, "Bad Request: No apartment with this id found.").build(); //---------------------------------------------------------------
         }
         
         if(parameters.name != null && parameters.name.length() >= 3 
@@ -133,7 +132,7 @@ public class MemberResource implements Serializable {
                 && parameters.birthdate != null && parameters.birthdate.length() == 10){
             Date d;
             try {
-                d = new Date(df.parse(parameters.birthdate).getTime());
+                d = new Date(DF.parse(parameters.birthdate).getTime());
             } catch (ParseException ex) {
                 Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
                 return Response.status(400, "Bad Request: birthdate format has to be yyyy-mm-dd").build();
@@ -195,9 +194,7 @@ public class MemberResource implements Serializable {
                 && parameters.birthdate != null && parameters.birthdate.length() == 10){
             Date d;
             try {
-                System.out.println(df.parse("2020-06-12").getTime());
-                System.out.println(df.parse(parameters.birthdate).getTime());
-                d = new Date(df.parse(parameters.birthdate).getTime());
+                d = new Date(DF.parse(parameters.birthdate).getTime());
             } catch (ParseException ex) {
                 Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
                 return Response.status(400, "Bad Request: birthdate format has to be yyyy-mm-dd").build();
@@ -243,5 +240,38 @@ public class MemberResource implements Serializable {
                     "    color: ...,\n" +
                     "}").build();
         }
+    }
+    
+    @DELETE
+    @Path("{id}")
+    public Response deleteApartment(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr) {
+        Long apartmentId;
+        Long memberId;
+        try {
+            apartmentId = Long.parseLong(apartmentIdStr);
+            memberId = Long.parseLong(idStr);
+        } catch(NumberFormatException e) {
+            return Response.status(400, "Bad Request: url ids are not numbers").build();
+        }
+        Member m = null;
+        try {
+            m = this.memberRepo.findMember(memberId);
+        } catch (AppException ex) {
+            Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if(m != null){
+            if(m.getApartmentID().equals(apartmentId)){
+                return Response.status(500, "Missing Implementation of Member.delteted Attribute").build();
+                //m.setDeleted(true);
+                //try {
+                //    this.memberRepo.updateMember(m);
+                //    return Response.ok().build();
+                //} catch (AppException ex) {
+                //    Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
+                //    return Response.status(500, "Server Error: Failure while trying to mark member as deleted").build();
+                //}
+            }
+        }
+        return Response.status(400, "Bad Request:  No member found for this id").build();
     }
 }

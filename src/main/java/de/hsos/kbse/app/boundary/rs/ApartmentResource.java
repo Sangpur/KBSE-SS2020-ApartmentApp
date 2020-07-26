@@ -7,8 +7,13 @@ package de.hsos.kbse.app.boundary.rs;
 
 import de.hsos.kbse.app.boundary.rs.DTOs.ApartmentInputDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
+import de.hsos.kbse.app.control.Calendar;
+import de.hsos.kbse.app.control.CashFlow;
 import de.hsos.kbse.app.control.MemberRepository;
+import de.hsos.kbse.app.control.Pinboard;
+import de.hsos.kbse.app.control.ShoppingList;
 import de.hsos.kbse.app.entity.Apartment;
+import de.hsos.kbse.app.entity.features.Note;
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
@@ -16,22 +21,18 @@ import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
-import static javax.ws.rs.HttpMethod.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -57,6 +58,18 @@ public class ApartmentResource implements Serializable {
     
     @Inject 
     MemberRepository memberRepo;
+    
+    @Inject 
+    Pinboard noteRepo;
+    
+    @Inject 
+    Calendar eventRepo;
+    
+    @Inject 
+    CashFlow paymentRepo;
+    
+    @Inject 
+    ShoppingList shoppingRepo;
     
     @Inject
     private Jsonb jsonb;
@@ -180,5 +193,68 @@ public class ApartmentResource implements Serializable {
         } else {
             return Response.status(400, "Bad Request: Apartment name is missing. This form is needed: { name : ... }").build();
         }
+    }
+    
+    @DELETE
+    @Path("{id}")
+    public Response updateApartment(@PathParam("id") String id) {
+        Long apartmentId;
+        try {
+            apartmentId = Long.parseLong(id);
+        } catch(NumberFormatException e) {
+            return Response.status(400, "Bad Request: url id is not a number").build();
+        }
+        Apartment a = null;
+        try {
+            a = this.repository.findApartment(apartmentId);
+        } catch (AppException ex) {
+            Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if(a == null){
+            return Response.status(400, "Bad Request: Apartment with this id could not be found.").build();
+        }
+        
+        
+        
+        try {
+            this.eventRepo.deleteAllEventsFrom(apartmentId);
+        } catch (AppException ex) {
+            Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500, "Server Error: Failed while trying to delete all events for aparment.").build();
+        }
+        try {
+            this.noteRepo.deleteAllNotesFrom(apartmentId);
+        } catch (AppException ex) {
+            Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500, "Server Error: Failed while trying to delete all notes for aparment.").build();
+        }
+        try {
+            this.paymentRepo.deleteAllPaymentsFrom(apartmentId);
+        } catch (AppException ex) {
+            Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500, "Server Error: Failed while trying to delete all payments for aparment.").build();
+        }
+        try {
+            this.shoppingRepo.deleteAllShoppingItemsFrom(apartmentId);
+        } catch (AppException ex) {
+            Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500, "Server Error: Failed while trying to delete all shoppingitems for aparment.").build();
+        }
+        try {
+            this.memberRepo.deleteAllMembersFrom(apartmentId);
+        } catch (AppException ex) {
+            Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500, "Server Error: Failed while trying to delete all members for aparment.").build();
+        }
+        try {
+            this.repository.deleteApartment(a);
+        } catch (AppException ex) {
+            Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500, "Server Error: Failed while trying to delete the aparment.").build();
+        }
+        
+        
+        
+        return Response.ok(jsonb.toJson(new Object())).build(); // Returns empty object for wrong id 
     }
 }
