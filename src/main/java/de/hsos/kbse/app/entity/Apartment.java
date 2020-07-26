@@ -43,10 +43,6 @@ public class Apartment implements Serializable {
         this.name = name;
     }
     
-    public Apartment(String name) {
-        this.name = name;
-    }
-    
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */

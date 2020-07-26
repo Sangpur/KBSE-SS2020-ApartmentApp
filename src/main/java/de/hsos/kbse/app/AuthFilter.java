@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -27,12 +28,11 @@ import javax.servlet.http.HttpSession;
  * @author Lucca Oberhößel
  */
 @WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"})
-@RequestScoped
 public class AuthFilter implements Filter {
     
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
-    private static final Set<String> ALLOWED_PATHS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("/ApartmentApp/faces/login.xhtml", "/ApartmentApp/faces/register.xhtml", "")));
+    private static final Set<String> ALLOWED_PATHS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("/KBSE-SS2020-ApartmentApp/faces/login.xhtml", "/KBSE-SS2020-ApartmentApp/faces/register.xhtml", "")));
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -42,7 +42,6 @@ public class AuthFilter implements Filter {
     
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         HttpSession session = request.getSession(false);
@@ -52,8 +51,6 @@ public class AuthFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
-        System.out.println(">>>>>>>>>>");        
-        System.out.println(path);
         if (ALLOWED_PATHS.contains(path) || (session != null && session.getAttribute("user") != null)) {
             chain.doFilter(req, res);
         } else {

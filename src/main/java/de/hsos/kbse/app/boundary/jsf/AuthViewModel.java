@@ -8,7 +8,6 @@ import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.Apartment;
 import de.hsos.kbse.app.entity.member.Member;
-import de.hsos.kbse.app.entity.member.MemberDetail;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
