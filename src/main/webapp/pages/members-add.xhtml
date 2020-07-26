@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Mitglieder</title>
     </h:head>
@@ -13,7 +14,9 @@
             <header>
                 <div class="header__content">
                     <h1 class="header__title">
-                        Mitglied hinzufügen<span>:</span>
+                        Mitglied 
+                        <ui:fragment rendered="#{apartmentVM.addMember}">hinzufügen<span>:</span></ui:fragment>
+                        <ui:fragment rendered="#{apartmentVM.editMember}">bearbeiten<span>:</span></ui:fragment>
                     </h1>
                 </div>
             </header>
@@ -32,49 +35,45 @@
                             </div>
                         </div>
                         <div class="input__wrap">
-                            <div class="input__label">Birthdate</div>
+                            <div class="input__label">Geburtstag:</div>
                             <div class="input input--big">
-                                <p:datePicker id="popup" value="#{apartmentVM.currentMember.details.birthday}" />
+                                <p:calendar id="german" value="#{apartmentVM.currentMember.details.birthday}" locale="de" navigator="true" pattern="dd.MM.yyyy" yearRange="-100:+0" />
                             </div>
                         </div>
-                        <p:outputPanel class="input__wrap" rendered="#{!apartmentVM.editMode}">
-                            <div class="input__label" style="font-size: 16px;">Passwort:</div>
-                            <div class="input input--small">
+                        <ui:fragment rendered="#{apartmentVM.addMember}">
+                        <div class="input__wrap">
+                            <div class="input__label">Passwort:</div>
+                            <div class="input input--big">
                                 <p:inputText type="password" value="#{apartmentVM.currentMember.password}"/>
                             </div>
-                        </p:outputPanel>
-                        <p:outputPanel class="input__wrap" rendered="#{apartmentVM.editMode}">
-                            <div class="input__label" style="font-size: 16px;">Neues Passwort:</div>
-                            <div class="input input--small">
-                                <p:inputText type="password" value="#{apartmentVM.newpassword}"/>
-                            </div>
-                        </p:outputPanel>
-                        <div class="input__wrap">
-                            <div class="input__label">Wiederhole Passwort:</div>
-                            <div class="input input--small">
-                                <p:inputText type="password" value="#{apartmentVM.repassword}"/>
-                            </div>
                         </div>
                         <div class="input__wrap">
+                            <div class="input__label">Passwort (Wh.):</div>
+                            <div class="input input--big">
+                                <p:inputText type="password" value="#{apartmentVM.currentMember.repassword}"/>
+                            </div>
+                        </div>
+                        </ui:fragment>
+                        <div class="input__wrap">
                             <div class="input__label">Farbe:</div>
-                            <div class="input input--small">
+                            <div class="input input__select">
                                 <p:selectOneMenu id="color" value="#{apartmentVM.currentMember.details.color}">
-                                    <f:selectItems value="#{apartmentVM.colors}" />
+                                    <f:selectItems value="#{apartmentVM.colors}" var="color" itemLabel="#{color.name}" />
                                 </p:selectOneMenu>
                             </div>
                         </div>
                         <p:outputPanel class="input__wrap" rendered="#{apartmentVM.isAdmin()}">
                             <div class="input__label" style="font-size: 16px;">Rolle:</div>
-                            <div class="input input--small">
+                            <div class="input input__select">
                                 <p:selectOneMenu id="role" value="#{apartmentVM.currentMember.memberRole}">
-                                    <f:selectItems value="#{apartmentVM.roles}" />
+                                    <f:selectItems value="#{apartmentVM.roles}" var="role" itemLabel="#{role.title}" />
                                 </p:selectOneMenu>
                             </div>
                         </p:outputPanel>
                     </div>
                     <div class="form__buttons">
                         <p:commandButton value="Speichern" action="#{apartmentVM.saveMember()}" class="form__button" />
-                        <p:commandButton value="Abbrechen" action="#{apartmentVM.resetMember()}" class="form__button" />
+                        <p:commandButton value="Abbrechen" action="#{apartmentVM.discard()}" class="form__button" />
                     </div>
                 </h:form>
 

@@ -21,6 +21,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
+import javax.persistence.Transient;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -53,6 +54,10 @@ public class Member implements Serializable {
     @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Das Passwort muss zwischen 3 und 50 Zeichen liegen!")
     private String password;
     
+    @Transient
+    @NotNull(groups = {Condition.class}, message="Die Passwortwiederholung darf nicht leer sein!")
+    private String repassword;
+    
     @OneToOne(cascade = CascadeType.ALL)
     @Valid
     private MemberDetail details;
@@ -67,6 +72,26 @@ public class Member implements Serializable {
     
     public Member() {
         this.details = new MemberDetail();
+        this.deleted = false;
+    }
+    
+    public Member(Member obj) {
+        this.name = obj.getName();
+        this.memberRole = obj.getMemberRole();
+        this.password = obj.getPassword();
+        this.repassword = obj.getRepassword();
+        this.details = new MemberDetail();
+        this.details.setBirthday(obj.getDetails().getBirthday());
+        this.details.setCashBalance(obj.getDetails().getCashBalance());
+        this.details.setColor(obj.getDetails().getColor());
+        this.apartmentID = obj.getApartmentID();
+        this.deleted = obj.getDeleted();
+    }
+    
+    public Member(MemberRole role, Long apartmentID) {
+        this.memberRole = role;
+        this.details = new MemberDetail();
+        this.apartmentID = apartmentID;
         this.deleted = false;
     }
     
@@ -114,6 +139,14 @@ public class Member implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRepassword() {
+        return repassword;
+    }
+
+    public void setRepassword(String repassword) {
+        this.repassword = repassword;
     }
 
     public MemberDetail getDetails() {

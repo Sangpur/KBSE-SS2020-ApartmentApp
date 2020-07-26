@@ -18,7 +18,7 @@ import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.PostConstruct;
@@ -33,10 +33,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 /**
  *
@@ -58,26 +54,8 @@ public class AuthViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    /* Login Form fields */
-    @NotNull(groups = {General.class, Condition.class}, message="Der Username darf nicht leer sein!")
-    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Der Username muss zwischen 3 und 50 Zeichen liegen!")
-    @Pattern(groups = {General.class, Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Der Username enthält ungültige Bezeichner!")
-    private String username;
-    @NotNull(groups = {General.class, Condition.class}, message="Das Passwort darf nicht leer sein!")
-    private String password;
-    
-    /* Register Form fields */
-    @NotNull(groups = {Condition.class}, message="Die Passwortwiederholung darf nicht leer sein!")
-    private String repassword;
-    @NotNull(groups = {Condition.class}, message="Der Name der WG darf nicht leer sein!")
-    @Size(groups = {Condition.class}, min=3, max=50, message="Der Name der WG muss zwischen 3 und 50 Zeichen liegen!")
-    @Pattern(groups = {Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Der Name der WG enthält ungültige Bezeichner!")
-    private String apartmentName;
-    @NotNull(groups = {Condition.class}, message="Das Geburtsdatum darf nicht leer sein!")
-    @Past(groups = {Condition.class}, message="Das Geburtsdatum muss in der Vergangenheit liegen!")
-    private Date birthday;
-    private String color;
-    
+    private Apartment currentApartment;
+    private Member currentMember;
     private Member loggedInMember;
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
@@ -88,6 +66,7 @@ public class AuthViewModel implements Serializable {
         this.memberRepository = memberRepository;
         this.apartmentRepository = apartmentRepository;
         this.conversation = conversation;
+        this.currentMember = new Member();
     }
     
     @Logable(LogLevel.INFO)
@@ -110,13 +89,13 @@ public class AuthViewModel implements Serializable {
         HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
         if(this.validateInput(ValidationGroup.GENERAL)) {
             try {
-                Member user = memberRepository.findMemberByName(this.username);
                 /* Abruf des Membes aus der Datenbank */
+                Member user = memberRepository.findMemberByName(this.currentMember.getName());
                 if(user == null || user.getDeleted()) {                 // User exisiert nicht oder ist als geloescht markiert
                     String message = "Der Username ist falsch!";
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", message);
                     facesContext.addMessage("Error",msg);
-                } else if(!user.getPassword().equals(this.password)){   // User existiert, aber falsches Passwort
+                } else if(!user.getPassword().equals(this.currentMember.getPassword())){   // User existiert, aber falsches Passwort
                     String message = "Das Passwort ist falsch!";
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", message);
                     facesContext.addMessage("Error",msg);
@@ -146,32 +125,34 @@ public class AuthViewModel implements Serializable {
     }
     
     @Logable(LogLevel.INFO)
+    public String addApartment() {
+        this.currentApartment = new Apartment();
+        this.currentMember = new Member();
+        return "register";
+    }
+    
+    @Logable(LogLevel.INFO)
     public String register() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if(this.validateInput(ValidationGroup.CONDITION)) { // Gueltige Eingabe
-            if(password.equals(repassword)){
-                    Apartment apartment = new Apartment(this.apartmentName);
-                    Member member = new Member(username, MemberRole.ADMIN, password, birthday, MemberColor.RED);
-                    /* Eingaben zuruecksetzen */
-                    this.apartmentName = "";
-                    this.username = "";
-                    this.password = "";
-                    this.repassword = "";
-                    this.birthday = null;
-                    try {
-                        /* Anlegen eines neuen Apartments und Members in der Datenbank */
-                        apartmentRepository.createApartment(apartment);
-                        member.setApartmentID(apartment.getId());
-                        memberRepository.createMember(member);
-                        /* FacesMessage fuer erfolgreiches Anlegen einer Wohngemeinschaft */
-                        String message = "WG #" + apartment.getId() + " erfolgreich angelegt!";
-                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
-                        facesContext.addMessage("Information",msg);
-                        return "faces/login?faces-redirect=true";
-                    } catch (AppException ex) {
-                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
-                        facesContext.addMessage("Error",msg);
-                    }
+            if(this.currentMember.getPassword().equals(this.currentMember.getRepassword())){
+                try {
+                    /* Anlegen eines neuen Apartments und Members in der Datenbank */
+                    apartmentRepository.createApartment(this.currentApartment);
+                    this.currentMember.setMemberRole(MemberRole.ADMIN);
+                    this.currentMember.setApartmentID(this.currentApartment.getId());
+                    this.currentMember.getDetails().setColor(MemberColor.RED);
+                    this.currentMember.getDetails().setCashBalance(new BigDecimal(0));
+                    memberRepository.createMember(this.currentMember);
+                    /* FacesMessage fuer erfolgreiches Anlegen einer Wohngemeinschaft */
+                    String message = "WG #" + this.currentApartment.getId() + " erfolgreich angelegt!";
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
+                    facesContext.addMessage("Information",msg);
+                    return "faces/login?faces-redirect=true";
+                } catch (AppException ex) {
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
             } else {
                 String message = "Die Passwörter müssen identisch sein!";
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", message);
@@ -182,11 +163,8 @@ public class AuthViewModel implements Serializable {
     }
     
     public String discardRegistration() {
-        this.apartmentName = "";
-        this.username = "";
-        this.password = "";
-        this.repassword = "";
-        this.birthday = null;
+        this.currentApartment = new Apartment();
+        this.currentMember = new Member();
         return "login";
     }
 
@@ -202,22 +180,34 @@ public class AuthViewModel implements Serializable {
     private boolean validateInput(ValidationGroup group) {
         /* Die Methode validate() gibt ein Set von ConstraintViolations zurueck, in dem alle moeglicherweise begangenen Verstoesse aufgefuehrt
          * sind. Dieses Set ist leer, falls die Eingabe gueltig ist. Durch die Gruppierung der Constraints, hier General.class, besteht die
-         * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird.
-         * s. https://www.baeldung.com/javax-validation-groups */
-        Set<ConstraintViolation<AuthViewModel>> constraintViolations = null;
+         * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird. */
+        Set<ConstraintViolation<Apartment>> constraintViolations = null;
+        Set<ConstraintViolation<Member>> constraintViolationsM = null;
         if(group == ValidationGroup.GENERAL) {
-            constraintViolations = validator.validate(this, General.class );
+            constraintViolationsM = validator.validate(this.currentMember, General.class );
         } else if(group == ValidationGroup.CONDITION) {
-            constraintViolations = validator.validate(this, Condition.class );
+            constraintViolations = validator.validate(this.currentApartment, Condition.class );
+            constraintViolationsM = validator.validate(this.currentMember, Condition.class );
+            
+            if(constraintViolations.size() > 0) {
+                /* Ungueltige Eingabe fuer Apartment */
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                Iterator<ConstraintViolation<Apartment>> iter = constraintViolations.iterator();
+                while (iter.hasNext()) {
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", iter.next().getMessage());
+                    facesContext.addMessage("Constraint Violation",msg);
+                }
+                return false;
+            }
         }
-
-        if(constraintViolations != null && constraintViolations.isEmpty()) {
-            /* Gueltige Eingabe */
+        
+        if(constraintViolationsM != null && constraintViolationsM.isEmpty()) {
+            /* Gueltige Eingabe fuer Member */
             return true;
         } else {
             /* Ungueltige Eingabe */
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Iterator<ConstraintViolation<AuthViewModel>> iter = constraintViolations.iterator();
+            Iterator<ConstraintViolation<Member>> iter = constraintViolationsM.iterator();
             while (iter.hasNext()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", iter.next().getMessage());
                 facesContext.addMessage("Constraint Violation",msg);
@@ -228,60 +218,24 @@ public class AuthViewModel implements Serializable {
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
-    public Member getLoggedInMember() {
-        return loggedInMember;
+    public Apartment getCurrentApartment() {
+        return currentApartment;
     }
 
-    public void setLoggedInMember(Member loggedInMember) {
-        this.loggedInMember = loggedInMember;
+    public void setCurrentApartment(Apartment currentApartment) {
+        this.currentApartment = currentApartment;
     }
 
-    public String getUsername() {
-        return username;
+    public Member getCurrentMember() {
+        return currentMember;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCurrentMember(Member currentMember) {
+        this.currentMember = currentMember;
     }
     
-    public String getRepassword() {
-        return repassword;
-    }
-
-    public void setRepassword(String repassword) {
-        this.repassword = repassword;
-    }
-
-    public String getApartmentName() {
-        return apartmentName;
-    }
-
-    public void setApartmentName(String apartmentName) {
-        this.apartmentName = apartmentName;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
+    public Member getLoggedInMember() {
+        return loggedInMember;
     }
 
 }

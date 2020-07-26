@@ -30,31 +30,31 @@
                         <div class="input__wrap">
                             <div class="input__label">WG-Name:</div>
                             <div class="input input--big">
-                                <p:inputText value="#{authVM.apartmentName}" />
+                                <p:inputText value="#{authVM.currentApartment.name}" />
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Username:</div>
                             <div class="input input--big">
-                                <p:inputText value="#{authVM.username}" />
+                                <p:inputText value="#{authVM.currentMember.name}" />
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Geburtstag</div>
                             <div class="input input--big">
-                                <p:calendar id="german" value="#{authVM.birthday}" locale="de" navigator="true" pattern="dd.MM.yyyy" yearRange="-100:+0" />
+                                <p:calendar id="german" value="#{authVM.currentMember.details.birthday}" locale="de" navigator="true" pattern="dd.MM.yyyy" yearRange="-100:+0" />
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Passwort:</div>
                             <div class="input input--big">
-                                <p:inputText type="password" value="#{authVM.password}"/>
+                                <p:inputText type="password" value="#{authVM.currentMember.password}"/>
                             </div>
                         </div>
                         <div class="input__wrap">
                             <div class="input__label">Passwort (Wh.):</div>
                             <div class="input input--big">
-                                <p:inputText type="password" value="#{authVM.repassword}"/>
+                                <p:inputText type="password" value="#{authVM.currentMember.repassword}"/>
                             </div>
                         </div>
                         

@@ -54,7 +54,7 @@ public class PinboardViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID = 1000L;   // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
+    private Long apartmentID;
     private Member loggedInMember;
     private Note currentNote;
     private Note originalNote;      // Sicherung des zu bearbeitenden Notiz-Objekts
@@ -74,15 +74,10 @@ public class PinboardViewModel implements Serializable {
         this.pinboard = pinboard;
         this.conversation = conversation;
         this.notes = new LinkedList<>();
-        this.initNoteList();
         this.initLoggedInMember();
+        this.apartmentID = this.loggedInMember.getApartmentID();
+        this.initNoteList();
         this.categories = NoteCategory.values();
-    }
-    
-    @PostConstruct
-    public static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
     }
     
     @Logable(LogLevel.INFO)
@@ -180,28 +175,10 @@ public class PinboardViewModel implements Serializable {
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
     
-    private void initNoteList() {
-        try {
-            List<Note> tmp = this.pinboard.getAllNotesFrom(apartmentID);
-            
-            /* Einträge der letzten 7 Tage der Notizen-Liste werden hinzugefügt */
-            Date lastWeek = java.sql.Date.valueOf(LocalDate.now().minusDays(7));
-            
-            tmp.forEach((note) -> {
-                if(note.getTimestamp().after(lastWeek)){
-                    this.notes.add(note);
-                }   
-            });
-            
-            /* Absteigende Sortierung der Notizen anhand des Datums. Notizen mit Status "URGENT" werden an oberster Stelle einsortiert.*/
-            Collections.sort(this.notes);
-            Collections.reverse(this.notes);
-
-        } catch(AppException ex) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
-            facesContext.addMessage("Error",msg);
-        }
+    @PostConstruct
+    private static void setUpValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
     
     private void initLoggedInMember() {
@@ -211,6 +188,26 @@ public class PinboardViewModel implements Serializable {
         this.loggedInMember = (Member) session.getAttribute("user");
         if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
             this.admin = true;
+        }
+    }
+    
+    private void initNoteList() {
+        try {
+            List<Note> tmp = this.pinboard.getAllNotesFrom(apartmentID);
+            /* Einträge der letzten 7 Tage der Notizen-Liste werden hinzugefügt */
+            Date lastWeek = java.sql.Date.valueOf(LocalDate.now().minusDays(7));
+            tmp.forEach((note) -> {
+                if(note.getTimestamp().after(lastWeek)){
+                    this.notes.add(note);
+                }   
+            });
+            /* Absteigende Sortierung der Notizen anhand des Datums. Notizen mit Status "URGENT" werden an oberster Stelle einsortiert.*/
+            Collections.sort(this.notes);
+            Collections.reverse(this.notes);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
         }
     }
     

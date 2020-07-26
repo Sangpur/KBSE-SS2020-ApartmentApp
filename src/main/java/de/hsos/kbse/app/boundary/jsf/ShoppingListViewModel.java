@@ -8,6 +8,7 @@ import de.hsos.kbse.app.control.ShoppingList;
 import de.hsos.kbse.app.entity.features.ShoppingItem;
 import de.hsos.kbse.app.entity.member.Member;
 import de.hsos.kbse.app.enums.LogLevel;
+import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.AppException;
 import de.hsos.kbse.app.util.Condition;
@@ -53,7 +54,8 @@ public class ShoppingListViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID = 1000L;   // TODO: Hinzufuegen sobald Scope gestartet wird bei Login-Prozess
+    private Long apartmentID;
+    private Member loggedInMember;
     private List<ShoppingItem> items;
     private ShoppingItem currentItem;
     private ShoppingItem originalItem;  // Sicherung des zu bearbeitenden ShoppingItem-Objekts
@@ -68,6 +70,8 @@ public class ShoppingListViewModel implements Serializable {
         this.shoppinglist = shoppinglist;
         this.conversation = conversation;
         this.items = new ArrayList();
+        this.initLoggedInMember();
+        this.apartmentID = this.loggedInMember.getApartmentID();
         this.initItemsList();
     }
     
@@ -174,6 +178,12 @@ public class ShoppingListViewModel implements Serializable {
     private static void setUpValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+    
+    private void initLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+        this.loggedInMember = (Member) session.getAttribute("user");
     }
     
     private void initItemsList() {

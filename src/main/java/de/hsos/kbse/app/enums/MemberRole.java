@@ -10,11 +10,16 @@ package de.hsos.kbse.app.enums;
  */
 public enum MemberRole {
     
-    ADMIN, USER;
+    ADMIN("Admin"), USER("User");
     
-    @Override
-    public String toString() {
-        return super.toString();
+    private final String title;
+    
+    private MemberRole(String title){
+        this.title = title;
+    }
+    
+    public String getTitle(){
+        return this.title;
     }
     
 }
