@@ -17,6 +17,7 @@ public interface EventManager {
     
     public void createEvent(Event event) throws AppException;
     public void deleteEvent(Event event) throws AppException;
+    public void deleteAllEventsFrom(Long apartmentID) throws AppException;
     public Event updateEvent(Event event) throws AppException;
     public Event findEvent(Long id) throws AppException;
     public List<Event> getAllEventsFrom(Long apartmentID) throws AppException;

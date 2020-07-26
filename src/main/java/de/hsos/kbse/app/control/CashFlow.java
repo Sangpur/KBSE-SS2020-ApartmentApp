@@ -88,8 +88,16 @@ public class CashFlow implements PaymentManager, Serializable {
         }
     }
     
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
-    /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-    
+    @Override
+    public void deleteAllPaymentsFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "DELETE FROM Payment p WHERE p.apartmentID = :id";
+            TypedQuery<Payment> querySelect = em.createQuery(str, Payment.class);
+            querySelect.setParameter("id", apartmentID);
+            querySelect.executeUpdate();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Alle Payments der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+        }
+    }
 }

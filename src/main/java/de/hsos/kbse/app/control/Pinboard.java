@@ -88,10 +88,16 @@ public class Pinboard implements NoteManager, Serializable {
         }
     }
     
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
-    /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-
-
-    
+    @Override
+    public void deleteAllNotesFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "DELETE FROM Note n WHERE n.apartmentID = :id";
+            TypedQuery<Note> querySelect = em.createQuery(str, Note.class);
+            querySelect.setParameter("id", apartmentID);
+            querySelect.executeUpdate();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Alle Notes der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+        }
+    }
 }

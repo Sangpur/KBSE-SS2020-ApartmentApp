@@ -15,6 +15,7 @@ public interface PaymentManager {
     
     public void createPayment(Payment payment) throws AppException;
     public void deletePayment(Payment payment) throws AppException;
+    public void deleteAllPaymentsFrom(Long apartmentID) throws AppException;
     public Payment updatePayment(Payment payment) throws AppException;
     public Payment findPayment(Long id) throws AppException;
     public List<Payment> getAllPaymentsFrom(Long apartmentID) throws AppException;

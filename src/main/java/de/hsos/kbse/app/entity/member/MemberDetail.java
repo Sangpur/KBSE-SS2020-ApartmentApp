@@ -65,6 +65,10 @@ public class MemberDetail implements Serializable {
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
+    public Long getId() {
+        return id;
+    }
+    
     public Date getBirthday() {
         return birthday;
     }

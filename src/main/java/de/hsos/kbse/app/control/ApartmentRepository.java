@@ -8,9 +8,11 @@ import de.hsos.kbse.app.entity.Apartment;
 import de.hsos.kbse.app.entity.ApartmentManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 /**
@@ -70,6 +72,20 @@ public class ApartmentRepository implements ApartmentManager, Serializable {
             throw new AppException("WG konnte nicht gefunden werden!");
         }
         return apartment;
+    }
+    
+    
+    @Override
+    public List<Apartment> getAllApartments() throws AppException {
+        try {
+            String str = "SELECT m FROM Apartment m";
+            TypedQuery<Apartment> querySelect = em.createQuery(str, Apartment.class);
+            List<Apartment> results = querySelect.getResultList();
+            return results;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Apartments konnten nicht ausgegeben werden!");
+        }
     }
     
     /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
