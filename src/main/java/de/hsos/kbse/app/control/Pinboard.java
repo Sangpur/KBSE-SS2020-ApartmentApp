@@ -8,6 +8,8 @@ import de.hsos.kbse.app.entity.features.Note;
 import de.hsos.kbse.app.entity.features.NoteManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
@@ -88,6 +90,8 @@ public class Pinboard implements NoteManager, Serializable {
         }
     }
     
+    
+    
     @Override
     public void deleteAllNotesFrom(Long apartmentID) throws AppException {
         try {
@@ -95,6 +99,24 @@ public class Pinboard implements NoteManager, Serializable {
             TypedQuery<Note> querySelect = em.createQuery(str, Note.class);
             querySelect.setParameter("id", apartmentID);
             querySelect.executeUpdate();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Die Notizen der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+        }
+    }
+
+    @Override
+    public List<Note> getAllNotesFromLastWeek(Long apartmentID) throws AppException {
+        LocalDate today = LocalDate.now();
+        Date lastWeek = java.sql.Date.valueOf(today.minusDays(7));
+        try {
+            String str = "SELECT n FROM Note n "
+                         + "WHERE n.apartmentID = :id AND n.timestamp >= :lastWeek";
+            TypedQuery<Note> querySelect = em.createQuery(str, Note.class);
+            querySelect.setParameter("id", apartmentID);
+            querySelect.setParameter("lastWeek", lastWeek);
+            List<Note> results = querySelect.getResultList();
+            return results;
         } catch(Exception ex) {
             ex.printStackTrace();
             throw new AppException("Die Notizen der WG "+ apartmentID +" konnten nicht gelöscht werden!");

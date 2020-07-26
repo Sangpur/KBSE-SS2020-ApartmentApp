@@ -89,7 +89,7 @@ public class Calendar implements EventManager, Serializable {
             throw new AppException("Events der WG "+ apartmentID +" konnten nicht gefunden werden!");
         }
     }
-    
+       
     @Override
     public List<Event> getAllEventsFromMonth(Long apartmentID, int year, int month, int totalDays) throws AppException {
         Date beginMonth = java.sql.Date.valueOf(LocalDate.of(year, month, 1));
@@ -122,4 +122,5 @@ public class Calendar implements EventManager, Serializable {
             throw new AppException("Die Events der WG "+ apartmentID +" konnten nicht gelöscht werden!");
         }
     }
+
 }

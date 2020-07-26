@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -66,6 +68,7 @@ public class CalendarViewModel implements Serializable {
     
     private boolean addEvent;           // true = addEvent()
     private boolean editEvent;          // true = editEvent()
+    private boolean isWholeDay; 
     private EventCategory[] categories;
     private LocalDate today;            // Heutiges Datum der System-Zeitzone
     private LocalDate currentMonth;     // Datum des Headers, immer der fünfte Tag eines Monats
@@ -164,7 +167,11 @@ public class CalendarViewModel implements Serializable {
     
     @Logable(LogLevel.INFO)
     public String saveEvent(){
-        if(this.addEvent ){ // Neues Event 
+        if(this.isIsWholeDay()){
+            this.currentEvent.setAllDayEvent(this.isIsWholeDay());
+            this.currentEvent.setBegin(this.currentEvent.getEnd());
+        }
+        if(this.addEvent ){ // Neues Event
             if(this.validateInput(ValidationGroup.GENERAL)) { // Gültige Eingabe
                 try {
                     /* Neues Event-Objekt der Datenbank hinzufügen */
@@ -189,6 +196,7 @@ public class CalendarViewModel implements Serializable {
             if(valid) { // Gültige Eingabe
                 try {
                     /* Bestehendes Event-Objekt wird in der Datenbank aktualisiert */
+                    this.currentEvent.setAllDayEvent(this.isIsWholeDay());
                     this.calendar.updateEvent(currentEvent);
                 } catch (AppException ex) {
                     FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -212,6 +220,7 @@ public class CalendarViewModel implements Serializable {
             this.currentEvent.setBegin(this.originalEvent.getBegin());
             this.currentEvent.setEnd(this.originalEvent.getEnd());
             this.currentEvent.setCategory(this.originalEvent.getCategory());
+            this.currentEvent.setAllDayEvent(this.originalEvent.isAllDayEvent());
         }
         return "calendar";
     }
@@ -280,6 +289,7 @@ public class CalendarViewModel implements Serializable {
     
     private void initCurrentMonthView() {
         /* Initialisiert CalenderDay-Objekte zur Anzeige des gesamten Monats */
+        this.setIsWholeDay(false);
         this.currentMonthDays.clear();
         int year = this.currentMonth.getYear();
         int month = this.currentMonth.getMonthValue();
@@ -336,7 +346,7 @@ public class CalendarViewModel implements Serializable {
         /* Berechnet Schaltjahr */
         return year % 4 == 0 && year % 100 != 0 || year % 400 == 0 || new GregorianCalendar().isLeapYear(year);
     }
-        
+           
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {
         /* Die Methode validate() gibt ein Set von ConstraintViolations zurueck, in dem alle moeglicherweise begangenen Verstoesse aufgefuehrt
@@ -435,6 +445,15 @@ public class CalendarViewModel implements Serializable {
     public void setToday(LocalDate today) {
         this.today = today;
     }
+
+    public boolean isIsWholeDay() {
+        return isWholeDay;
+    }
+
+    public void setIsWholeDay(boolean isWholeDay) {
+        this.isWholeDay = isWholeDay;
+    }
+    
     
     
     

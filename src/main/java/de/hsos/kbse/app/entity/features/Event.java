@@ -188,7 +188,9 @@ public class Event implements Serializable, Comparable<Event> {
         LocalDate eventBegin = event.getBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate eventEnd = event.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         
-        if(eventBegin.isEqual(currentCalenderDay) && eventEnd.isEqual(currentCalenderDay)) {
+        if(event.isAllDayEvent()){
+            return "ganztägig";
+        } else if(eventBegin.isEqual(currentCalenderDay) && eventEnd.isEqual(currentCalenderDay)) {
             /* Das Event ist beginnt und endet am aktuell betrachteten Tag. */
             return formatter.format(event.getBegin()) + " – " + formatter.format(event.getEnd()) + " Uhr";
         } else if(eventBegin.isBefore(currentCalenderDay) && eventEnd.isAfter(currentCalenderDay)) {

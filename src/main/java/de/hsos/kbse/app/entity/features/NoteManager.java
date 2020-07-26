@@ -19,5 +19,6 @@ public interface NoteManager {
     public Note updateNote(Note note) throws AppException;
     public Note findNote(Long id) throws AppException;
     public List<Note> getAllNotesFrom(Long apartmentID) throws AppException;
+    public List<Note> getAllNotesFromLastWeek(Long apartmentID) throws AppException;
     
 }
