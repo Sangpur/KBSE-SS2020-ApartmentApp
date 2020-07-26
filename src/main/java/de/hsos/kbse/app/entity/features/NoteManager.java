@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Christoph Weigandt
  */
 public interface NoteManager {
     

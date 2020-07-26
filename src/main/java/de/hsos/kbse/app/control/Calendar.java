@@ -19,7 +19,7 @@ import javax.transaction.Transactional;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Christoph Weigandt
  */
 @RequestScoped
 @Transactional
@@ -38,7 +38,7 @@ public class Calendar implements EventManager, Serializable {
             this.em.persist(event);
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Kalendereintrag konnte nicht angelegt werden!");
+            throw new AppException("Events konnte nicht angelegt werden!");
         }
     }
 
@@ -49,7 +49,7 @@ public class Calendar implements EventManager, Serializable {
             this.em.remove(toMerge);
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Kalendereintrag konnte nicht geloescht werden!");
+            throw new AppException("Events konnte nicht geloescht werden!");
         }
     }
 
@@ -59,7 +59,7 @@ public class Calendar implements EventManager, Serializable {
             event = this.em.merge(event);           // Rueckgabe ist null, falls Kalendereintrag nicht existiert
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Kalendereintrag konnte nicht angepasst werden!");
+            throw new AppException("Events konnte nicht angepasst werden!");
         }
         return event;
     }
@@ -71,7 +71,7 @@ public class Calendar implements EventManager, Serializable {
             event = this.em.find(Event.class, id);  // Rueckgabe ist null, falls Kalendereintrag nicht existiert
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Kalendereintrag konnte nicht gefunden werden!");
+            throw new AppException("Events konnte nicht gefunden werden!");
         }
         return event;
     }

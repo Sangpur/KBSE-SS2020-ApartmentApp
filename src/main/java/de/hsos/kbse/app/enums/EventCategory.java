@@ -6,7 +6,7 @@ package de.hsos.kbse.app.enums;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Christoph Weigandt
  */
 public enum EventCategory {
     

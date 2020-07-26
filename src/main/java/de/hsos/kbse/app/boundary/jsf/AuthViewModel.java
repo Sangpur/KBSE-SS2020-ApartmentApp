@@ -36,7 +36,7 @@ import javax.validation.ValidatorFactory;
 
 /**
  *
- * @author Lucca Oberhößel
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 @Named("authVM")
 @ConversationScoped
@@ -45,8 +45,8 @@ public class AuthViewModel implements Serializable {
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
     /* Controller Classes */
+    private final ApartmentRepository repository;
     private final MemberRepository memberRepository;
-    private final ApartmentRepository apartmentRepository;
     
     /* Conversation */
     private final Conversation conversation;
@@ -62,10 +62,11 @@ public class AuthViewModel implements Serializable {
     
     @Inject
     @Logable(LogLevel.INFO)
-    public AuthViewModel(MemberRepository memberRepository, Conversation conversation, ApartmentRepository apartmentRepository) {
+    public AuthViewModel(MemberRepository memberRepository, Conversation conversation, ApartmentRepository repository) {
+        this.repository = repository;
         this.memberRepository = memberRepository;
-        this.apartmentRepository = apartmentRepository;
         this.conversation = conversation;
+        this.currentApartment = new Apartment();
         this.currentMember = new Member();
     }
     
@@ -90,9 +91,9 @@ public class AuthViewModel implements Serializable {
         if(this.validateInput(ValidationGroup.GENERAL)) {
             try {
                 /* Abruf des Membes aus der Datenbank */
-                Member user = memberRepository.findMemberByName(this.currentMember.getName());
+                Member user = memberRepository.findMemberByName(this.currentApartment.getId(), this.currentMember.getName());
                 if(user == null || user.getDeleted()) {                 // User exisiert nicht oder ist als geloescht markiert
-                    String message = "Der Username ist falsch!";
+                    String message = "Die WG-ID oder der Username ist falsch!";
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", message);
                     facesContext.addMessage("Error",msg);
                 } else if(!user.getPassword().equals(this.currentMember.getPassword())){   // User existiert, aber falsches Passwort
@@ -138,7 +139,7 @@ public class AuthViewModel implements Serializable {
             if(this.currentMember.getPassword().equals(this.currentMember.getRepassword())){
                 try {
                     /* Anlegen eines neuen Apartments und Members in der Datenbank */
-                    apartmentRepository.createApartment(this.currentApartment);
+                    repository.createApartment(this.currentApartment);
                     this.currentMember.setMemberRole(MemberRole.ADMIN);
                     this.currentMember.setApartmentID(this.currentApartment.getId());
                     this.currentMember.getDetails().setColor(MemberColor.RED);

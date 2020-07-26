@@ -87,9 +87,7 @@ public class ShoppingItem implements Serializable, Comparable<ShoppingItem>  {
         }
         return this.name.compareTo(s.getName());    // Beide Items haben den gleichen Status
     }
-    
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
+
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
     public Long getId() {

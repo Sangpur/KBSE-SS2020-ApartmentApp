@@ -34,7 +34,7 @@ import javax.validation.ValidatorFactory;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock
  */
 @Named("shoppingVM")
 @ConversationScoped
@@ -243,6 +243,14 @@ public class ShoppingListViewModel implements Serializable {
 
     public void setCurrentItem(ShoppingItem currentItem) {
         this.currentItem = currentItem;
+    }
+
+    public boolean isAddItem() {
+        return addItem;
+    }
+
+    public boolean isEditItem() {
+        return editItem;
     }
 
 }

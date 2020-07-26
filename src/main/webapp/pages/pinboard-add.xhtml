@@ -14,7 +14,9 @@
             <header>
                 <div class="header__content">
                     <h1 class="header__title">
-                        Notiz hinzufügen<span>:</span>
+                        Notiz 
+                        <ui:fragment rendered="#{pinboardVM.addNote}">hinzufügen<span>:</span></ui:fragment>
+                        <ui:fragment rendered="#{pinboardVM.editNote}">bearbeiten<span>:</span></ui:fragment>
                     </h1>
                 </div>
             </header>

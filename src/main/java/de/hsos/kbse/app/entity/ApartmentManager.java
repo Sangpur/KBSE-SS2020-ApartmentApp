@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 public interface ApartmentManager {
     

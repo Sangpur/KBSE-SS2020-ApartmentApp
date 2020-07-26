@@ -1,7 +1,6 @@
 /*
  * JAX RS BOUNDARY CLASS ApartmentResource
  * 
- *
  */
 package de.hsos.kbse.app.boundary.rs;
 

@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * JAX RS BOUNDARY CLASS CalendarResource
+ * 
  */
 package de.hsos.kbse.app.boundary.rs;
 
@@ -39,13 +38,14 @@ import javax.ws.rs.core.UriInfo;
 
 /**
  *
- * @author Lucca
+ * @author Lucca Oberhößel
  */
 @Stateless
 @Path("apartments/{apartmentId}/events")
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
 public class CalendarResource implements Serializable {
+    
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
     @Inject 

@@ -36,7 +36,7 @@ import javax.validation.ValidatorFactory;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 @Named("apartmentVM")
 @ConversationScoped
@@ -156,8 +156,6 @@ public class ApartmentViewModel implements Serializable {
             this.memberRepository.updateMember(this.currentMember);
             /* Entfernen des Members aus der Members-List */
             this.members.remove(this.currentMember);
-            String message = "Mitglied erfolgreich geloescht!";
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
             return "members";
         } catch (AppException ex) {
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
@@ -203,10 +201,6 @@ public class ApartmentViewModel implements Serializable {
                         this.memberRepository.createMember(this.currentMember);
                         /* Hinzufuegen des neuen Members zur Members-List */
                         this.members.add(this.currentMember);
-                        /* FacesMessage fuer erfolgreiches Anlegen eines neuen Mitglieds */
-                        String message = "Mitglied erfolgreich angelegt!";
-                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
-                        facesContext.addMessage("Information",msg);
                         return "members";
                     } catch (AppException ex) {
                         FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
@@ -218,17 +212,24 @@ public class ApartmentViewModel implements Serializable {
                     facesContext.addMessage("Constraint",msg);
                 }
             } else if(this.editMember) {    // Bestehenden Member updaten
+                /* Falls ein Mitglied sich den Status "User" zuweist, wird geprueft, ob noch ein weiterer Admin
+                 * vorhanden ist und ansonsten die Aktion abgebrochen. */
+                if(this.currentMember.getMemberRole().equals(MemberRole.USER) && !this.isAdminInMembers()) {
+                    String message = "Die WG muss mindestens einen Admin haben!";
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", message);
+                    facesContext.addMessage("Constraint",msg);
+                    return "";
+                }
                 try {
                     /* Bestehendes Mitglied in der Datenbank updaten */
                     this.memberRepository.updateMember(this.currentMember);
-                    /* Erneutes Setzen des Users in der Session, damit moegliche Zugriffsrechte aktualisiert werden */
-                    HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-                    session.setAttribute("user", this.currentMember);
-                    this.initLoggedInMember();
-                    /* FacesMessage fuer erfolgreiches Updates eines Mitglieds */
-                    String message = "Mitglied erfolgreich aktualisiert!";
-                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
-                    facesContext.addMessage("Information",msg);
+                    /* Erneutes Setzen des Users in der Session, falls das gerade bearbeitete Mitglied auch das 
+                     * das eingeloggte Mitglied ist, damit moegliche Zugriffsrechte aktualisiert werden. */
+                    if(this.currentMember.getId().equals(this.loggedInMember.getId())) {
+                        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+                        session.setAttribute("user", this.currentMember);
+                        this.initLoggedInMember();
+                    }
                     return "members";
                 } catch (AppException ex) {
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
@@ -316,6 +317,16 @@ public class ApartmentViewModel implements Serializable {
         }
     }
     
+    private boolean isAdminInMembers() {
+        for(int i = 0; i < this.members.size(); i++) {
+            Member tmpMember = this.members.get(i);
+            if(tmpMember.getMemberRole().equals(MemberRole.ADMIN)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     @Logable(LogLevel.INFO)
     private boolean validateInput(ValidationGroup group) {
         /* Die Methode validate() gibt ein Set von ConstraintViolations zurueck, in dem alle moeglicherweise begangenen Verstoesse aufgefuehrt
@@ -363,6 +374,10 @@ public class ApartmentViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+    
+    public String getApartmentName() {
+        return this.apartment.getName();
+    }
 
     public List<Member> getMembers() {
         this.initMemberList();

@@ -14,7 +14,9 @@
             <header>
                 <div class="header__content">
                     <h1 class="header__title">
-                        Zahlung hinzufügen<span>:</span>
+                        Zahlung 
+                        <ui:fragment rendered="#{cashflowVM.addPayment}">hinzufügen<span>:</span></ui:fragment>
+                        <ui:fragment rendered="#{cashflowVM.editPayment}">bearbeiten<span>:</span></ui:fragment>
                     </h1>
                 </div>
             </header>

@@ -43,7 +43,7 @@ import javax.validation.ValidatorFactory;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock, Christoph Weigandt
  */
 @Named("calendarVM")
 @ConversationScoped

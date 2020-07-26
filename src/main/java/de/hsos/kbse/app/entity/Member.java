@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 @Entity(name="Members")
 @Vetoed
@@ -105,8 +105,6 @@ public class Member implements Serializable {
         this.details.setColor(color);
     }
     
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
     public Long getId() {
@@ -177,6 +175,5 @@ public class Member implements Serializable {
     public String toString() {
         return "Member{" + "id=" + id + ", name=" + name + ", memberRole=" + memberRole + ", password=" + password + ", details=" + details + ", apartmentID=" + apartmentID + '}';
     }
-
     
 }

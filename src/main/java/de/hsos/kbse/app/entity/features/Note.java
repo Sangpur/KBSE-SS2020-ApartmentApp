@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Christoph Weigandt
  */
 @Entity
 @Vetoed
@@ -60,9 +60,7 @@ public class Note implements Serializable, Comparable<Note> {
     @Column(name="apartment_id")
     private Long apartmentID;
 
-    public Note(){
-        
-    }
+    public Note() {}
     
     public Note(Member loggedInMember, Date date, Long apartmentID) {
         this.author = loggedInMember;
@@ -98,8 +96,6 @@ public class Note implements Serializable, Comparable<Note> {
         
         return this.timestamp.compareTo(n.getTimestamp());
     }
-    
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 

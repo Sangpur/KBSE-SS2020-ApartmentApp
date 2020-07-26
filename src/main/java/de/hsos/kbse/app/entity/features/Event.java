@@ -11,7 +11,6 @@ import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import javax.enterprise.inject.Vetoed;
@@ -35,7 +34,7 @@ import javax.validation.constraints.Size;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock, Christoph Weigandt
  */
 @Entity
 @Vetoed
@@ -79,9 +78,7 @@ public class Event implements Serializable, Comparable<Event> {
     
     /* --------------------------------------- PUBLIC METHODS -------------------------------------- */
     
-    public Event(){
-        
-    }
+    public Event(){}
     
     public Event(Member author, Date begin, Date end, Long apartmentID){
         this.author = author;
@@ -119,8 +116,6 @@ public class Event implements Serializable, Comparable<Event> {
         }
         return this.compareTo(e);
     }
-    
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
     

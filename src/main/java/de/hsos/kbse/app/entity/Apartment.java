@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 @Entity
 @Vetoed
@@ -45,8 +45,6 @@ public class Apartment implements Serializable {
         this.name = name;
     }
     
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
     public Long getId() {
@@ -70,4 +68,4 @@ public class Apartment implements Serializable {
         return "Apartment{" + "id=" + id + ", name=" + name + '}';
     }
     
-    }
+}

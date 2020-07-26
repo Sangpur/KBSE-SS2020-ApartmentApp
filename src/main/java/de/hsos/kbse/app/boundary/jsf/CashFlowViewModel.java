@@ -38,7 +38,7 @@ import javax.validation.ValidatorFactory;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock
  */
 @Named("cashflowVM")
 @ConversationScoped

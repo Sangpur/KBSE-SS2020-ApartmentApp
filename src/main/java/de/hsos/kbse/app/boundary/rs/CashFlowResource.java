@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * JAX RS BOUNDARY CLASS CashFlowResource
+ * 
  */
 package de.hsos.kbse.app.boundary.rs;
 
@@ -43,13 +42,14 @@ import javax.ws.rs.core.UriInfo;
 
 /**
  *
- * @author Lucca
+ * @author Lucca Oberhößel
  */
 @Stateless
 @Path("apartments/{apartmentId}/payments")
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
 public class CashFlowResource implements Serializable {
+    
     /* ----------------------------------------- ATTRIBUTE ---------------------------------------- */
     
     @Inject 

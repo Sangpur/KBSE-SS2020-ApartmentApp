@@ -27,7 +27,7 @@ import javax.validation.constraints.Past;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock
  */
 @Entity
 @Vetoed
@@ -60,8 +60,6 @@ public class MemberDetail implements Serializable {
     public void subtractCashBalance(BigDecimal value) {
         this.cashBalance = this.cashBalance.subtract(value);
     }
-    
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 

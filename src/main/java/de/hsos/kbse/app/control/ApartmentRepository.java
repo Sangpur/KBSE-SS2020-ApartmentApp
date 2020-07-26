@@ -17,7 +17,7 @@ import javax.transaction.Transactional;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 @RequestScoped
 @Transactional
@@ -84,13 +84,8 @@ public class ApartmentRepository implements ApartmentManager, Serializable {
             return results;
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Apartments konnten nicht ausgegeben werden!");
+            throw new AppException("WGs konnten nicht ausgegeben werden!");
         }
     }
-    
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
-    /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
-
     
 }

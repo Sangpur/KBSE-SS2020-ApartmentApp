@@ -39,7 +39,7 @@
                 </p:messages>
                 
                 <div class="cards">
-                    <p:dataGrid id="payments__balance" var="member" value="#{cashflowVM.members}" columns="4" layout="grid" rows="8" paginator="false">
+                    <p:dataGrid id="payments__balance" var="member" value="#{cashflowVM.members}" columns="3" layout="grid" paginator="false">
                         <div class="card card--#{member.details.color}">
                             <p class="card__name">
                                 <h:outputText value="#{member.name}" />
@@ -54,44 +54,48 @@
                     </p:dataGrid>
                 </div>
                 
-                <p:dataTable id="payments__list" var="payment" value="#{cashflowVM.payments}">
-                    <p:column headerText="Beschreibung" class="table__cell">
-                        <h:outputText value="#{payment.description}" />
-                    </p:column>
+                <div class="table--scrollable">
+                    <p:dataTable id="payments__list" var="payment" value="#{cashflowVM.payments}">
+                        <p:column headerText="Beschreibung" class="table__cell">
+                            <h:outputText value="#{payment.description}" />
+                        </p:column>
 
-                    <p:column headerText="Datum" class="table__cell table__cell--medium table__cell--center">
-                        <h:outputText value="#{payment.getDateFormat()}" />
-                    </p:column>
+                        <p:column headerText="Datum" class="table__cell table__cell--medium table__cell--center">
+                            <h:outputText value="#{payment.getDateFormat()}" />
+                        </p:column>
 
-                    <p:column headerText="Bezahlt von" class="table__cell">
-                        <h:outputText value="#{payment.giver.name}" />
-                    </p:column>
-                    
-                    <p:column headerText="Bezahlt für" class="table__cell">
-                        <h:outputText value="#{payment.getInvolvedMembersFormat()}" />
-                    </p:column>
+                        <p:column headerText="Bezahlt von" class="table__cell">
+                            <h:outputText value="#{payment.giver.name}" />
+                        </p:column>
 
-                    <p:column headerText="Betrag" class="table__cell table__cell--small table__cell--right">
-                        <h:outputText value="#{payment.sum}">
-                            <f:convertNumber pattern="#0.00"/>
-                        </h:outputText> €
-                    </p:column>
-                    
-                    <p:column class="table__cell table__cell--edit table__cell--center">
-                        <ui:fragment rendered="#{cashflowVM.checkAccessRights(payment)}">
-                            <h:form>
-                                <p:commandButton action="#{cashflowVM.editPayment(payment)}" icon="pi pi-pencil" class="form__button" />
-                                <p:commandButton action="#{cashflowVM.deletePayment(payment)}" icon="pi pi-trash" class="form__button button--no-margin" update="payments__balance, payments__list">
-                                    <p:confirm header="Löschen der Zahlung" message="Soll die Zahlung wirklich gelöscht werden?" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton>
-                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-                                    <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                                    <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                                </p:confirmDialog> 
-                            </h:form>
-                        </ui:fragment>
-                    </p:column>
-                </p:dataTable>
+                        <p:column headerText="Bezahlt für" class="table__cell">
+                            <h:outputText value="#{payment.getInvolvedMembersFormat()}" />
+                        </p:column>
+
+                        <p:column headerText="Betrag" class="table__cell table__cell--small table__cell--right">
+                            <h:outputText value="#{payment.sum}">
+                                <f:convertNumber pattern="#0.00"/>
+                            </h:outputText> €
+                        </p:column>
+
+                        <p:column class="table__cell table__cell--edit table__cell--center">
+                            <ui:fragment rendered="#{cashflowVM.checkAccessRights(payment)}">
+                                <h:form>
+                                    <p:commandButton action="#{cashflowVM.editPayment(payment)}" icon="pi pi-pencil" class="form__button" />
+                                    <p:commandButton action="#{cashflowVM.deletePayment(payment)}" icon="pi pi-trash" class="form__button button--no-margin" update="payments__balance, payments__list">
+                                        <p:confirm header="Löschen der Zahlung" message="Soll die Zahlung wirklich gelöscht werden?" icon="pi pi-exclamation-triangle" />
+                                    </p:commandButton>
+                                </h:form>
+                            </ui:fragment>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+                <h:form>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog> 
+                </h:form>
                 
             </main>
         </div>

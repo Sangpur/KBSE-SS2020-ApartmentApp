@@ -19,7 +19,7 @@ import javax.transaction.Transactional;
 
 /**
  *
- * @author Annika Limbrock
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 @RequestScoped
 @Transactional
@@ -77,11 +77,12 @@ public class MemberRepository implements MemberManager, Serializable {
     }
     
     @Override
-    public Member findMemberByName(String name) throws AppException {
+    public Member findMemberByName(Long apartmentID, String name) throws AppException {
         Member member = null;
         try {
-            String str = "SELECT m FROM Members m WHERE m.name = :name AND m.deleted = :deleted";
+            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id AND m.name = :name AND m.deleted = :deleted";
             TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
+            querySelect.setParameter("id", apartmentID);
             querySelect.setParameter("name", name);
             querySelect.setParameter("deleted", false);
             /* Es ist grundsaetzlich sinnvoll, auch bei nur einem erwarteten Ergebnis eine ResultList zurueckgeben zu lassen,

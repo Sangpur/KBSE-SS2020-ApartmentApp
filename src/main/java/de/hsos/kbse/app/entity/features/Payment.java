@@ -96,9 +96,7 @@ public class Payment implements Serializable, Comparable<Payment> {
         return 0;
       return this.date.compareTo(p.getDate());
     }
-    
-    /* -------------------------------------- PRIVATE METHODS -------------------------------------- */
-    
+
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
     public Long getId() {

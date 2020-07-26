@@ -19,7 +19,7 @@ import javax.transaction.Transactional;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Annika Limbrock
  */
 @RequestScoped
 @Transactional

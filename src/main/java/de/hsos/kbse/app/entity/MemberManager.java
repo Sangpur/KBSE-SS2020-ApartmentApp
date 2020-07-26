@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author Annika Limbrock
+ * @author Annika Limbrock, Lucca Oberhößel
  */
 public interface MemberManager {
     
@@ -18,7 +18,7 @@ public interface MemberManager {
     public void deleteAllMembersFrom(Long apartmentID) throws AppException;
     public Member updateMember(Member member) throws AppException;
     public Member findMember(Long id) throws AppException;
-    public Member findMemberByName(String name)throws AppException;
+    public Member findMemberByName(Long apartmentID, String name) throws AppException;
     public List<Member> getAllMembersFrom(Long apartmentID) throws AppException;
     public List<Member> getActiveMembersFrom(Long apartmentID) throws AppException;
     

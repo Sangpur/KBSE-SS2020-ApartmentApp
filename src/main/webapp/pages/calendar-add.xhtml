@@ -14,7 +14,9 @@
             <header>
                 <div class="header__content">
                     <h1 class="header__title">
-                        Eintrag hinzufügen<span>:</span>
+                        Eintrag 
+                        <ui:fragment rendered="#{calendarVM.addEvent}">hinzufügen<span>:</span></ui:fragment>
+                        <ui:fragment rendered="#{calendarVM.editEvent}">bearbeiten<span>:</span></ui:fragment>
                     </h1>
                 </div>
             </header>

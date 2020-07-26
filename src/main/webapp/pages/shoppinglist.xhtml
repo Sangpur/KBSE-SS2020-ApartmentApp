@@ -62,14 +62,16 @@
                             <p:commandButton action="#{shoppingVM.deleteItem(item)}" icon="pi pi-trash" class="form__button button--no-margin" update="items__list">
                                 <p:confirm header="Löschen des Artikels" message="Soll der Artikel wirklich gelöscht werden?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
-                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-                                <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                                <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                            </p:confirmDialog> 
                         </h:form>
                         </ui:fragment>
                     </p:column>
                 </p:dataTable>
+                <h:form>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog> 
+                </h:form>
                 
             </main>
         </div>

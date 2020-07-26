@@ -10,7 +10,7 @@ import javax.json.bind.JsonbBuilder;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Lucca Oberhößel
  */
 public class JsonbFactory {
     
