@@ -54,12 +54,10 @@ public class PinboardViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID;
-    private Member loggedInMember;
+    private final Long apartmentID;
     private Note currentNote;
     private Note originalNote;      // Sicherung des zu bearbeitenden Notiz-Objekts
     private List<Note> notes;
-    private boolean admin;          // true = ADMIN, false = USER
     private boolean addNote;        // true = addNote()
     private boolean editNote;       // true = editNote()
     private final NoteCategory[] categories;
@@ -74,8 +72,7 @@ public class PinboardViewModel implements Serializable {
         this.pinboard = pinboard;
         this.conversation = conversation;
         this.notes = new LinkedList<>();
-        this.initLoggedInMember();
-        this.apartmentID = this.loggedInMember.getApartmentID();
+        this.apartmentID = this.getLoggedInMember().getApartmentID();
         this.initNoteList();
         this.categories = NoteCategory.values();
     }
@@ -83,13 +80,14 @@ public class PinboardViewModel implements Serializable {
     public boolean checkAccessRights(Note note) {
         /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        return this.admin || note.getAuthor().getId().equals(this.loggedInMember.getId());
+        boolean isAdmin = this.getLoggedInMember().getMemberRole().equals(MemberRole.ADMIN);
+        return isAdmin || note.getAuthor().getId().equals(this.getLoggedInMember().getId());
     }
     
     @Logable(LogLevel.INFO)
     public String addNote() {
         /* Neues Note-Objekt initiieren */
-        this.currentNote = new Note(this.loggedInMember, new Date(), this.apartmentID);
+        this.currentNote = new Note(this.getLoggedInMember(), new Date(), this.apartmentID);
         this.addNote = true;
         this.editNote = false;
         return "pinboard-add";
@@ -192,17 +190,7 @@ public class PinboardViewModel implements Serializable {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
-    
-    private void initLoggedInMember() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
 
-        this.loggedInMember = (Member) session.getAttribute("user");
-        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
-            this.admin = true;
-        }
-    }
-    
     private void initNoteList() {
         try {
             List<Note> tmp = this.pinboard.getAllNotesFrom(apartmentID);
@@ -258,8 +246,7 @@ public class PinboardViewModel implements Serializable {
     private boolean validateInput(ValidationGroup group) {
         /* Die Methode validate() gibt ein Set von ConstraintViolations zurueck, in dem alle moeglicherweise begangenen Verstoesse aufgefuehrt
          * sind. Dieses Set ist leer, falls die Eingabe gueltig ist. Durch die Gruppierung der Constraints, hier General.class, besteht die
-         * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird.
-         * s. https://www.baeldung.com/javax-validation-groups */
+         * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird. */
         Set<ConstraintViolation<Note>> constraintViolations = null;
         if(group == ValidationGroup.GENERAL) {
             constraintViolations = validator.validate( this.currentNote, General.class );
@@ -281,6 +268,12 @@ public class PinboardViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+    
+    private Member getLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+        return (Member) session.getAttribute("user");
+    }
 
     public Note getCurrentNote() {
         return currentNote;

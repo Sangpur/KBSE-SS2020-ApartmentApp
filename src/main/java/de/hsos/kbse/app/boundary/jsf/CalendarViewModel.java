@@ -60,12 +60,10 @@ public class CalendarViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID;
-    private Member loggedInMember;
+    private final Long apartmentID;
     private Event currentEvent;
     private Event originalEvent;
     
-    private boolean admin;              // true = ADMIN, false = USER
     private boolean addEvent;           // true = addEvent()
     private boolean editEvent;          // true = editEvent()
     private EventCategory[] categories;
@@ -87,8 +85,7 @@ public class CalendarViewModel implements Serializable {
         this.categories = EventCategory.values();
         this.today = LocalDate.now(ZoneId.systemDefault());
         this.currentMonth = this.today.withDayOfMonth(5);
-        this.initLoggedInMember();
-        this.apartmentID = this.loggedInMember.getApartmentID();
+        this.apartmentID = this.getLoggedInMember().getApartmentID();
         this.initCurrentMonth();
     }
     
@@ -120,7 +117,8 @@ public class CalendarViewModel implements Serializable {
     public boolean checkAccessRightAndDate(LocalDate currentDay, Event currentEvent) {
         /* Es muss geprueft werden, ob der jeweilige Zahlung bearbeitet oder geloescht werden kann,
          * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin oder der Verfasser ist. */
-        boolean access = this.admin || currentEvent.getAuthor().getId().equals(this.loggedInMember.getId());
+        boolean isAdmin = this.getLoggedInMember().getMemberRole().equals(MemberRole.ADMIN);
+        boolean access = isAdmin || currentEvent.getAuthor().getId().equals(this.getLoggedInMember().getId());
         boolean isFutureDate = currentDay.isAfter(today.minusDays(1));
         return access && isFutureDate;
     }
@@ -128,7 +126,7 @@ public class CalendarViewModel implements Serializable {
     @Logable(LogLevel.INFO)
     public String addEvent() {
         /* Neues Event-Objekt initiieren */
-        this.currentEvent = new Event(this.loggedInMember, new Date(), new Date(), this.apartmentID);
+        this.currentEvent = new Event(this.getLoggedInMember(), new Date(), new Date(), this.apartmentID);
         this.originalEvent = new Event(this.currentEvent);
         this.addEvent = true;
         this.editEvent = false;
@@ -261,16 +259,6 @@ public class CalendarViewModel implements Serializable {
         validator = factory.getValidator();
     }
     
-    private void initLoggedInMember() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-
-        this.loggedInMember = (Member) session.getAttribute("user");
-        if(this.loggedInMember.getMemberRole() == MemberRole.ADMIN) {
-            this.admin = true;
-        }
-    }
-    
     private void initCurrentMonth() {
         this.initCurrentMonthEvents();
         this.initCurrentMonthView();
@@ -378,6 +366,12 @@ public class CalendarViewModel implements Serializable {
     }
     
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+    
+    private Member getLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+        return (Member) session.getAttribute("user");
+    }
 
     public Event getCurrentEvent() {
         return currentEvent;
@@ -385,14 +379,6 @@ public class CalendarViewModel implements Serializable {
 
     public void setCurrentEvent(Event currentEvent) {
         this.currentEvent = currentEvent;
-    }
-
-    public Long getApartmentID() {
-        return apartmentID;
-    }
-
-    public void setApartmentID(Long apartmentID) {
-        this.apartmentID = apartmentID;
     }
     
     public boolean isAddEvent() {

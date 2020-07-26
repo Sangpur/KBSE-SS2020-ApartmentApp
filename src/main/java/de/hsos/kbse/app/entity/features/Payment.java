@@ -10,6 +10,7 @@ import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
@@ -75,6 +76,7 @@ public class Payment implements Serializable, Comparable<Payment> {
     
     public Payment(Member giver, Date date, Long apartmentID) {
         this.giver = giver;
+        this.involvedMembers = new ArrayList();
         this.date = date;
         this.apartmentID = apartmentID;
     }

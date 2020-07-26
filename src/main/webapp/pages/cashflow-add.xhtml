@@ -35,17 +35,9 @@
                         <div class="input__wrap">
                             <div class="input__label">Bezahlt für:</div>
                             <div class="input">
-                                <ui:fragment >
-                                    <p:selectManyCheckbox value="#{cashflowVM.currentPayment.involvedMembers}" layout="grid" columns="4" rendered="#{cashflowVM.addPayment}">
-                                        <f:selectItems value="#{cashflowVM.members}" var="member" itemLabel="#{member.name}" itemValue="#{member}" />
+                                    <p:selectManyCheckbox value="#{cashflowVM.currentPayment.involvedMembers}" layout="grid" columns="4">
+                                        <f:selectItems value="#{cashflowVM.getMembersToSelect()}" var="member" itemLabel="#{member.name}" itemValue="#{member}" />
                                     </p:selectManyCheckbox>
-                                </ui:fragment>
-                                <ui:fragment >
-                                    <!-- bereits ausgewaehlte Elemente schon auswaehlen -->
-                                    <p:selectManyCheckbox value="#{cashflowVM.currentPayment.involvedMembers}" layout="grid" columns="4" rendered="#{cashflowVM.editPayment}">
-                                        <f:selectItems value="#{cashflowVM.members}" var="member" itemLabel="#{member.name}" itemValue="#{member}" />
-                                    </p:selectManyCheckbox>
-                                </ui:fragment>
                             </div>
                         </div>
                         <div class="input__wrap">

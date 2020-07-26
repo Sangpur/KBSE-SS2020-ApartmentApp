@@ -8,14 +8,11 @@ import de.hsos.kbse.app.control.ShoppingList;
 import de.hsos.kbse.app.entity.features.ShoppingItem;
 import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.LogLevel;
-import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.ValidationGroup;
 import de.hsos.kbse.app.util.AppException;
-import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -54,8 +51,7 @@ public class ShoppingListViewModel implements Serializable {
     /* Bean Validation API */
     private static Validator validator;
     
-    private Long apartmentID;
-    private Member loggedInMember;
+    private final Long apartmentID;
     private List<ShoppingItem> items;
     private ShoppingItem currentItem;
     private ShoppingItem originalItem;  // Sicherung des zu bearbeitenden ShoppingItem-Objekts
@@ -70,8 +66,7 @@ public class ShoppingListViewModel implements Serializable {
         this.shoppinglist = shoppinglist;
         this.conversation = conversation;
         this.items = new ArrayList();
-        this.initLoggedInMember();
-        this.apartmentID = this.loggedInMember.getApartmentID();
+        this.apartmentID = this.getLoggedInMember().getApartmentID();
         this.initItemsList();
     }
     
@@ -192,12 +187,6 @@ public class ShoppingListViewModel implements Serializable {
         validator = factory.getValidator();
     }
     
-    private void initLoggedInMember() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-        this.loggedInMember = (Member) session.getAttribute("user");
-    }
-    
     private void initItemsList() {
         try {
             this.items = this.shoppinglist.getAllShoppingItemsFrom(apartmentID);
@@ -237,6 +226,12 @@ public class ShoppingListViewModel implements Serializable {
     }
      
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
+    
+    private Member getLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+        return (Member) session.getAttribute("user");
+    }
 
     public List<ShoppingItem> getItems() {
         return items;
