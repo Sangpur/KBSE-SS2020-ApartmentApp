@@ -194,6 +194,10 @@ public class ApartmentViewModel implements Serializable {
                 try {
                     /* Bestehendes Mitglied in der Datenbank updaten */
                     this.memberRepository.updateMember(this.currentMember);
+                    /* Erneutes Setzen des Users in der Session, damit moegliche Zugriffsrechte aktualisiert werden */
+                    HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+                    session.setAttribute("user", this.currentMember);
+                    this.initLoggedInMember();
                     /* FacesMessage fuer erfolgreiches Updates eines Mitglieds */
                     String message = "Mitglied erfolgreich aktualisiert!";
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);

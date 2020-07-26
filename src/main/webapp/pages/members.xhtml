@@ -25,11 +25,13 @@
             </header>
             <main class="members">
                 
+                <ui:fragment rendered="#{apartmentVM.isAdmin()}">
                 <div class="addbutton__wrap">
                     <h:form>
                         <p:commandButton value="+" action="#{apartmentVM.addMember()}" class="addbutton" />
                     </h:form>
                 </div>
+                </ui:fragment>
                 
                 <p:messages id="messages" showDetail="true" closable="true">
                     <p:autoUpdate />
