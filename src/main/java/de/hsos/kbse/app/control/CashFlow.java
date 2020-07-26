@@ -97,7 +97,7 @@ public class CashFlow implements PaymentManager, Serializable {
             querySelect.executeUpdate();
         } catch(Exception ex) {
             ex.printStackTrace();
-            throw new AppException("Alle Payments der WG "+ apartmentID +" konnten nicht gelöscht werden!");
+            throw new AppException("Die Zahlungen der WG "+ apartmentID +" konnten nicht gelöscht werden!");
         }
     }
 }

@@ -2,7 +2,7 @@
  * ENTITY CLASS Member
  *
  */
-package de.hsos.kbse.app.entity.member;
+package de.hsos.kbse.app.entity;
 
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;

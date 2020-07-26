@@ -7,7 +7,7 @@ package de.hsos.kbse.app.boundary.jsf;
 import de.hsos.kbse.app.control.Calendar;
 import de.hsos.kbse.app.entity.features.CalendarDay;
 import de.hsos.kbse.app.entity.features.Event;
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.EventCategory;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberRole;

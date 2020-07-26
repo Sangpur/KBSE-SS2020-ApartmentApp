@@ -7,7 +7,7 @@ package de.hsos.kbse.app.boundary.jsf;
 import de.hsos.kbse.app.control.CashFlow;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.features.Payment;
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.ValidationGroup;
@@ -185,6 +185,18 @@ public class CashFlowViewModel implements Serializable {
             this.currentPayment.setSum(this.originalPayment.getSum());
         }
         return "cashflow";
+    }
+    
+    @Logable(LogLevel.INFO)
+    public void deleteAllPayments() {
+        try {
+            /* Bestehende Payment-Objekte in der Datenbank loeschen */
+            this.cashflow.deleteAllPaymentsFrom(this.apartmentID);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
     }
     
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */

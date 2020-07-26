@@ -7,7 +7,7 @@ package de.hsos.kbse.app.boundary.jsf;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.Apartment;
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
@@ -94,7 +94,13 @@ public class ApartmentViewModel implements Serializable {
         return this.loggedInMember.getId().equals(member.getId());
     }
     
-    public Boolean isLoggedInAndLastMember(Member member) {
+    public boolean isLoggedInNotLastMember(Member member) {
+        boolean isLoggedIn = this.loggedInMember.getId().equals(member.getId());
+        boolean isNotLast = this.members.size() > 1;
+        return isLoggedIn && isNotLast;
+    }
+    
+    public boolean isLoggedInAndLastMember(Member member) {
         Boolean isLoggedIn = this.loggedInMember.getId().equals(member.getId());
         Boolean isLast = this.members.size() == 1;
         return isLoggedIn && isLast;

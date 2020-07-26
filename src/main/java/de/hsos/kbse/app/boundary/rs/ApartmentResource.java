@@ -5,7 +5,7 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.entity.rs.ApartmentDTO;
+import de.hsos.kbse.app.boundary.rs.dto.ApartmentDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.Calendar;
 import de.hsos.kbse.app.control.CashFlow;
@@ -13,8 +13,7 @@ import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.control.Pinboard;
 import de.hsos.kbse.app.control.ShoppingList;
 import de.hsos.kbse.app.entity.Apartment;
-import de.hsos.kbse.app.entity.features.Note;
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.util.AppException;
@@ -220,37 +219,37 @@ public class ApartmentResource implements Serializable {
             this.eventRepo.deleteAllEventsFrom(apartmentId);
         } catch (AppException ex) {
             Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.status(500, "Server Error: Failed while trying to delete all events for aparment.").build();
+            return Response.status(500, "Server Error: Failed while trying to delete all events for apartment.").build();
         }
         try {
             this.noteRepo.deleteAllNotesFrom(apartmentId);
         } catch (AppException ex) {
             Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.status(500, "Server Error: Failed while trying to delete all notes for aparment.").build();
+            return Response.status(500, "Server Error: Failed while trying to delete all notes for apartment.").build();
         }
         try {
             this.paymentRepo.deleteAllPaymentsFrom(apartmentId);
         } catch (AppException ex) {
             Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.status(500, "Server Error: Failed while trying to delete all payments for aparment.").build();
+            return Response.status(500, "Server Error: Failed while trying to delete all payments for apartment.").build();
         }
         try {
             this.shoppingRepo.deleteAllShoppingItemsFrom(apartmentId);
         } catch (AppException ex) {
             Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.status(500, "Server Error: Failed while trying to delete all shoppingitems for aparment.").build();
+            return Response.status(500, "Server Error: Failed while trying to delete all shoppingitems for apartment.").build();
         }
         try {
             this.memberRepo.deleteAllMembersFrom(apartmentId);
         } catch (AppException ex) {
             Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.status(500, "Server Error: Failed while trying to delete all members for aparment.").build();
+            return Response.status(500, "Server Error: Failed while trying to delete all members for apartment.").build();
         }
         try {
             this.repository.deleteApartment(a);
         } catch (AppException ex) {
             Logger.getLogger(ApartmentResource.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.status(500, "Server Error: Failed while trying to delete the aparment.").build();
+            return Response.status(500, "Server Error: Failed while trying to delete the apartment.").build();
         }
         
         

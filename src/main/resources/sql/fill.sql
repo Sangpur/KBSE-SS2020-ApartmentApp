@@ -5,8 +5,8 @@ INSERT INTO memberdetail (id, birthday, cashbalance, color) VALUES (2, '1993-05-
 INSERT INTO memberdetail (id, birthday, cashbalance, color) VALUES (3, '1992-09-09', 3.89, 'BLUE')
 INSERT INTO memberdetail (id, birthday, cashbalance, color) VALUES (4, '1991-05-23', 0, 'YELLOW')
 
-INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (1, 1000, 'ADMIN', 'Lucca', '123', 1, 0)
-INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (2, 1000, 'ADMIN', 'Christoph', '123', 2, 0)
+INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (1, 1000, 'ADMIN', 'Lucca', '123', 1, 1)
+INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (2, 1000, 'ADMIN', 'Christoph', '123', 2, 1)
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (3, 1000, 'ADMIN', 'Annika', '123', 3, 0)
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (4, 1000, 'USER', 'Max', '123', 4, 1)
 

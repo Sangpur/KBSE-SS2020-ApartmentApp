@@ -5,13 +5,13 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.entity.rs.EventDTO;
+import de.hsos.kbse.app.boundary.rs.dto.EventDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.Calendar;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.Apartment;
 import de.hsos.kbse.app.entity.features.Event;
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.EventCategory;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;

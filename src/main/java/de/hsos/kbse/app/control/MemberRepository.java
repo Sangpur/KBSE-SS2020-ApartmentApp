@@ -4,9 +4,9 @@
  */
 package de.hsos.kbse.app.control;
 
-import de.hsos.kbse.app.entity.member.Member;
-import de.hsos.kbse.app.entity.member.MemberDetail;
-import de.hsos.kbse.app.entity.member.MemberManager;
+import de.hsos.kbse.app.entity.Member;
+import de.hsos.kbse.app.entity.MemberDetail;
+import de.hsos.kbse.app.entity.MemberManager;
 import de.hsos.kbse.app.util.AppException;
 import java.io.Serializable;
 import java.util.ArrayList;

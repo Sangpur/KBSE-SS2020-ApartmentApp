@@ -4,7 +4,7 @@
  */
 package de.hsos.kbse.app.entity.features;
 
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.NoteCategory;
 import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;

@@ -9,7 +9,7 @@ import javax.ws.rs.core.Application;
 
 /**
  *
- * @author Annika Limbrock, Lucca Oberhößel, Christoph Weigandt
+ * @author Lucca Oberhößel
  */
 @ApplicationPath("resources")
 public class JAXRSConfiguration extends Application {

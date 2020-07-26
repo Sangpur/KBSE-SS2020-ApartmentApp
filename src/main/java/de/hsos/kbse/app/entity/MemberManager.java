@@ -2,7 +2,7 @@
  * INTERFACE MemberManager
  *
  */
-package de.hsos.kbse.app.entity.member;
+package de.hsos.kbse.app.entity;
 
 import de.hsos.kbse.app.util.AppException;
 import java.util.List;

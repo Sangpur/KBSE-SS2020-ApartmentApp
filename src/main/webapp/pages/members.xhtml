@@ -64,13 +64,13 @@
                                     <p:confirm header="Löschen des Mitglieds" message="Soll das Mitglied wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                                 <!-- Loeschen des eingeloggten Members -->
-                                <p:commandButton action="#{apartmentVM.deleteLoggedInMember()}" icon="pi pi-lock" class="form__button" rendered="#{!apartmentVM.isLoggedInAndLastMember(member)}">
+                                <p:commandButton action="#{apartmentVM.deleteLoggedInMember()}" icon="pi pi-lock" class="form__button" rendered="#{apartmentVM.isLoggedInNotLastMember(member)}">
                                     <p:confirm header="Löschen des Mitglieds" message="Soll das Mitglied wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                                 <!-- Loeschen des letzten Mitglieds und damit kaskadierendes Loeschen der gesamten WG-->
                                 <p:commandButton action="#{apartmentVM.deleteLoggedInMember()}" icon="pi pi-lock" class="form__button" rendered="#{apartmentVM.isLoggedInAndLastMember(member)}">
                                     <p:confirm header="Löschen des Mitglieds und der WG" message="Sollen das letzte Mitglied und damit auch die WG wirklich geloescht werden?" icon="pi pi-exclamation-triangle" />
-                                    <f:actionListener binding="#{cashflowVM.test()}"/>
+                                    <f:actionListener binding="#{cashflowVM.deleteAllPayments()}"/>
                                 </p:commandButton>
                                 <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                                     <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />

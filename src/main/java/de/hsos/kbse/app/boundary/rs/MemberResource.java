@@ -5,12 +5,12 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.entity.rs.MemberDTO;
+import de.hsos.kbse.app.boundary.rs.dto.MemberDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.Apartment;
-import de.hsos.kbse.app.entity.member.Member;
-import de.hsos.kbse.app.entity.member.MemberDetail;
+import de.hsos.kbse.app.entity.Member;
+import de.hsos.kbse.app.entity.MemberDetail;
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.util.AppException;

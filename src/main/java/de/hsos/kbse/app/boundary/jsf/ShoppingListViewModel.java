@@ -6,7 +6,7 @@ package de.hsos.kbse.app.boundary.jsf;
 
 import de.hsos.kbse.app.control.ShoppingList;
 import de.hsos.kbse.app.entity.features.ShoppingItem;
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberRole;
 import de.hsos.kbse.app.enums.ValidationGroup;
