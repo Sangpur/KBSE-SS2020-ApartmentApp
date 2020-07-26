@@ -193,14 +193,12 @@ public class PinboardViewModel implements Serializable {
 
     private void initNoteList() {
         try {
-            List<Note> tmp = this.pinboard.getAllNotesFrom(apartmentID);
             /* Einträge der letzten 7 Tage der Notizen-Liste werden hinzugefügt */
-            Date lastWeek = java.sql.Date.valueOf(LocalDate.now().minusDays(7));
+            List<Note> tmp = this.pinboard.getAllNotesFromLastWeek(apartmentID);
             tmp.forEach((note) -> {
-                if(note.getTimestamp().after(lastWeek)){
-                    this.notes.add(note);
-                }   
-            });
+                this.notes.add(note);
+            }); 
+
             /* Absteigende Sortierung der Notizen anhand des Datums. Notizen mit Status "URGENT" werden an oberster Stelle einsortiert.*/
             Collections.sort(this.notes);
             Collections.reverse(this.notes);
