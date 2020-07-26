@@ -3,11 +3,12 @@ INSERT INTO apartment (id, name) VALUES (1000, 'Irgendwas mit Medien')
 INSERT INTO memberdetail (id, birthday, cashbalance, color) VALUES (1, '1990-01-01', 8.20, 'RED')
 INSERT INTO memberdetail (id, birthday, cashbalance, color) VALUES (2, '1993-05-13', -12.09, 'GREEN')
 INSERT INTO memberdetail (id, birthday, cashbalance, color) VALUES (3, '1992-09-09', 3.89, 'BLUE')
+INSERT INTO memberdetail (id, birthday, cashbalance, color) VALUES (4, '1991-05-23', 0, 'YELLOW')
 
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (1, 1000, 'ADMIN', 'Lucca', '123', 1, 0)
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (2, 1000, 'ADMIN', 'Christoph', '123', 2, 0)
 INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (3, 1000, 'ADMIN', 'Annika', '123', 3, 0)
-INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (4, 1000, 'USER', 'Max', '123', 3, 1)
+INSERT INTO members (id, apartment_id, memberrole, name, password, details_id, deleted) VALUES (4, 1000, 'USER', 'Max', '123', 4, 1)
 
 INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (1, 1000, '2020-07-01 12:00:00', 'APPOINTMENT', '2020-07-01 16:00:00', 0, 'Termin Handwerker', 1)
 INSERT INTO event (id, apartment_id, datetime_begin, category, datetime_end, alldayevent, title, author_id) VALUES (2, 1000, '2020-07-01 12:00:00', 'APPOINTMENT', '2020-07-01 14:00:00', 0,  'Termin Vermieter', 2)

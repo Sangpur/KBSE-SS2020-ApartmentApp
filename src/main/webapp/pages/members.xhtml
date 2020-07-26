@@ -53,7 +53,7 @@
                     </p:column>
                     
                     <p:column class="table__cell table__cell--center">
-                        <ui:fragment rendered="#{apartmentVM.isAllowedToChangeMember(member.id)}">
+                        <ui:fragment rendered="#{apartmentVM.checkAccessRights(member)}">
                             <h:form>
                                 <p:commandButton action="#{apartmentVM.changePassword(member)}" icon="pi pi-lock" class="form__button" rendered="#{apartmentVM.isLoggedInMember(member)}" />
                                 <p:commandButton action="#{apartmentVM.editMember(member)}" icon="pi pi-pencil" class="form__button" />

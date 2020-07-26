@@ -4,18 +4,17 @@
  */
 package de.hsos.kbse.app.entity;
 
-import de.hsos.kbse.app.entity.member.Member;
+import de.hsos.kbse.app.util.Condition;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.enterprise.inject.Vetoed;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -32,6 +31,9 @@ public class Apartment implements Serializable {
     @TableGenerator(name = "modApartment", initialValue = 1001)
     private Long id;
     
+    @NotNull(groups = {Condition.class}, message="Der Name der WG darf nicht leer sein!")
+    @Size(groups = {Condition.class}, min=3, max=50, message="Der Name der WG muss zwischen 3 und 50 Zeichen liegen!")
+    @Pattern(groups = {Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Der Name der WG enthält ungültige Bezeichner!")
     private String name;
     
     

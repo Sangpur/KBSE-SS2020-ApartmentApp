@@ -8,7 +8,6 @@ import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.Apartment;
 import de.hsos.kbse.app.entity.member.Member;
-import de.hsos.kbse.app.entity.member.MemberDetail;
 import de.hsos.kbse.app.enums.LogLevel;
 import de.hsos.kbse.app.enums.MemberColor;
 import de.hsos.kbse.app.enums.MemberRole;
@@ -22,8 +21,6 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -33,12 +30,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  *
@@ -62,16 +56,14 @@ public class ApartmentViewModel implements Serializable {
     
     private Apartment apartment;
     private List<Member> members;
-    @Valid
-    private Member currentMember = null;
-    @NotNull(groups = {General.class, Condition.class}, message="Das Passwort darf nicht leer sein!")
-    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Das Passwort muss zwischen 3 und 50 Zeichen liegen!")
-    private String newpassword = "";
-    @NotNull(groups = {General.class, Condition.class}, message="Die Passwort-Wiederholung darf nicht leer sein!")
-    private String repassword = "";
-    private Boolean editMode = false;
-    private MemberColor[] colors;
-    private MemberRole[] roles = {MemberRole.ADMIN, MemberRole.USER};
+    private Member loggedInMember;
+    private Member currentMember;
+    private Member originalMember;  // Sicherung des zu bearbeitenden Member-Objekts
+    private final MemberColor[] colors;
+    private final MemberRole[] memberRoles;
+    private boolean addMember;      // true = addMember()
+    private boolean editMember;     // true = editMember()
+    private boolean changePassword; // true = changePassword()
     
     /* -------------------------------------- METHODEN PUBLIC ------------------------------------- */
     
@@ -82,46 +74,64 @@ public class ApartmentViewModel implements Serializable {
         this.memberRepository = memberRepository;
         this.conversation = conversation;
         this.colors = MemberColor.values();
-        this.initApartmentByID(getLoggedInMember().getApartmentID()); // TODO: Bei Login-Prozess entsprechende ID setzen
+        this.memberRoles = MemberRole.values();
+        this.initLoggedInMember();
+        System.out.println("Eingeloggt: " + this.loggedInMember.getName());
+        this.initApartmentByID(this.loggedInMember.getApartmentID());
+        System.out.println("ApartmentID: " + this.apartment.getId());
+        System.out.println("Member: " + this.members.size());
     }
     
+    public boolean checkAccessRights(Member member) {
+        /* Es muss geprueft werden, ob das jeweilige Mitglied bearbeitet oder geloescht werden kann,
+         * da dies nur erlaubt ist, wenn der zugreifende Nutzer Admin ist oder seine eigenen Daten
+         * bearbeiten moechte. */
+        return this.loggedInMember.getMemberRole().equals(MemberRole.ADMIN) || member.getId().equals(this.loggedInMember.getId());
+    }
     
-    @PostConstruct
-    public void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+    public boolean isAdmin(){
+        return this.loggedInMember.getMemberRole().equals(MemberRole.ADMIN);
+    }
+    
+    public boolean isLoggedInMember(Member member) {
+        return this.loggedInMember.getId().equals(member.getId());
     }
     
     public String addMember() {
-        this.currentMember = new Member();
-        this.repassword = "";
-        this.editMode = false;
-        this.currentMember.setApartmentID(apartment.getId());
-        this.currentMember.setMemberRole(MemberRole.USER);
+        /* Initialisierung eines neuen Member-Objekts */
+        this.currentMember = new Member(MemberRole.USER, this.apartment.getId());
         /* Berechnung der naechsten Mitglieds-Farbe anhand der Anzahl der Mitglieder */
         int amountMembers = this.members.size();
         int colorIndex = amountMembers % MemberColor.values().length;
         MemberColor color = this.colors[colorIndex];
         this.currentMember.getDetails().setColor(color);
+        this.addMember = true;
+        this.editMember = false;
+        this.changePassword = false;
         return "members-add";
     }
     
     public String editMember(Member member) {
-        /*this.currentMember = members.stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
-        if(currentMember == null){
-            FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage("Member with id " + id + "could not be found."));
-            return "";
-        }*/
+        /* Ausgewaehltes Member-Objekt setzen und Sicherungskopie anlegen */
         this.currentMember = member;
-        this.newpassword = "";
-        this.repassword = "";
-        this.editMode = true;
+        this.currentMember.setRepassword(this.currentMember.getPassword());
+        this.originalMember = new Member(this.currentMember);
+        this.editMember = true;
+        this.addMember = false;
+        this.changePassword = false;
         return "members-add";
     }
     
     public String changePassword(Member member) {
         System.out.println("Change Password");
-        return "";
+        this.currentMember = this.loggedInMember;
+        this.currentMember.setPassword("");
+        this.currentMember.setRepassword("");
+        this.originalMember = new Member(this.loggedInMember);
+        this.changePassword = true;
+        this.addMember = false;
+        this.editMember = false;
+        return "member-password";
     }
     
     public String deleteMember(Member member) {
@@ -133,7 +143,8 @@ public class ApartmentViewModel implements Serializable {
              * ist und von dem Mitglied erstellte Beitraege erhalten bleiben. */
             currentMember.setDeleted(true);
             this.memberRepository.updateMember(currentMember);
-            initApartmentByID(apartment.getId());
+            /* Entfernen des Members aus der Members-List */
+            this.members.remove(this.currentMember);
             String message = "Mitglied erfolgreich geloescht!";
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
             return "members";
@@ -146,18 +157,30 @@ public class ApartmentViewModel implements Serializable {
     
     public String saveMember() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        if(this.validateInput(ValidationGroup.GENERAL)) { // Gueltige Eingabe
-            if(!editMode){  // Member hinzufuegen
-                if(currentMember.getPassword().equals(this.repassword)){
+        if(this.validateInput(ValidationGroup.CONDITION)) { // Gueltige Eingabe
+            if(this.addMember){  // Member hinzufuegen
+                /* Ueberpruefung, ob der Name innerhalb der WG schon vorhanden ist! */
+                for(int i = 0; i < this.members.size(); i++) {
+                    Member tempMember = this.members.get(i);
+                    if(this.currentMember.getName().equals(tempMember.getName())) {
+                        String message = "Der Name ist in der WG bereits vorhanden!";
+                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", message);
+                        facesContext.addMessage("Constraint",msg);
+                        return "";
+                    }
+                }
+                if(this.currentMember.getPassword().equals(this.currentMember.getRepassword())){
                     try {
                         /* Anlegen eines neuen Members in der Datenbank */
-                        currentMember.getDetails().setCashBalance(new BigDecimal(0));
-                        this.memberRepository.createMember(currentMember);
+                        this.currentMember.getDetails().setCashBalance(new BigDecimal(0));
+                        this.memberRepository.createMember(this.currentMember);
+                        /* Hinzufuegen des neuen Members zur Members-List */
+                        this.members.add(this.currentMember);
                         /* FacesMessage fuer erfolgreiches Anlegen eines neuen Mitglieds */
                         String message = "Mitglied erfolgreich angelegt!";
                         FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
                         facesContext.addMessage("Information",msg);
-                        return resetMember();
+                        return "members";
                     } catch (AppException ex) {
                         FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
                         facesContext.addMessage("Error",msg);
@@ -167,17 +190,28 @@ public class ApartmentViewModel implements Serializable {
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", message);
                     facesContext.addMessage("Constraint",msg);
                 }
-            } else {        // Bestehenden Member updaten
-                if(newpassword.equals(this.repassword)){
-                    currentMember.setPassword(newpassword);
+            } else if(this.editMember) {    // Bestehenden Member updaten
+                try {
+                    /* Bestehendes Mitglied in der Datenbank updaten */
+                    this.memberRepository.updateMember(this.currentMember);
+                    /* FacesMessage fuer erfolgreiches Updates eines Mitglieds */
+                    String message = "Mitglied erfolgreich aktualisiert!";
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
+                    facesContext.addMessage("Information",msg);
+                    return "members";
+                } catch (AppException ex) {
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+                    facesContext.addMessage("Error",msg);
+                }
+            } else if(this.changePassword) {    // Passwort des eingeloggten Mitglieds aendern
+                if(this.currentMember.getPassword().equals(this.currentMember.getRepassword())){
                     try {
-                        /* Bestehendes Mitglied in der Datenbank updaten */
-                        this.memberRepository.updateMember(currentMember);
-                        /* FacesMessage fuer erfolgreiches Updates eines Mitglieds */
-                        String message = "Mitglied erfolgreich aktualisiert!";
+                        /* Eingeloggtes Mitglied in der Datenbank updaten */
+                        this.memberRepository.updateMember(this.currentMember);
+                        String message = "Passwort erfolgreich aktualisiert!";
                         FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Information.", message);
                         facesContext.addMessage("Information",msg);
-                        return resetMember();
+                        return "members";
                     } catch (AppException ex) {
                         FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
                         facesContext.addMessage("Error",msg);
@@ -192,34 +226,29 @@ public class ApartmentViewModel implements Serializable {
         return "";
     }
     
-    public String resetMember() {
-        this.currentMember = null;
-        this.newpassword = "";
-        this.repassword = "";
-        this.editMode = false;
+    public String discard() {
+        if(this.editMember || this.changePassword) {
+            this.currentMember.setName(this.originalMember.getName());
+            this.currentMember.getDetails().setBirthday(this.originalMember.getDetails().getBirthday());
+            this.currentMember.getDetails().setColor(this.originalMember.getDetails().getColor());
+            this.currentMember.setMemberRole(this.originalMember.getMemberRole());
+        }
         return "members";
     }
     
-    public Boolean isAllowedToChangeMember(Long id){
-        if(getLoggedInMember().getMemberRole().equals(MemberRole.ADMIN))
-            return true;
-        this.currentMember = members.stream().filter(x -> x.getId().equals(id)).findFirst().orElse(null);
-        if(currentMember == null){
-            FacesContext.getCurrentInstance().addMessage("Error", new FacesMessage("Member with id " + id + "could not be found."));
-            return false;
-        }
-        return currentMember.getId().equals(getLoggedInMember().getId());
-    }
-    
-    public Boolean isAdmin(){
-        return getLoggedInMember().getMemberRole().equals(MemberRole.ADMIN);
-    }
-    
-    public Boolean isLoggedInMember(Member member) {
-        return this.getLoggedInMember().getId().equals(member.getId());
-    }
-    
     /* ------------------------------------- METHODEN PRIVATE ------------------------------------- */
+    
+    @PostConstruct
+    private void setUpValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+    
+    private void initLoggedInMember() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+        this.loggedInMember = (Member) session.getAttribute("user");
+    }
     
     private void initApartmentByID(Long id) {
         try {
@@ -236,11 +265,12 @@ public class ApartmentViewModel implements Serializable {
     private boolean validateInput(ValidationGroup group) {
         /* Die Methode validate() gibt ein Set von ConstraintViolations zurueck, in dem alle moeglicherweise begangenen Verstoesse aufgefuehrt
          * sind. Dieses Set ist leer, falls die Eingabe gueltig ist. Durch die Gruppierung der Constraints, hier General.class, besteht die
-         * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird.
-         * s. https://www.baeldung.com/javax-validation-groups */
-        Set<ConstraintViolation<ApartmentViewModel>> constraintViolations = null;
+         * Moeglichkeit, die Validation erst dann auszufuehren, wenn die entsprechende Gruppe direkt durch das Programm angesprochen wird. */
+        Set<ConstraintViolation<Member>> constraintViolations = null;
         if(group == ValidationGroup.GENERAL) {
-            constraintViolations = validator.validate(this, General.class );
+            constraintViolations = validator.validate(this.currentMember, General.class );
+        } else if(group == ValidationGroup.CONDITION) {
+            constraintViolations = validator.validate(this.currentMember, Condition.class );
         }
         if(constraintViolations != null && constraintViolations.isEmpty()) {
             /* Gueltige Eingabe */
@@ -248,7 +278,7 @@ public class ApartmentViewModel implements Serializable {
         } else {
             /* Ungueltige Eingabe */
             FacesContext facesContext = FacesContext.getCurrentInstance();
-            Iterator<ConstraintViolation<ApartmentViewModel>> iter = constraintViolations.iterator();
+            Iterator<ConstraintViolation<Member>> iter = constraintViolations.iterator();
             while (iter.hasNext()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Constraint.", iter.next().getMessage());
                 facesContext.addMessage("Constraint Violation",msg);
@@ -263,14 +293,6 @@ public class ApartmentViewModel implements Serializable {
         return members;
     }
 
-    public Member getLoggedInMember() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-
-        Member loggedInMember = (Member) session.getAttribute("user");
-        return loggedInMember;
-    }
-
     public Member getCurrentMember() {
         return currentMember;
     }
@@ -278,36 +300,21 @@ public class ApartmentViewModel implements Serializable {
     public void setCurrentMember(Member currentMember) {
         this.currentMember = currentMember;
     }
-
-    public String getRepassword() {
-        return repassword;
+    
+    public boolean getAddMember() {
+        return addMember;
     }
 
-    public void setRepassword(String repassword) {
-        this.repassword = repassword;
+    public boolean getEditMember() {
+        return editMember;
     }
-
-    public String getNewpassword() {
-        return newpassword;
-    }
-
-    public void setNewpassword(String newpassword) {
-        this.newpassword = newpassword;
-    }
-
+    
     public MemberColor[] getColors() {
         return colors;
     }
 
     public MemberRole[] getRoles() {
-        return roles;
+        return memberRoles;
     }
 
-    public Boolean getEditMode() {
-        return editMode;
-    }
-
-    public void setEditMode(Boolean editMode) {
-        this.editMode = editMode;
-    }
 }

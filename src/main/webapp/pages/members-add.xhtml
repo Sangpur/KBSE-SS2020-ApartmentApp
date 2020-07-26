@@ -15,8 +15,8 @@
                 <div class="header__content">
                     <h1 class="header__title">
                         Mitglied 
-                        <ui:fragment rendered="#{!apartmentVM.editMode}">hinzufügen<span>:</span></ui:fragment>
-                        <ui:fragment rendered="#{apartmentVM.editMode}">bearbeiten<span>:</span></ui:fragment>
+                        <ui:fragment rendered="#{apartmentVM.addMember}">hinzufügen<span>:</span></ui:fragment>
+                        <ui:fragment rendered="#{apartmentVM.editMember}">bearbeiten<span>:</span></ui:fragment>
                     </h1>
                 </div>
             </header>
@@ -40,29 +40,20 @@
                                 <p:calendar id="german" value="#{apartmentVM.currentMember.details.birthday}" locale="de" navigator="true" pattern="dd.MM.yyyy" yearRange="-100:+0" />
                             </div>
                         </div>
-                        <ui:fragment rendered="#{!apartmentVM.editMode}">
-                            <div class="input__wrap">
-                                <div class="input__label">Passwort:</div>
-                                <div class="input input--big">
-                                    <p:inputText type="password" value="#{apartmentVM.currentMember.password}"/>
-                                </div>
+                        <ui:fragment rendered="#{apartmentVM.addMember}">
+                        <div class="input__wrap">
+                            <div class="input__label">Passwort:</div>
+                            <div class="input input--big">
+                                <p:inputText type="password" value="#{apartmentVM.currentMember.password}"/>
                             </div>
-                        </ui:fragment>
-                        <ui:fragment rendered="#{apartmentVM.editMode}">
-                            <div class="input__wrap">
-                                <div class="input__label">Passwort (neu):</div>
-                                <div class="input input--big">
-                                    <p:inputText type="password" value="#{apartmentVM.newpassword}"/>
-                                </div>
-                            </div>
-                        </ui:fragment>
-                        
+                        </div>
                         <div class="input__wrap">
                             <div class="input__label">Passwort (Wh.):</div>
                             <div class="input input--big">
-                                <p:inputText type="password" value="#{apartmentVM.repassword}"/>
+                                <p:inputText type="password" value="#{apartmentVM.currentMember.repassword}"/>
                             </div>
                         </div>
+                        </ui:fragment>
                         <div class="input__wrap">
                             <div class="input__label">Farbe:</div>
                             <div class="input input__select">
@@ -82,7 +73,7 @@
                     </div>
                     <div class="form__buttons">
                         <p:commandButton value="Speichern" action="#{apartmentVM.saveMember()}" class="form__button" />
-                        <p:commandButton value="Abbrechen" action="#{apartmentVM.resetMember()}" class="form__button" />
+                        <p:commandButton value="Abbrechen" action="#{apartmentVM.discard()}" class="form__button" />
                     </div>
                 </h:form>
 

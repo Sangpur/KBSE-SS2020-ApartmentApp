@@ -37,11 +37,11 @@ public class MemberDetail implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "modMemberDetail")
-    @TableGenerator(name = "modMemberDetail", initialValue = 4)
+    @TableGenerator(name = "modMemberDetail", initialValue = 5)
     private Long id;
     
-    @NotNull(groups = {General.class, Condition.class}, message="Das Geburtsdatum darf nicht leer sein!")
-    @Past(groups = {General.class, Condition.class}, message="Das Geburtsdatum muss in der Vergangenheit liegen!")
+    @NotNull(groups = {Condition.class}, message="Das Geburtsdatum darf nicht leer sein!")
+    @Past(groups = {Condition.class}, message="Das Geburtsdatum muss in der Vergangenheit liegen!")
     @Temporal(TemporalType.DATE)
     private Date birthday;
     
