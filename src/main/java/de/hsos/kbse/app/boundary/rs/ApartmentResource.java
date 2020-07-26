@@ -5,7 +5,7 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.boundary.rs.DTOs.ApartmentInputDTO;
+import de.hsos.kbse.app.entity.rs.ApartmentDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.Calendar;
 import de.hsos.kbse.app.control.CashFlow;
@@ -116,7 +116,7 @@ public class ApartmentResource implements Serializable {
     }
     
     @POST
-    public Response createApartment(ApartmentInputDTO parameters) {
+    public Response createApartment(ApartmentDTO parameters) {
         System.out.println(jsonb.toJson(parameters));
         
         if(parameters.apartmentname != null){

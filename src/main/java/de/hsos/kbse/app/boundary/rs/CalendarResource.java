@@ -5,7 +5,7 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.boundary.rs.DTOs.EventInputDTO;
+import de.hsos.kbse.app.entity.rs.EventDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.Calendar;
 import de.hsos.kbse.app.control.MemberRepository;
@@ -113,7 +113,7 @@ public class CalendarResource implements Serializable {
     }
     
     @POST
-    public Response createEvent(@PathParam("apartmentId") String apartmentIdStr, EventInputDTO parameters) {
+    public Response createEvent(@PathParam("apartmentId") String apartmentIdStr, EventDTO parameters) {
         Long apartmentId;
         Long authorId;
         try {
@@ -201,7 +201,7 @@ public class CalendarResource implements Serializable {
     
     @PUT
     @Path("{id}")
-    public Response updateEvent(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, EventInputDTO parameters) {
+    public Response updateEvent(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, EventDTO parameters) {
         Long apartmentId;
         Long id;
         try {

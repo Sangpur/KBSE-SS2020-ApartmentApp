@@ -3,17 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsos.kbse.app.boundary.rs.DTOs;
+package de.hsos.kbse.app.entity.rs;
 
 /**
  *
  * @author Lucca
  */
-public class EventInputDTO {
+public class NoteDTO {
     public String id;
-    public String title;
+    public String message;
     public String authorid;
-    public String begin;
-    public String end;
     public String category;
 }

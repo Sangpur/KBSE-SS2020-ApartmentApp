@@ -5,7 +5,7 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.boundary.rs.DTOs.MemberInputDTO;
+import de.hsos.kbse.app.entity.rs.MemberDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.entity.Apartment;
@@ -109,7 +109,7 @@ public class MemberResource implements Serializable {
     }
     
     @POST
-    public Response createApartment(@PathParam("apartmentId") String apartmentIdStr, MemberInputDTO parameters) {
+    public Response createApartment(@PathParam("apartmentId") String apartmentIdStr, MemberDTO parameters) {
         Long apartmentId;
         try {
             apartmentId = Long.parseLong(apartmentIdStr);
@@ -172,7 +172,7 @@ public class MemberResource implements Serializable {
     
     @PUT
     @Path("{id}")
-    public Response updateApartment(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, MemberInputDTO parameters) {
+    public Response updateApartment(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, MemberDTO parameters) {
         Long apartmentId;
         Long memberId;
         try {

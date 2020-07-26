@@ -5,7 +5,7 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.boundary.rs.DTOs.NoteInputDTO;
+import de.hsos.kbse.app.entity.rs.NoteDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.MemberRepository;
 import de.hsos.kbse.app.control.Pinboard;
@@ -112,7 +112,7 @@ public class PinboardResource implements Serializable {
     }
     
     @POST
-    public Response createNote(@PathParam("apartmentId") String apartmentIdStr, NoteInputDTO parameters) {
+    public Response createNote(@PathParam("apartmentId") String apartmentIdStr, NoteDTO parameters) {
         Long apartmentId;
         Long authorId;
         try {
@@ -179,7 +179,7 @@ public class PinboardResource implements Serializable {
     
     @PUT
     @Path("{id}")
-    public Response updateNote(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, NoteInputDTO parameters) {
+    public Response updateNote(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, NoteDTO parameters) {
         Long apartmentId;
         Long id;
         try {

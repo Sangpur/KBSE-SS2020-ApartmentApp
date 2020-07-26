@@ -5,7 +5,7 @@
  */
 package de.hsos.kbse.app.boundary.rs;
 
-import de.hsos.kbse.app.boundary.rs.DTOs.PaymentInputDTO;
+import de.hsos.kbse.app.entity.rs.PaymentDTO;
 import de.hsos.kbse.app.control.ApartmentRepository;
 import de.hsos.kbse.app.control.CashFlow;
 import de.hsos.kbse.app.control.MemberRepository;
@@ -117,7 +117,7 @@ public class CashFlowResource implements Serializable {
     }
     
     @POST
-    public Response createPayment(@PathParam("apartmentId") String apartmentIdStr, PaymentInputDTO parameters) {
+    public Response createPayment(@PathParam("apartmentId") String apartmentIdStr, PaymentDTO parameters) {
         Long apartmentId;
         Long giverId;
         List<Long> listOfInvolvedId = new ArrayList<>();
@@ -217,7 +217,7 @@ public class CashFlowResource implements Serializable {
     
     @PUT
     @Path("{id}")
-    public Response updatePayment(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, PaymentInputDTO parameters) {
+    public Response updatePayment(@PathParam("apartmentId") String apartmentIdStr, @PathParam("id") String idStr, PaymentDTO parameters) {
         Long apartmentId;
         Long id;
         List<Long> listOfInvolvedId = new ArrayList<>();
