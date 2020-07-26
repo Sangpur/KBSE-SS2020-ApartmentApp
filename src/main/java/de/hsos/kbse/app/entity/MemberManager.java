@@ -20,5 +20,6 @@ public interface MemberManager {
     public Member findMember(Long id) throws AppException;
     public Member findMemberByName(String name)throws AppException;
     public List<Member> getAllMembersFrom(Long apartmentID) throws AppException;
+    public List<Member> getActiveMembersFrom(Long apartmentID) throws AppException;
     
 }

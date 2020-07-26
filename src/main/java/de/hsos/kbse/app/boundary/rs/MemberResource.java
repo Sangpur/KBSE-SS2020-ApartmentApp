@@ -75,7 +75,7 @@ public class MemberResource implements Serializable {
         }
         List<Member> results = null;
         try {
-            results = this.memberRepo.getAllMembersFrom(apartmentId);
+            results = this.memberRepo.getActiveMembersFrom(apartmentId);
         } catch (AppException ex) {
             Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
         }

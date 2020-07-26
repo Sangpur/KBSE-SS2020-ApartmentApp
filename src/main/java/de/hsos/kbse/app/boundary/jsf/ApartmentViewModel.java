@@ -77,6 +77,7 @@ public class ApartmentViewModel implements Serializable {
         this.memberRoles = MemberRole.values();
         this.initLoggedInMember();
         this.initApartmentByID(this.loggedInMember.getApartmentID());
+        this.initMemberList();
     }
     
     public boolean checkAccessRights(Member member) {
@@ -151,6 +152,7 @@ public class ApartmentViewModel implements Serializable {
              * auf true gesetzt. So wird verhindert, dass ein kaskadierendes Loeschen von Eintraegen notwendig
              * ist und von dem Mitglied erstellte Beitraege erhalten bleiben. */
             this.currentMember.setDeleted(true);
+            this.currentMember.getDetails().setCashBalance(BigDecimal.ZERO);
             this.memberRepository.updateMember(this.currentMember);
             /* Entfernen des Members aus der Members-List */
             this.members.remove(this.currentMember);
@@ -169,6 +171,7 @@ public class ApartmentViewModel implements Serializable {
             /* Das gerade eingeloggte Mitglied wird beim Loeschen ebenfalls mit dem Status "deleted = true"
              * geupdatet und danach automatisch ausgeloggt. */
             this.loggedInMember.setDeleted(true);
+            this.loggedInMember.getDetails().setCashBalance(BigDecimal.ZERO);
             this.memberRepository.updateMember(this.loggedInMember);
             this.members.remove(this.loggedInMember);
             this.resetApplicationAfterDelete();
@@ -296,7 +299,16 @@ public class ApartmentViewModel implements Serializable {
     private void initApartmentByID(Long id) {
         try {
             this.apartment = this.repository.findApartment(id);
-            this.members = this.memberRepository.getAllMembersFrom(id);
+        } catch(AppException ex) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
+            facesContext.addMessage("Error",msg);
+        }
+    }
+    
+    private void initMemberList() {
+        try {
+            this.members = this.memberRepository.getActiveMembersFrom(this.apartment.getId());
         } catch(AppException ex) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.", ex.getMessage());
@@ -353,6 +365,7 @@ public class ApartmentViewModel implements Serializable {
     /* -------------------------------------- GETTER AND SETTER ------------------------------------ */
 
     public List<Member> getMembers() {
+        this.initMemberList();
         return members;
     }
 

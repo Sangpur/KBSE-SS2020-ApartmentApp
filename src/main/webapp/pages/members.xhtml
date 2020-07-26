@@ -62,10 +62,12 @@
                                 <!-- Loeschen eines anderen Members -->
                                 <p:commandButton action="#{apartmentVM.deleteMember(member)}" icon="pi pi-trash" class="form__button" update="member__list" rendered="#{!apartmentVM.isLoggedInMember(member)}">
                                     <p:confirm header="Löschen des Mitglieds" message="Soll das Mitglied wirklich gelöscht werden?" icon="pi pi-exclamation-triangle" />
+                                    <f:actionListener binding="#{cashflowVM.compensateBalance(member)}"/>
                                 </p:commandButton>
                                 <!-- Loeschen des eingeloggten Members -->
                                 <p:commandButton action="#{apartmentVM.deleteLoggedInMember()}" icon="pi pi-trash" class="form__button" rendered="#{apartmentVM.isLoggedInNotLastMember(member)}">
                                     <p:confirm header="Löschen des Mitglieds" message="Soll das Mitglied wirklich gelöscht werden?" icon="pi pi-exclamation-triangle" />
+                                    <f:actionListener binding="#{cashflowVM.compensateBalance(member)}"/>
                                 </p:commandButton>
                                 <!-- Loeschen des letzten Mitglieds und damit kaskadierendes Loeschen der gesamten WG-->
                                 <p:commandButton action="#{apartmentVM.deleteApartment()}" icon="pi pi-trash" class="form__button" rendered="#{apartmentVM.isLoggedInAndLastMember(member)}">

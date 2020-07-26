@@ -99,9 +99,23 @@ public class MemberRepository implements MemberManager, Serializable {
         }
         return member;
     }
-
+    
     @Override
     public List<Member> getAllMembersFrom(Long apartmentID) throws AppException {
+        try {
+            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id";
+            TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
+            querySelect.setParameter("id", apartmentID);
+            List<Member> results = querySelect.getResultList();
+            return results;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            throw new AppException("Mitglieder der WG "+ apartmentID +" konnten nicht gefunden werden!");
+        }
+    }
+
+    @Override
+    public List<Member> getActiveMembersFrom(Long apartmentID) throws AppException {
         try {
             String str = "SELECT m FROM Members m WHERE m.apartmentID = :id AND m.deleted = :deleted";
             TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
@@ -117,18 +131,8 @@ public class MemberRepository implements MemberManager, Serializable {
     
     @Override
     public void deleteAllMembersFrom(Long apartmentID) throws AppException {
-        List<Member> members;
+        List<Member> members = this.getAllMembersFrom(apartmentID);
         List<Long> listMemberDetails = new ArrayList();
-        /* Abruf aller Member-Objekte aus der Datenbank, inklusive der als geloescht markierten Mitglieder */
-        try {
-            String str = "SELECT m FROM Members m WHERE m.apartmentID = :id";
-            TypedQuery<Member> querySelect = em.createQuery(str, Member.class);
-            querySelect.setParameter("id", apartmentID);
-            members = querySelect.getResultList();
-        } catch(Exception ex) {
-            ex.printStackTrace();
-            throw new AppException("Mitglieder der WG "+ apartmentID +" konnten nicht gefunden werden!");
-        }
         /* Loeschen aller zur WG gehoerigen Mitglieder */
         try {
             String str = "DELETE FROM Members m WHERE m.apartmentID = :id";
