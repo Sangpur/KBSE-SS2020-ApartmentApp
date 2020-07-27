@@ -418,6 +418,24 @@ body .registration .form__button:hover, body .registration .form__button:focus {
     width: 8em;
 }
 
+body .ui-panel .ui-panel-content {
+    border: none;
+    padding: 0;
+    line-height: inherit;
+}
+
+.ui-panel .ui-panel-content {
+    padding: 0;
+    font-size: 16px !important;
+}
+
+/* Radio */
+
+body .ui-radiobutton .ui-radiobutton-box.ui-state-active {
+    border-color: #43d7a6;
+    background-color: #43d7a6;
+}
+
 /* Select */
 
 .input__select .ui-selectonemenu {

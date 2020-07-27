@@ -8,6 +8,7 @@ import de.hsos.kbse.app.entity.Member;
 import de.hsos.kbse.app.enums.EventCategory;
 import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
+import de.hsos.kbse.app.util.Specific;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -47,9 +48,9 @@ public class Event implements Serializable, Comparable<Event> {
     @TableGenerator(name = "modEvent", initialValue = 5)
     private Long id;
     
-    @NotNull(groups = {General.class, Condition.class}, message="Der Titel darf nicht leer sein!")
-    @Size(groups = {General.class, Condition.class}, min=3, max=50, message="Der Titel muss zwischen 3 und 50 Zeichen liegen!")
-    @Pattern(groups = {General.class, Condition.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Der Titel enthält ungültige Bezeichner!")
+    @NotNull(groups = {General.class, Condition.class, Specific.class}, message="Der Titel darf nicht leer sein!")
+    @Size(groups = {General.class, Condition.class, Specific.class}, min=3, max=50, message="Der Titel muss zwischen 3 und 50 Zeichen liegen!")
+    @Pattern(groups = {General.class, Condition.class, Specific.class}, regexp = "^[0-9A-Za-zäÄöÖüÜß\\-\\.\\s]+$", message="Der Titel enthält ungültige Bezeichner!")
     private String title;
     
     @OneToOne(cascade = CascadeType.MERGE)
@@ -63,6 +64,8 @@ public class Event implements Serializable, Comparable<Event> {
     
     @NotNull(groups = {General.class, Condition.class}, message="Das Ende muss gesetzt werden!")
     @Future(groups = {General.class, Condition.class}, message="Das Ende muss in der Zukunft liegen!")
+    @NotNull(groups = {Specific.class}, message="Das Datum muss gesetzt werden!")
+    @FutureOrPresent(groups = {Specific.class}, message="Das Datum muss in der Zukunft liegen!")
     @Column(name="datetime_end")
     @Temporal(TemporalType.TIMESTAMP)
     private Date end;

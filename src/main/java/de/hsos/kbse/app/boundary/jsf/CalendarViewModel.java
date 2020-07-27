@@ -16,6 +16,7 @@ import de.hsos.kbse.app.util.AppException;
 import de.hsos.kbse.app.util.Condition;
 import de.hsos.kbse.app.util.General;
 import de.hsos.kbse.app.util.Logable;
+import de.hsos.kbse.app.util.Specific;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -167,12 +168,18 @@ public class CalendarViewModel implements Serializable {
     
     @Logable(LogLevel.INFO)
     public String saveEvent(){
-        if(this.isIsWholeDay()){
+        if(this.isIsWholeDay()) {
             this.currentEvent.setAllDayEvent(this.isIsWholeDay());
             this.currentEvent.setBegin(this.currentEvent.getEnd());
         }
         if(this.addEvent ){ // Neues Event
-            if(this.validateInput(ValidationGroup.GENERAL)) { // Gültige Eingabe
+            boolean valid;
+            if(this.isIsWholeDay()) {
+                valid = this.validateInput(ValidationGroup.SPECIFIC);
+            } else {
+                valid = this.validateInput(ValidationGroup.GENERAL);
+            }
+            if(valid) { // Gültige Eingabe
                 try {
                     /* Neues Event-Objekt der Datenbank hinzufügen */
                     this.calendar.createEvent(currentEvent);
@@ -188,8 +195,10 @@ public class CalendarViewModel implements Serializable {
             }
         } else if(this.editEvent){ // Bestehendes Event bearbeiten
             boolean valid;
-            if(this.originalEvent.getBegin().before(new Date())) {
+            if(this.originalEvent.getBegin().before(new Date()) || this.isWholeDay) {
                 valid = this.validateInput(ValidationGroup.CONDITION);
+            } else if(this.isIsWholeDay()) {
+                valid = this.validateInput(ValidationGroup.SPECIFIC);
             } else {
                 valid = this.validateInput(ValidationGroup.GENERAL);
             }
@@ -358,6 +367,8 @@ public class CalendarViewModel implements Serializable {
             constraintViolations = validator.validate( this.currentEvent, General.class );
         } else if(group == ValidationGroup.CONDITION) {
             constraintViolations = validator.validate( this.currentEvent, Condition.class );
+        } else if(group == ValidationGroup.SPECIFIC) {
+            constraintViolations = validator.validate( this.currentEvent, Specific.class );
         }
 
         if(constraintViolations != null && constraintViolations.isEmpty()) {
