@@ -261,15 +261,15 @@ public class MemberResource implements Serializable {
         }
         if(m != null){
             if(m.getApartmentID().equals(apartmentId)){
-                return Response.status(500, "Missing Implementation of Member.delteted Attribute").build();
-                //m.setDeleted(true);
-                //try {
-                //    this.memberRepo.updateMember(m);
-                //    return Response.ok().build();
-                //} catch (AppException ex) {
-                //    Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
-                //    return Response.status(500, "Server Error: Failure while trying to mark member as deleted").build();
-                //}
+                
+                m.setDeleted(true);
+                try {
+                    this.memberRepo.updateMember(m);
+                    return Response.ok().build();
+                } catch (AppException ex) {
+                    Logger.getLogger(MemberResource.class.getName()).log(Level.SEVERE, null, ex);
+                    return Response.status(500, "Server Error: Failure while trying to mark member as deleted").build();
+                }
             }
         }
         return Response.status(400, "Bad Request:  No member found for this id").build();
