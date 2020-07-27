@@ -392,7 +392,11 @@ public class CashFlowViewModel implements Serializable {
              * ebenfalls in der Liste der involvierten Mitgiedern befindet, wird in der folgenden 
              * Schleife der Betrag, den er dementsprechend nur fuer sich bezahlt hat, 
              * von seiner Cashbalance angezogen. */
-            amountMembers = this.currentPayment.getInvolvedMembers().size();
+            if(this.editPayment) {
+                amountMembers = this.currentPayment.getInvolvedMembers().size();
+            } else {
+                amountMembers = payment.getInvolvedMembers().size();
+            }
             involvedMembers.clear();
             for(int i = 0; i < amountMembers; i++) {
                 Long tempID = payment.getInvolvedMembers().get(i).getId();
