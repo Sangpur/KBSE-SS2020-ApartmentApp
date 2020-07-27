@@ -10,6 +10,6 @@ package de.hsos.kbse.app.enums;
  */
 public enum ValidationGroup {
     
-    GENERAL, CONDITION
+    GENERAL, CONDITION, SPECIFIC
     
 }
