@@ -226,6 +226,7 @@ public class CashFlowViewModel implements Serializable {
     public void compensateBalance(Member deletedMember) {
         /* Falls ein Mitglied aus der WG entfernt wird, muss dessen Barguthaben noch herausgerechnet werden,
          * sofern es nicht einen Wert von 0.0 hat. */
+	this.initMemberList();
         BigDecimal balanceToCompensate = deletedMember.getDetails().getCashBalance();
         /* Erstellen einer Liste der aktiven Mitglieder der WG, da diese entweder die Rueckzahlung erhalten
          * oder leisten muessen. */
