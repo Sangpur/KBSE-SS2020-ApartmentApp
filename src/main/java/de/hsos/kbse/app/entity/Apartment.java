@@ -5,6 +5,7 @@
 package de.hsos.kbse.app.entity;
 
 import de.hsos.kbse.app.util.Condition;
+import de.hsos.kbse.app.util.General;
 import java.io.Serializable;
 import javax.enterprise.inject.Vetoed;
 import javax.persistence.Entity;
