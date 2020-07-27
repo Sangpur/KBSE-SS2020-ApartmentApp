@@ -338,7 +338,10 @@ public class CashFlowViewModel implements Serializable {
          * moeglicherweise nicht auf dem aktuellen Stand bzgl. der CashBalance sind. */
         Member giver = this.findMemberByID(payment.getGiver().getId());
         int amountMembers = payment.getInvolvedMembers().size();
-        int amountMembersOriginal = this.originalPayment.getInvolvedMembers().size();
+        int amountMembersOriginal = 0;
+        if(this.editPayment) {
+            amountMembersOriginal = this.originalPayment.getInvolvedMembers().size();
+        }
         List<Member> involvedMembers = new ArrayList();
         for(int i = 0; i < amountMembers; i++) {
             Long tempID = payment.getInvolvedMembers().get(i).getId();
@@ -389,8 +392,15 @@ public class CashFlowViewModel implements Serializable {
              * ebenfalls in der Liste der involvierten Mitgiedern befindet, wird in der folgenden 
              * Schleife der Betrag, den er dementsprechend nur fuer sich bezahlt hat, 
              * von seiner Cashbalance angezogen. */
-            giver.getDetails().addCashBalance(balanceTotal);
+            amountMembers = this.currentPayment.getInvolvedMembers().size();
+            involvedMembers.clear();
             for(int i = 0; i < amountMembers; i++) {
+                Long tempID = payment.getInvolvedMembers().get(i).getId();
+                Member tempMember = this.findMemberByID(tempID);
+                involvedMembers.add(tempMember);
+            }
+            giver.getDetails().addCashBalance(balanceTotal);
+            for(int i = 0; i < involvedMembers.size(); i++) {
                 Member tempMember = involvedMembers.get(i);
                 tempMember.getDetails().subtractCashBalance(balancePerMember);
                 if(tempMember.getId().equals(giver.getId())) {
